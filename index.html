@@ -760,23 +760,15 @@
             }
         }
 
-        // Back button
-        document.getElementById('post-back-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            showBlogList();
-        });
-
         document.addEventListener('DOMContentLoaded', function() {
-            // Init blog
-            renderBlogList();
-            handleBlogRoute();
-
-            // ======== Navbar ========
-            const nav = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
-            });
-
+            // Back button
+            var backBtn = document.getElementById('post-back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showBlogList();
+                });
+            }
             // ======== Reveal on scroll ========
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -785,6 +777,16 @@
                     }
                 });
             }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+            // Init blog (must be after revealObserver is defined)
+            renderBlogList();
+            handleBlogRoute();
+
+            // ======== Navbar ========
+            const nav = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+            });
 
             document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
