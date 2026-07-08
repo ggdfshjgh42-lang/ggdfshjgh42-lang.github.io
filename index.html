@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="奥斯拖拉机斯基 - 个人主页">
+    <meta name="description" content="奥斯拖拉机斯基 - 博客与小游戏">
     <title>奥斯拖拉机斯基 | Fantastic Matrix</title>
     <style>
         :root {
@@ -35,6 +35,7 @@
             color: var(--text);
             line-height: 1.75;
             overflow-x: hidden;
+            padding-top: 72px;
         }
 
         /* ---- Nav ---- */
@@ -44,14 +45,10 @@
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(250, 250, 250, 0.8);
+            background: rgba(250, 250, 250, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.3s;
-        }
-        nav.scrolled {
-            border-bottom-color: var(--border);
+            border-bottom: 1px solid var(--border);
         }
         .nav-inner {
             max-width: 800px;
@@ -92,84 +89,7 @@
         }
 
         section {
-            padding: 120px 0;
-        }
-
-        /* ---- Hero ---- */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding-top: 72px;
-        }
-        .hero .container {
-            width: 100%;
-        }
-        .hero-greeting {
-            font-size: 15px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fadeUp 0.6s ease forwards;
-        }
-        .hero-name {
-            font-size: 56px;
-            font-weight: 800;
-            letter-spacing: -2px;
-            line-height: 1.15;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeUp 0.6s 0.15s ease forwards;
-        }
-        .hero-subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 480px;
-            opacity: 0;
-            animation: fadeUp 0.6s 0.3s ease forwards;
-        }
-        .hero-scroll {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            animation: fadeUp 0.6s 0.6s ease forwards, bounce 2s 1.2s infinite;
-        }
-        .hero-scroll span {
-            display: block;
-            width: 24px;
-            height: 40px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            position: relative;
-        }
-        .hero-scroll span::after {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 8px;
-            background: var(--text-secondary);
-            border-radius: 2px;
-            animation: scrollDot 1.5s infinite;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50%      { transform: translateX(-50%) translateY(8px); }
-        }
-        @keyframes scrollDot {
-            0%   { top: 8px; opacity: 1; }
-            100% { top: 24px; opacity: 0; }
+            padding: 80px 0 40px;
         }
 
         /* ---- Section Titles ---- */
@@ -187,53 +107,6 @@
             letter-spacing: -1px;
             margin-bottom: 32px;
             line-height: 1.3;
-        }
-
-        /* ---- About ---- */
-        .about-text {
-            font-size: 17px;
-            color: var(--text-secondary);
-            max-width: 560px;
-        }
-        .about-highlight {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        /* ---- Interests ---- */
-        .interests-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 16px;
-        }
-        .interest-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 40px 28px;
-            text-align: center;
-            transition: transform 0.25s, box-shadow 0.25s;
-            cursor: default;
-        }
-        .interest-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
-        }
-        .interest-icon {
-            font-size: 40px;
-            margin-bottom: 16px;
-            display: block;
-        }
-        .interest-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .interest-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
         }
 
         /* ======== Blog ======== */
@@ -294,9 +167,6 @@
         #blog-post.active {
             display: block;
         }
-        .post-header {
-            margin-bottom: 40px;
-        }
         .post-back {
             display: inline-flex;
             align-items: center;
@@ -324,6 +194,7 @@
             display: flex;
             gap: 16px;
             align-items: center;
+            margin-bottom: 40px;
         }
         .post-body {
             font-size: 17px;
@@ -356,89 +227,27 @@
             display: none;
         }
 
-        /* ======== Guestbook ======== */
-        .giscus-wrapper {
-            margin-top: 8px;
-        }
-        .guestbook-notice {
-            background: #fffbe6;
-            border: 1px solid #ffe58f;
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            font-size: 14px;
-            color: #8c6d00;
-            line-height: 1.8;
-            margin-bottom: 24px;
-        }
-        .guestbook-notice code {
-            background: rgba(0,0,0,0.06);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        /* ---- Contact ---- */
-        .contact-links {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-        .contact-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            text-decoration: none;
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 500;
-            background: var(--surface);
-            transition: all 0.2s;
-        }
-        .contact-link:hover {
-            border-color: var(--text);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-        }
-        .contact-link-icon {
-            font-size: 20px;
-        }
-
         /* ---- Footer ---- */
         footer {
             border-top: 1px solid var(--border);
             padding: 32px 0;
             text-align: center;
+            margin-top: 40px;
         }
         footer p {
             font-size: 13px;
             color: var(--text-secondary);
         }
 
-        /* ---- Fade-in on scroll ---- */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         /* ---- Responsive ---- */
         @media (max-width: 640px) {
-            .hero-name { font-size: 38px; letter-spacing: -1px; }
-            .hero-subtitle { font-size: 16px; }
-            .interests-grid { grid-template-columns: 1fr; }
-            section { padding: 80px 0; }
+            section { padding: 60px 0 30px; }
             .nav-links { gap: 16px; }
             .nav-links a { font-size: 13px; }
             .post-title { font-size: 28px; }
             .blog-card-title { font-size: 18px; }
             .blog-card { padding: 24px; }
+            .section-title { font-size: 26px; }
         }
     </style>
 </head>
@@ -447,95 +256,26 @@
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-inner">
-            <a href="#" class="nav-logo">FM</a>
+            <a href="/" class="nav-logo">奥斯拖拉机斯基</a>
             <ul class="nav-links">
-                <li><a href="#about">关于</a></li>
-                <li><a href="#interests">爱好</a></li>
-                <li><a href="#blog">博客</a></li>
-                <li><a href="#guestbook">留言</a></li>
+                <li><a href="/">博客</a></li>
                 <li><a href="gomoku.html">小游戏</a></li>
-                <li><a href="#contact">联系</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="container">
-            <p class="hero-greeting">Hi，你好</p>
-            <h1 class="hero-name">奥斯拖拉机斯基</h1>
-            <p class="hero-subtitle">
-                一个在路上的学生。<br>
-                对世界保持好奇，用心感受生活的每个瞬间。
-            </p>
-            <div class="hero-scroll">
-                <span></span>
-            </div>
-        </div>
-    </section>
-
-    <!-- About -->
-    <section id="about">
-        <div class="container">
-            <div class="reveal">
-                <p class="section-label">关于我</p>
-                <h2 class="section-title">保持简单，保持真实</h2>
-                <p class="about-text">
-                    我是<span class="about-highlight">奥斯拖拉机斯基</span>，一名学生。
-                    我相信<span class="about-highlight">好奇心</span>是最好的老师，
-                    每一本书、每一次快门、每一个美好的瞬间，都是在学习如何更好地生活。
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Interests -->
-    <section id="interests" style="padding-top: 0;">
-        <div class="container">
-            <div class="reveal">
-                <p class="section-label">爱好</p>
-                <h2 class="section-title">我所热爱的</h2>
-            </div>
-            <div class="interests-grid">
-                <div class="interest-card reveal">
-                    <span class="interest-icon">📚</span>
-                    <h3 class="interest-name">读书</h3>
-                    <p class="interest-desc">
-                        在字里行间探索世界，与伟大的灵魂对话。阅读让独处变得充实而有趣。
-                    </p>
-                </div>
-                <div class="interest-card reveal">
-                    <span class="interest-icon">📷</span>
-                    <h3 class="interest-name">摄影</h3>
-                    <p class="interest-desc">
-                        用镜头捕捉光和影的舞蹈。按下快门的瞬间，时间便有了形状。
-                    </p>
-                </div>
-                <div class="interest-card reveal">
-                    <span class="interest-icon">✨</span>
-                    <h3 class="interest-name">欣赏美好</h3>
-                    <p class="interest-desc">
-                        无论是街头的一道风景，还是生活中的意外之美。发现美好本身就是一种能力。
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Blog -->
-    <section id="blog" style="padding-top: 0;">
+    <section id="blog">
         <div class="container">
-            <div class="reveal">
-                <p class="section-label">博客</p>
-                <h2 class="section-title">随便写写</h2>
-            </div>
+            <p class="section-label">博客</p>
+            <h2 class="section-title">随便写写</h2>
 
             <!-- Blog List -->
             <div id="blog-list" class="blog-list"></div>
 
             <!-- Blog Post (hidden by default) -->
             <div id="blog-post">
-                <a href="#blog" class="post-back" id="post-back-btn">&larr; 返回博客列表</a>
+                <a href="/" class="post-back" id="post-back-btn">&larr; 返回博客列表</a>
                 <div class="post-header">
                     <h1 class="post-title" id="post-title"></h1>
                     <div class="post-meta">
@@ -546,50 +286,7 @@
                 </div>
                 <div class="post-body" id="post-body"></div>
                 <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border);">
-                    <a href="#blog" class="post-back">&larr; 返回博客列表</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Guestbook -->
-    <section id="guestbook" style="padding-top: 0;">
-        <div class="container">
-            <div class="reveal">
-                <p class="section-label">留言板</p>
-                <h2 class="section-title">留下你的足迹</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 15px;">
-                    想说点什么？签个到、提建议、或者单纯打个招呼都可以 👋
-                </p>
-            </div>
-
-            <div class="guestbook-notice reveal">
-                <strong>留言功能需要你完成两步设置（2 分钟）：</strong><br>
-                1. 在 <a href="https://github.com/ggdfshjgh42-lang/ggdfshjgh42-lang.github.io/settings" target="_blank" rel="noopener" style="color: #8c6d00;">仓库设置 &rarr; Features</a> 中勾选 <code>Discussions</code><br>
-                2. 访问 <a href="https://github.com/apps/giscus" target="_blank" rel="noopener" style="color: #8c6d00;">github.com/apps/giscus</a>，点击 <code>Install</code>，选择此仓库<br><br>
-                完成后刷新本页面即可看到留言板。留言会自动保存到 GitHub Discussions 中。
-            </div>
-
-            <div class="giscus-wrapper reveal" id="giscus-container"></div>
-        </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" style="padding-top: 0;">
-        <div class="container">
-            <div class="reveal">
-                <p class="section-label">联系我</p>
-                <h2 class="section-title">来打个招呼吧</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 28px; font-size: 15px;">
-                    欢迎随时联系交流，虽然我可能在上课 😄
-                </p>
-                <div class="contact-links">
-                    <a href="mailto:hello@fantasticmatrix.xyz" class="contact-link">
-                        <span class="contact-link-icon">✉️</span> hello@fantasticmatrix.xyz
-                    </a>
-                    <a href="https://github.com/ggdfshjgh42-lang" target="_blank" rel="noopener" class="contact-link">
-                        <span class="contact-link-icon">🐙</span> GitHub
-                    </a>
+                    <a href="/" class="post-back">&larr; 返回博客列表</a>
                 </div>
             </div>
         </div>
@@ -598,7 +295,7 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2026 fantasticmatrix.xyz &mdash; 奥斯拖拉机斯基</p>
+            <p>&copy; 2026 fantasticmatrix.xyz — 奥斯拖拉机斯基</p>
         </div>
     </footer>
 
@@ -707,17 +404,16 @@
 
         // ======== Blog Rendering ========
         function showBlogList() {
-            document.getElementById('blog-list').classList.remove('hidden');
-            document.getElementById('blog-post').classList.remove('active');
-            window.location.hash = 'blog';
+            var list = document.getElementById('blog-list');
+            var post = document.getElementById('blog-post');
+            if (list) list.classList.remove('hidden');
+            if (post) post.classList.remove('active');
+            window.location.hash = '';
         }
 
         function showBlogPost(postId) {
-            const post = posts.find(p => p.id === postId || p.slug === postId);
-            if (!post) {
-                showBlogList();
-                return;
-            }
+            var post = posts.find(function(p) { return p.id === postId || p.slug === postId; });
+            if (!post) { showBlogList(); return; }
 
             document.getElementById('blog-list').classList.add('hidden');
             document.getElementById('blog-post').classList.add('active');
@@ -732,34 +428,30 @@
         }
 
         function renderBlogList() {
-            const container = document.getElementById('blog-list');
+            var container = document.getElementById('blog-list');
             if (!container) return;
-            container.innerHTML = posts.map(post => `
-                <div class="blog-card reveal" onclick="showBlogPost('${post.slug}')">
-                    <div class="blog-card-date">${post.date}</div>
-                    <h3 class="blog-card-title">${post.title}</h3>
-                    <p class="blog-card-excerpt">${post.excerpt}</p>
-                    <div class="blog-card-tags">
-                        ${post.tags.map(t => `<span class="blog-tag">${t}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-
-            // Re-observe new reveal elements
-            document.querySelectorAll('#blog-list .reveal').forEach(el => revealObserver.observe(el));
+            container.innerHTML = posts.map(function(post) {
+                return '<div class="blog-card" onclick="showBlogPost(\'' + post.slug + '\')">' +
+                    '<div class="blog-card-date">' + post.date + '</div>' +
+                    '<h3 class="blog-card-title">' + post.title + '</h3>' +
+                    '<p class="blog-card-excerpt">' + post.excerpt + '</p>' +
+                    '<div class="blog-card-tags">' +
+                        post.tags.map(function(t) { return '<span class="blog-tag">' + t + '</span>'; }).join('') +
+                    '</div>' +
+                '</div>';
+            }).join('');
         }
 
         function handleBlogRoute() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#post-')) {
-                const slug = hash.replace('#post-', '');
-                const post = posts.find(p => p.slug === slug);
-                if (post) {
-                    showBlogPost(post.id);
-                }
+            var hash = window.location.hash;
+            if (hash.indexOf('#post-') === 0) {
+                var slug = hash.replace('#post-', '');
+                var post = posts.find(function(p) { return p.slug === slug; });
+                if (post) showBlogPost(post.id);
             }
         }
 
+        // Init when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             // Back button
             var backBtn = document.getElementById('post-back-btn');
@@ -769,61 +461,11 @@
                     showBlogList();
                 });
             }
-            // ======== Reveal on scroll ========
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-            // Init blog (must be after revealObserver is defined)
+            // Render blog
             renderBlogList();
             handleBlogRoute();
-
-            // ======== Navbar ========
-            const nav = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
-            });
-
-            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-            // Hide hero scroll indicator on scroll
-            const heroScroll = document.querySelector('.hero-scroll');
-            window.addEventListener('scroll', () => {
-                if (heroScroll) {
-                    heroScroll.style.opacity = window.scrollY > 100 ? '0' : '';
-                }
-            });
-
-            // ======== Giscus Guestbook ========
-            loadGiscus();
         });
-
-        // ======== Giscus Guestbook ========
-        function loadGiscus() {
-            var container = document.getElementById('giscus-container');
-            if (!container) return;
-            var script = document.createElement('script');
-            script.src = 'https://giscus.app/client.js';
-            script.setAttribute('data-repo', 'ggdfshjgh42-lang/ggdfshjgh42-lang.github.io');
-            script.setAttribute('data-repo-id', 'R_kgDOSt35nQ');
-            script.setAttribute('data-category', 'Guestbook');
-            script.setAttribute('data-category-id', 'PLACEHOLDER_NEEDS_SETUP');
-            script.setAttribute('data-mapping', 'pathname');
-            script.setAttribute('data-strict', '0');
-            script.setAttribute('data-reactions-enabled', '1');
-            script.setAttribute('data-emit-metadata', '0');
-            script.setAttribute('data-input-position', 'top');
-            script.setAttribute('data-theme', 'light');
-            script.setAttribute('data-lang', 'zh-CN');
-            script.setAttribute('crossorigin', 'anonymous');
-            script.async = true;
-            container.innerHTML = '';
-            container.appendChild(script);
-        }
     </script>
 </body>
 </html>
