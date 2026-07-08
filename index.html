@@ -11,9 +11,11 @@
             --surface: #ffffff;
             --text: #1a1a1a;
             --text-secondary: #6b6b6b;
+            --text-muted: #999;
             --accent: #2d2d2d;
             --border: #ebebeb;
             --radius: 12px;
+            --radius-sm: 8px;
         }
 
         * {
@@ -234,6 +236,147 @@
             line-height: 1.6;
         }
 
+        /* ======== Blog ======== */
+        .blog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .blog-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            cursor: pointer;
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        }
+        .blog-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border-color: var(--text);
+        }
+        .blog-card-date {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .blog-card-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            line-height: 1.4;
+        }
+        .blog-card-excerpt {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .blog-card-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .blog-tag {
+            font-size: 12px;
+            padding: 4px 12px;
+            background: #f3f3f3;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Blog Post View */
+        #blog-post {
+            display: none;
+        }
+        #blog-post.active {
+            display: block;
+        }
+        .post-header {
+            margin-bottom: 40px;
+        }
+        .post-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 24px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .post-back:hover {
+            color: var(--text);
+        }
+        .post-title {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+        .post-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .post-body {
+            font-size: 17px;
+            line-height: 2;
+            color: var(--text);
+        }
+        .post-body h3 {
+            font-size: 22px;
+            margin: 40px 0 16px;
+            font-weight: 700;
+        }
+        .post-body p {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .post-body blockquote {
+            border-left: 3px solid var(--border);
+            padding-left: 20px;
+            margin: 24px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .post-body img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            margin: 24px 0;
+        }
+
+        #blog-list.hidden {
+            display: none;
+        }
+
+        /* ======== Guestbook ======== */
+        .giscus-wrapper {
+            margin-top: 8px;
+        }
+        .guestbook-notice {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            font-size: 14px;
+            color: #8c6d00;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        .guestbook-notice code {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
         /* ---- Contact ---- */
         .contact-links {
             display: flex;
@@ -293,6 +436,9 @@
             section { padding: 80px 0; }
             .nav-links { gap: 16px; }
             .nav-links a { font-size: 13px; }
+            .post-title { font-size: 28px; }
+            .blog-card-title { font-size: 18px; }
+            .blog-card { padding: 24px; }
         }
     </style>
 </head>
@@ -305,6 +451,8 @@
             <ul class="nav-links">
                 <li><a href="#about">关于</a></li>
                 <li><a href="#interests">爱好</a></li>
+                <li><a href="#blog">博客</a></li>
+                <li><a href="#guestbook">留言</a></li>
                 <li><a href="#contact">联系</a></li>
             </ul>
         </div>
@@ -373,6 +521,58 @@
         </div>
     </section>
 
+    <!-- Blog -->
+    <section id="blog" style="padding-top: 0;">
+        <div class="container">
+            <div class="reveal">
+                <p class="section-label">博客</p>
+                <h2 class="section-title">随便写写</h2>
+            </div>
+
+            <!-- Blog List -->
+            <div id="blog-list" class="blog-list"></div>
+
+            <!-- Blog Post (hidden by default) -->
+            <div id="blog-post">
+                <a href="#blog" class="post-back" id="post-back-btn">&larr; 返回博客列表</a>
+                <div class="post-header">
+                    <h1 class="post-title" id="post-title"></h1>
+                    <div class="post-meta">
+                        <span id="post-date"></span>
+                        <span>·</span>
+                        <span id="post-tags-display"></span>
+                    </div>
+                </div>
+                <div class="post-body" id="post-body"></div>
+                <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border);">
+                    <a href="#blog" class="post-back">&larr; 返回博客列表</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Guestbook -->
+    <section id="guestbook" style="padding-top: 0;">
+        <div class="container">
+            <div class="reveal">
+                <p class="section-label">留言板</p>
+                <h2 class="section-title">留下你的足迹</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 15px;">
+                    想说点什么？签个到、提建议、或者单纯打个招呼都可以 👋
+                </p>
+            </div>
+
+            <div class="guestbook-notice reveal">
+                <strong>留言功能需要你完成两步设置（2 分钟）：</strong><br>
+                1. 在 <a href="https://github.com/ggdfshjgh42-lang/ggdfshjgh42-lang.github.io/settings" target="_blank" rel="noopener" style="color: #8c6d00;">仓库设置 &rarr; Features</a> 中勾选 <code>Discussions</code><br>
+                2. 访问 <a href="https://github.com/apps/giscus" target="_blank" rel="noopener" style="color: #8c6d00;">github.com/apps/giscus</a>，点击 <code>Install</code>，选择此仓库<br><br>
+                完成后刷新本页面即可看到留言板。留言会自动保存到 GitHub Discussions 中。
+            </div>
+
+            <div class="giscus-wrapper reveal" id="giscus-container"></div>
+        </div>
+    </section>
+
     <!-- Contact -->
     <section id="contact" style="padding-top: 0;">
         <div class="container">
@@ -386,7 +586,7 @@
                     <a href="mailto:hello@fantasticmatrix.xyz" class="contact-link">
                         <span class="contact-link-icon">✉️</span> hello@fantasticmatrix.xyz
                     </a>
-                    <a href="https://github.com" target="_blank" rel="noopener" class="contact-link">
+                    <a href="https://github.com/ggdfshjgh42-lang" target="_blank" rel="noopener" class="contact-link">
                         <span class="contact-link-icon">🐙</span> GitHub
                     </a>
                 </div>
@@ -402,14 +602,163 @@
     </footer>
 
     <script>
-        // Navbar scroll effect
+        // ======== Blog Data ========
+        const posts = [
+            {
+                id: 1,
+                slug: 'why-we-read',
+                title: '我们为什么要读书',
+                date: '2026-07-05',
+                excerpt: '读书不是为了记住什么，而是为了在某个不确定的瞬间，发现自己原来可以这样理解世界。',
+                tags: ['读书', '随笔'],
+                body: `<p>小时候被逼着读书，大了反而自己想读。这件事本身就很有意思。</p>
+
+<p>我觉得读书最好的状态不是"我要读完这本书"，而是"这本书刚好在我手边"。没有压力、没有 deadline，翻开哪页算哪页。有时候一页能让人想一下午。</p>
+
+<h3>读书不是输入，是对话</h3>
+
+<p>很多人把读书当成一种"输入"——获取知识、积累素材。但我越来越觉得，读书更像一场对话。你在读的时候，其实是在和作者争论、共鸣、质疑。</p>
+
+<blockquote>一本好书就像一面镜子，你读到的不只是作者的想法，更多的是你自己的投射。</blockquote>
+
+<p>有时候读完一本书，记住的不是具体内容，而是一种感觉。那种"原来还可以这样想"的瞬间，就是阅读最珍贵的部分。</p>
+
+<h3>读得慢一点</h3>
+
+<p>我以前也有"一年读 50 本书"的野心，后来放弃了。不是因为读不完，而是觉得没必要。一本好书反复读三遍，比匆匆翻过三本新书要有意义得多。</p>
+
+<p>现在我们被训练成快速消费信息的机器——刷短视频、刷微博、刷朋友圈。但有些东西天生就是慢的：一首好诗、一本好小说、一个需要琢磨的观点。</p>
+
+<p>慢下来，反而读得更多了。</p>`
+            },
+            {
+                id: 2,
+                slug: 'camera-and-eye',
+                title: '摄影教会我的那些事',
+                date: '2026-06-28',
+                excerpt: '按下快门的那一刻，你不是在记录世界，而是在选择看世界的方式。',
+                tags: ['摄影', '生活'],
+                body: `<p>我有个习惯：出门一定会带相机。不一定是专业的，有时候就是手机。</p>
+
+<p>很多人问："天天拍有什么好拍的？"其实这个问题本身就是答案——正因为觉得没什么好拍的，才更要拍。摄影训练的不是技术，是眼睛。</p>
+
+<h3>学会发现平凡中的不平凡</h3>
+
+<p>自从开始拍照之后，走路的方式都变了。以前是低头赶路，现在是到处张望。你会发现楼梯转角的光影、路边老人脸上的皱纹、下雨后地上的倒影——这些东西一直都在，只是之前从没认真看过。</p>
+
+<blockquote>摄影最神奇的地方在于：它让你对习以为常的东西重新感到好奇。</blockquote>
+
+<p>这种好奇会蔓延到生活的其他方面。你开始注意季节变化的细节、注意到街上人们的表情、注意到一天中不同时刻的光线。世界变得更有层次了。</p>
+
+<h3>接受不完美</h3>
+
+<p>拍了 100 张照片，可能只有 1 张自己满意。但那 99 张不是浪费，它们教会你什么是好的。</p>
+
+<p>这和很多事情一样——学写作、学编程、学任何东西。你不可能一开始就做出完美的作品，但每一次尝试都在缩小你和"好"之间的距离。</p>
+
+<p>所以现在我拍照不再纠结于"拍得好不好"，而是"拍完开不开心"。心态变了，照片也跟着变了。</p>`
+            },
+            {
+                id: 3,
+                slug: 'build-first-website',
+                title: '我建了一个自己的网站',
+                date: '2026-07-08',
+                excerpt: '拥有一块属于自己的互联网角落，这件事比想象中更有意义。',
+                tags: ['技术', '生活'],
+                body: `<p>终于有了自己的域名和网站——fantasticmatrix.xyz。</p>
+
+<p>说实话，在这个社交媒体泛滥的时代，建一个个人网站听起来有点老派。谁还会去输入一个网址呢？但我还是做了。不是为了让别人看，是为了让自己有一块地方。</p>
+
+<h3>为什么要有一个自己的网站？</h3>
+
+<p>社交媒体很方便，但有一个根本问题：你的内容不属于你。平台可以随时改规则、改算法、甚至关掉。你在上面写的东西，本质上是在帮别人建内容。</p>
+
+<p>而一个自己的网站不一样。你想放什么就放什么，想怎么设计就怎么设计。没有人给你限流，没有人插广告，没有人告诉你"这条内容可能不太合适"。</p>
+
+<blockquote>拥有一个自己的网站，就像在数字世界里有一间属于自己的房间。</blockquote>
+
+<h3>建站本身就是一个学习过程</h3>
+
+<p>从写 HTML 到配置 DNS，从 GitHub Pages 到绑定域名，中间踩了不少坑。但也正是这些坑，让我理解了互联网最基础的运作方式——域名是怎么解析的、静态网站是怎么托管的、Git 是怎么协作的。</p>
+
+<p>这些知识可能不会出现在考试里，但它们让我觉得，互联网不再是那个神秘的黑盒子了。</p>
+
+<p>希望这个网站能一直更新下去。</p>`
+            }
+        ];
+
+        // ======== Blog Rendering ========
+        function showBlogList() {
+            document.getElementById('blog-list').classList.remove('hidden');
+            document.getElementById('blog-post').classList.remove('active');
+            window.location.hash = 'blog';
+        }
+
+        function showBlogPost(postId) {
+            const post = posts.find(p => p.id === postId || p.slug === postId);
+            if (!post) {
+                showBlogList();
+                return;
+            }
+
+            document.getElementById('blog-list').classList.add('hidden');
+            document.getElementById('blog-post').classList.add('active');
+
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('post-date').textContent = post.date;
+            document.getElementById('post-tags-display').textContent = post.tags.join(' · ');
+            document.getElementById('post-body').innerHTML = post.body;
+
+            window.location.hash = 'post-' + post.slug;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderBlogList() {
+            const container = document.getElementById('blog-list');
+            container.innerHTML = posts.map(post => `
+                <div class="blog-card reveal" onclick="showBlogPost('${post.slug}')">
+                    <div class="blog-card-date">${post.date}</div>
+                    <h3 class="blog-card-title">${post.title}</h3>
+                    <p class="blog-card-excerpt">${post.excerpt}</p>
+                    <div class="blog-card-tags">
+                        ${post.tags.map(t => `<span class="blog-tag">${t}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Re-observe new reveal elements
+            document.querySelectorAll('#blog-list .reveal').forEach(el => revealObserver.observe(el));
+        }
+
+        function handleBlogRoute() {
+            const hash = window.location.hash;
+            if (hash.startsWith('#post-')) {
+                const slug = hash.replace('#post-', '');
+                const post = posts.find(p => p.slug === slug);
+                if (post) {
+                    showBlogPost(post.id);
+                }
+            }
+        }
+
+        // Back button
+        document.getElementById('post-back-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            showBlogList();
+        });
+
+        // Init blog
+        renderBlogList();
+        handleBlogRoute();
+
+        // ======== Navbar ========
         const nav = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Reveal on scroll
-        const observer = new IntersectionObserver((entries) => {
+        // ======== Reveal on scroll ========
+        const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
@@ -417,7 +766,7 @@
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
         // Hide hero scroll indicator on scroll
         const heroScroll = document.querySelector('.hero-scroll');
@@ -426,6 +775,30 @@
                 heroScroll.style.opacity = window.scrollY > 100 ? '0' : '';
             }
         });
+
+        // ======== Giscus Guestbook ========
+        function loadGiscus() {
+            var container = document.getElementById('giscus-container');
+            var script = document.createElement('script');
+            script.src = 'https://giscus.app/client.js';
+            script.setAttribute('data-repo', 'ggdfshjgh42-lang/ggdfshjgh42-lang.github.io');
+            script.setAttribute('data-repo-id', 'R_kgDOSt35nQ');
+            script.setAttribute('data-category', 'Guestbook');
+            script.setAttribute('data-category-id', 'PLACEHOLDER_NEEDS_SETUP');
+            script.setAttribute('data-mapping', 'pathname');
+            script.setAttribute('data-strict', '0');
+            script.setAttribute('data-reactions-enabled', '1');
+            script.setAttribute('data-emit-metadata', '0');
+            script.setAttribute('data-input-position', 'top');
+            script.setAttribute('data-theme', 'light');
+            script.setAttribute('data-lang', 'zh-CN');
+            script.setAttribute('crossorigin', 'anonymous');
+            script.async = true;
+            container.innerHTML = '';
+            container.appendChild(script);
+        }
+
+        loadGiscus();
     </script>
 </body>
 </html>
