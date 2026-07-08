@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="奥斯拖拉机斯基 - 个人主页">
+    <title>奥斯拖拉机斯基 | Fantastic Matrix</title>
+    <style>
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #6b6b6b;
+            --accent: #2d2d2d;
+            --border: #ebebeb;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            overflow-x: hidden;
+        }
+
+        /* ---- Nav ---- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        nav.scrolled {
+            border-bottom-color: var(--border);
+        }
+        .nav-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-logo {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        /* ---- Layout ---- */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        section {
+            padding: 120px 0;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 72px;
+        }
+        .hero .container {
+            width: 100%;
+        }
+        .hero-greeting {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 0.6s ease forwards;
+        }
+        .hero-name {
+            font-size: 56px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.15s ease forwards;
+        }
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            opacity: 0;
+            animation: fadeUp 0.6s 0.3s ease forwards;
+        }
+        .hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            animation: fadeUp 0.6s 0.6s ease forwards, bounce 2s 1.2s infinite;
+        }
+        .hero-scroll span {
+            display: block;
+            width: 24px;
+            height: 40px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            position: relative;
+        }
+        .hero-scroll span::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 2px;
+            animation: scrollDot 1.5s infinite;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(8px); }
+        }
+        @keyframes scrollDot {
+            0%   { top: 8px; opacity: 1; }
+            100% { top: 24px; opacity: 0; }
+        }
+
+        /* ---- Section Titles ---- */
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 32px;
+            line-height: 1.3;
+        }
+
+        /* ---- About ---- */
+        .about-text {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 560px;
+        }
+        .about-highlight {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ---- Interests ---- */
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 16px;
+        }
+        .interest-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px 28px;
+            text-align: center;
+            transition: transform 0.25s, box-shadow 0.25s;
+            cursor: default;
+        }
+        .interest-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+        }
+        .interest-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .interest-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .interest-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ---- Contact ---- */
+        .contact-links {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 500;
+            background: var(--surface);
+            transition: all 0.2s;
+        }
+        .contact-link:hover {
+            border-color: var(--text);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        }
+        .contact-link-icon {
+            font-size: 20px;
+        }
+
+        /* ---- Footer ---- */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            text-align: center;
+        }
+        footer p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ---- Fade-in on scroll ---- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 640px) {
+            .hero-name { font-size: 38px; letter-spacing: -1px; }
+            .hero-subtitle { font-size: 16px; }
+            .interests-grid { grid-template-columns: 1fr; }
+            section { padding: 80px 0; }
+            .nav-links { gap: 16px; }
+            .nav-links a { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">FM</a>
+            <ul class="nav-links">
+                <li><a href="#about">关于</a></li>
+                <li><a href="#interests">爱好</a></li>
+                <li><a href="#contact">联系</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <p class="hero-greeting">Hi，你好</p>
+            <h1 class="hero-name">奥斯拖拉机斯基</h1>
+            <p class="hero-subtitle">
+                一个在路上的学生。<br>
+                对世界保持好奇，用心感受生活的每个瞬间。
+            </p>
+            <div class="hero-scroll">
+                <span></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+        <div class="container">
+            <div class="reveal">
+                <p class="section-label">关于我</p>
+                <h2 class="section-title">保持简单，保持真实</h2>
+                <p class="about-text">
+                    我是<span class="about-highlight">奥斯拖拉机斯基</span>，一名学生。
+                    我相信<span class="about-highlight">好奇心</span>是最好的老师，
+                    每一本书、每一次快门、每一个美好的瞬间，都是在学习如何更好地生活。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interests -->
+    <section id="interests" style="padding-top: 0;">
+        <div class="container">
+            <div class="reveal">
+                <p class="section-label">爱好</p>
+                <h2 class="section-title">我所热爱的</h2>
+            </div>
+            <div class="interests-grid">
+                <div class="interest-card reveal">
+                    <span class="interest-icon">📚</span>
+                    <h3 class="interest-name">读书</h3>
+                    <p class="interest-desc">
+                        在字里行间探索世界，与伟大的灵魂对话。阅读让独处变得充实而有趣。
+                    </p>
+                </div>
+                <div class="interest-card reveal">
+                    <span class="interest-icon">📷</span>
+                    <h3 class="interest-name">摄影</h3>
+                    <p class="interest-desc">
+                        用镜头捕捉光和影的舞蹈。按下快门的瞬间，时间便有了形状。
+                    </p>
+                </div>
+                <div class="interest-card reveal">
+                    <span class="interest-icon">✨</span>
+                    <h3 class="interest-name">欣赏美好</h3>
+                    <p class="interest-desc">
+                        无论是街头的一道风景，还是生活中的意外之美。发现美好本身就是一种能力。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" style="padding-top: 0;">
+        <div class="container">
+            <div class="reveal">
+                <p class="section-label">联系我</p>
+                <h2 class="section-title">来打个招呼吧</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 28px; font-size: 15px;">
+                    欢迎随时联系交流，虽然我可能在上课 😄
+                </p>
+                <div class="contact-links">
+                    <a href="mailto:hello@fantasticmatrix.xyz" class="contact-link">
+                        <span class="contact-link-icon">✉️</span> hello@fantasticmatrix.xyz
+                    </a>
+                    <a href="https://github.com" target="_blank" rel="noopener" class="contact-link">
+                        <span class="contact-link-icon">🐙</span> GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 fantasticmatrix.xyz &mdash; 奥斯拖拉机斯基</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        const nav = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Reveal on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Hide hero scroll indicator on scroll
+        const heroScroll = document.querySelector('.hero-scroll');
+        window.addEventListener('scroll', () => {
+            if (heroScroll) {
+                heroScroll.style.opacity = window.scrollY > 100 ? '0' : '';
+            }
+        });
+    </script>
+</body>
+</html>
