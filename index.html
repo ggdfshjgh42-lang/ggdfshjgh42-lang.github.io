@@ -733,6 +733,7 @@
 
         function renderBlogList() {
             const container = document.getElementById('blog-list');
+            if (!container) return;
             container.innerHTML = posts.map(post => `
                 <div class="blog-card reveal" onclick="showBlogPost('${post.slug}')">
                     <div class="blog-card-date">${post.date}</div>
@@ -765,38 +766,44 @@
             showBlogList();
         });
 
-        // Init blog
-        renderBlogList();
-        handleBlogRoute();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Init blog
+            renderBlogList();
+            handleBlogRoute();
 
-        // ======== Navbar ========
-        const nav = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', window.scrollY > 50);
-        });
+            // ======== Navbar ========
+            const nav = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+            });
 
-        // ======== Reveal on scroll ========
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+            // ======== Reveal on scroll ========
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+            // Hide hero scroll indicator on scroll
+            const heroScroll = document.querySelector('.hero-scroll');
+            window.addEventListener('scroll', () => {
+                if (heroScroll) {
+                    heroScroll.style.opacity = window.scrollY > 100 ? '0' : '';
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-        // Hide hero scroll indicator on scroll
-        const heroScroll = document.querySelector('.hero-scroll');
-        window.addEventListener('scroll', () => {
-            if (heroScroll) {
-                heroScroll.style.opacity = window.scrollY > 100 ? '0' : '';
-            }
+            // ======== Giscus Guestbook ========
+            loadGiscus();
         });
 
         // ======== Giscus Guestbook ========
         function loadGiscus() {
             var container = document.getElementById('giscus-container');
+            if (!container) return;
             var script = document.createElement('script');
             script.src = 'https://giscus.app/client.js';
             script.setAttribute('data-repo', 'ggdfshjgh42-lang/ggdfshjgh42-lang.github.io');
@@ -815,8 +822,6 @@
             container.innerHTML = '';
             container.appendChild(script);
         }
-
-        loadGiscus();
     </script>
 </body>
 </html>
