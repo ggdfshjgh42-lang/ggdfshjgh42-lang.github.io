@@ -7,6 +7,15 @@
   },
   "posts": [
     {
+      "id": 5,
+      "slug": "article-c341db11",
+      "title": "kaokaokaoakaoak",
+      "date": "2026-10-10",
+      "excerpt": "gagaggagagagagagagagag",
+      "tags": [],
+      "body": "sssssssssssaaaaaaa"
+    },
+    {
       "id": 4,
       "slug": "nonsense-literature",
       "title": "今天发点废话",
