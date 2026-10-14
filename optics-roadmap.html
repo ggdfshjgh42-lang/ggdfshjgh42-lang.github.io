@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>光学全景｜8 周学习地图</title>
+  <style>
+    :root{--ink:#14243b;--muted:#5c6d80;--paper:#f5f7fb;--card:#fff;--line:#dce5ef;--blue:#2962e8;--mint:#10a886;--gold:#ecaa35;--shadow:0 14px 40px rgba(25,48,83,.08)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+    a{color:#194cbb;text-decoration:none}a:hover{text-decoration:underline}button{font:inherit;cursor:pointer}
+    .shell{max-width:1240px;margin:auto;padding:24px}.hero{background:linear-gradient(120deg,#14243b,#183b69 64%,#1d756d);color:#fff;border-radius:28px;padding:40px 44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .hero:after{content:"◌";position:absolute;right:3%;top:-100px;font-size:400px;line-height:1;color:rgba(255,255,255,.055);pointer-events:none}.eyebrow{font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:#b9d4ff;font-weight:700}
+    h1{font-size:clamp(32px,5vw,58px);line-height:1.16;margin:12px 0}h2{font-size:25px;margin:0 0 15px}h3{font-size:19px;margin:0 0 8px}.hero p{max-width:780px;color:#e0ebfa;margin:0 0 25px}
+    .stats{display:flex;gap:12px;flex-wrap:wrap}.stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:11px 18px;min-width:130px}.stat strong{display:block;font-size:24px;line-height:1.15}.stat span{font-size:12px;color:#d5e7f4}
+    .notice{margin-top:18px;background:#eaf4f0;border-left:4px solid var(--mint);padding:15px 18px;border-radius:0 12px 12px 0}.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;margin-top:22px}
+    aside{align-self:start;position:sticky;top:16px}.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+    .progress-bar{height:12px;background:#e5ebf4;border-radius:50px;overflow:hidden;margin:12px 0}.progress-bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--mint),#67d6be);width:0;transition:width .25s}
+    .nav a{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-radius:10px;color:var(--ink);font-size:14px}.nav a:hover{background:#eef4ff;text-decoration:none}.nav small{color:var(--muted)}
+    .pill{display:inline-block;border-radius:99px;padding:3px 9px;background:#eaf1ff;color:#2456b6;font-size:12px;font-weight:700}.map{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.map .node{background:#f1f5ff;border:1px solid #d8e3fc;border-radius:14px;padding:14px;font-weight:700}.map .node small{display:block;color:var(--muted);font-weight:400;margin-top:4px}.map .node:first-child{background:#e9f8f4;border-color:#cae9df}
+    .intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.clean{margin:8px 0 0;padding-left:20px}.clean li{margin:4px 0}.week{scroll-margin-top:15px}.week-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.week .subtitle{color:var(--muted);margin:0 0 13px}.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.week details{border-top:1px solid var(--line);padding-top:12px}.week summary{cursor:pointer;color:#1b55bd;font-weight:700;list-style:none}.week summary::-webkit-details-marker{display:none}.week summary::before{content:"▸ ";color:var(--blue)}.week details[open] summary::before{content:"▾ "}
+    .day{display:grid;grid-template-columns:85px 1fr;gap:10px;padding:13px 0;border-bottom:1px solid #e9eef5}.day:last-child{border-bottom:0}.day-index{font-weight:800;color:#2657a7}.day-title{font-weight:700}.day p{margin:4px 0;color:#384c62;font-size:14px}.day .output{color:#0d715d}.check{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-top:7px}.check input{accent-color:var(--mint);width:17px;height:17px}.sources a{display:inline-block;margin:5px 8px 0 0;background:#edf3fc;border-radius:7px;padding:2px 7px;font-size:12px}.done .day-title{text-decoration:line-through;color:#7d8b9d}
+    .checkpoint{background:#f4f8fe;border-radius:12px;padding:12px 15px;margin-top:14px;font-size:14px}.checkpoint strong{color:#1d4a9a}
+    .resources{columns:2;column-gap:30px}.resources li{break-inside:avoid;margin-bottom:10px}.small{font-size:13px;color:var(--muted)}.btn{border:1px solid #bbcadc;background:#fff;border-radius:10px;padding:7px 12px;color:var(--ink)}.btn:hover{background:#eef4ff}
+    .footer{color:var(--muted);font-size:13px;padding:10px 4px 40px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}aside{position:static}.nav #weekNav{display:grid;grid-template-columns:repeat(2,1fr)}.map{grid-template-columns:repeat(2,1fr)}.intro-grid{grid-template-columns:1fr}}
+    @media(max-width:560px){.shell{padding:12px}.hero{padding:28px 22px;border-radius:20px}.panel{padding:18px}.map{grid-template-columns:1fr}.day{grid-template-columns:1fr}.resources{columns:1}}
+    @media print{body{background:#fff}.shell{max-width:none}.hero{background:#fff;color:#000;border:1px solid #aaa;box-shadow:none}.hero p,.eyebrow{color:#333}.layout{display:block}aside{display:none}.panel{box-shadow:none;break-inside:avoid}.week details{display:block}.week details:not([open]) .days{display:block}.btn{display:none}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <p class="small"><a href="index.html">← 返回网站首页</a></p>
+  <header class="hero">
+    <div class="eyebrow">OPTICS · 8-WEEK LEARNING MAP</div>
+    <h1>先看懂光学全貌<br>再选择职业方向</h1>
+    <p>为“数理有一些基础、会一点 Zemax 操作但概念零散、想在一年后求职”的学习者设计。每天 2 小时，先建立共同基础，再用小任务体验成像、照明、激光、光纤、探测与测量。</p>
+    <div class="stats"><div class="stat"><strong>8 周</strong><span>完整一轮</span></div><div class="stat"><strong>56 天</strong><span>每天 2 小时</span></div><div class="stat"><strong>112 小时</strong><span>基础与方向探索</span></div><div class="stat"><strong id="doneCount">0 / 56</strong><span>已完成任务</span></div></div>
+  </header>
+  <div class="notice"><strong>目标边界：</strong>两个月后，你应能画出光学主要分支之间的关系，解释范围清单中的 46 个核心概念，完成基本计算与小案例，并选出下一阶段想深入的 1–2 个方向。“精通所有光学分支”需要更长时间和工程实践；这里的验收标准是可解释、可预测、可核查。</div>
+  <div class="layout">
+    <aside>
+      <div class="panel"><h3>学习进度</h3><div class="progress-bar"><span id="progressFill"></span></div><div id="progressText" class="small">0% · 第 1 天可开始</div><button class="btn" id="resetBtn" style="margin-top:12px">清空勾选</button></div>
+      <div class="panel nav"><h3>8 周路线</h3><div id="weekNav"></div></div>
+    </aside>
+    <main>
+      <section class="panel"><h2>你正在学什么</h2><p class="small">所有专题都放进同一条“光的工程链”，每学完一周，把新概念补回这张图。</p>
+        <div class="map"><div class="node">光是什么<small>波长、频率、能量、偏振</small></div><div class="node">怎样传播<small>反射、折射、干涉、衍射、光纤</small></div><div class="node">怎样控制<small>透镜、光阑、激光、照明、光栅</small></div><div class="node">怎样利用<small>成像、探测、测量、通信</small></div></div>
+        <div class="intro-grid"><div><h3>每天固定 120 分钟</h3><ol class="clean"><li>10 分钟：闭卷回忆昨天的概念。</li><li>35 分钟：看当天主题视频。</li><li>35 分钟：读当天指定教材或官方资料。</li><li>30 分钟：完成当天的图、计算或比较任务。</li><li>10 分钟：记录“会解释 / 会预测 / 仍不懂”。</li></ol></div><div><h3>什么算真的学会</h3><ol class="clean"><li><b>会解释：</b>用自己的话、图和单位说清含义。</li><li><b>会预测：</b>改变一个参数前，先说结果会怎样变。</li><li><b>会核查：</b>写出结论的适用条件和资料出处。</li><li><b>会应用：</b>在一个真实系统里指出它的位置。</li></ol></div></div>
+        <details style="margin-top:17px"><summary style="cursor:pointer;color:#1b55bd;font-weight:700">查看完整概念范围</summary><div class="intro-grid" style="margin-top:10px"><div><p><b>传播与成像：</b>波长、频率、光谱、折射率、反射、折射、全反射、色散、吸收、散射、实像、虚像、焦距、放大率、近轴、光阑、F 数、视场、像差。</p><p><b>波与偏振：</b>相位、相干、光程差、干涉、衍射、光栅、分辨率、线偏振、检偏、波片。</p></div><div><p><b>器件与系统：</b>PSF、MTF、LED、受激辐射、谐振腔、光电二极管、CCD、CMOS、量子效率、噪声、光纤数值孔径、损耗、辐射通量、光通量、照度、光谱仪、干涉仪。</p><p class="small">这些词在两个月内以“能解释、能举例、能做少量基本计算”为标准。深入推导和独立工程设计留给选定方向后的阶段。</p></div></div></details>
+      </section>
+      <section class="panel"><h2>先核对，再记忆</h2><p>出现相互矛盾的公式或说法时，先检查<strong>模型、符号约定、单位、适用条件</strong>。例如薄透镜成像公式只在薄透镜及近轴模型下直接使用；光从真空进入介质后，频率不变，但波长要用介质中的值。把存疑的说法写进“待核对清单”，再查下方教材或官方资料。不要只记软件图窗里的结果。</p></section>
+      <div id="weeks"></div>
+      <section class="panel"><h2>第 8 周之后怎么接到求职</h2><p>对成像设计、照明、激光、光纤、探测测量分别给 <b>兴趣 / 理解程度 / 愿意继续练习</b> 打 1–5 分。选最高的 1–2 个方向，再用之后 10 个月补专业课程、软件或实验、作品和岗位要求。两个月的全景阶段负责帮你选方向，不能代替后续的专业项目经验。</p></section>
+      <section class="panel"><h2>资料柜</h2><p class="small">中文课程负责建立直觉；教材、仿真和官方技术资料用于复核。部分课程可能需要登录；英文页面可用浏览器翻译。以下链接已按原发布机构核查。</p><ol class="resources" id="resourceList"></ol></section>
+    </main>
+  </div>
+  <div class="footer">本计划按 2026-10-09 可访问的课程与文档编排。每周的第 7 天用于闭卷检测和补漏；若某天未完成，先用该周第 7 天补齐，不把进度百分比当成理解程度。</div>
+</div>
+<script>
+const R={
+  pku:['北京大学《光学》中文课程','https://www.icourse163.org/course/PKU-1460411162'],
+  cust:['长春理工大学《应用光学》中文课程','https://www.icourse163.org/course/0807CUST002-1472770176'],
+  njut:['南京理工大学《物理光学》中文课程','https://higher.smartedu.cn/course/698665c495df98bb27d90d0d'],
+  os1:['OpenStax 第 1 章：光的传播','https://openstax.org/books/university-physics-volume-3/pages/1-introduction'],
+  os2:['OpenStax 第 2 章：几何成像','https://openstax.org/books/university-physics-volume-3/pages/2-introduction'],
+  os3:['OpenStax 第 3 章：干涉','https://openstax.org/books/university-physics-volume-3/pages/3-introduction'],
+  os4:['OpenStax 第 4 章：衍射','https://openstax.org/books/university-physics-volume-3/pages/4-introduction'],
+  geo:['PhET 几何光学互动仿真','https://phet.colorado.edu/en/simulations/geometric-optics'],
+  wave:['PhET 波的干涉互动仿真','https://phet.colorado.edu/en/simulations/wave-interference'],
+  laser:['厦门大学《激光原理与技术》中文课程','https://www.icourse163.org/course/XMU-1002851002'],
+  fiber:['华中科技大学《光纤通信技术》中文课程','https://www.icourse163.org/course/HUST-1207041819'],
+  detect:['内蒙古大学《光电检测原理与技术》中文课程','https://higher.smartedu.cn/course/690528325345b68214576273'],
+  sensor:['Hamamatsu：图像传感器技术指南','https://camera.hamamatsu.com/eu/en/learn/technical_information/thechnical_guide/visual_guide.html'],
+  zemax:['Ansys：成像系统基础教程','https://optics.ansys.com/hc/en-us/articles/42661797020435--Tutorial-Series-Imaging-System-Fundamentals'],
+  illum:['Ansys：照明系统基础教程','https://optics.ansys.com/hc/en-us/articles/42661790485011--Tutorial-Series-Illumination-Systems-Fundamentals'],
+  spec:['Ansys：光谱仪原理与设计教程','https://optics.ansys.com/hc/en-us/articles/42661854953491--Tutorial-Series-How-to-Build-a-Spectrometer'],
+  nist:['NIST：辐射度学与光度学','https://www.nist.gov/publications/radiometry-and-photometry-review-vision-optics'],
+  mit:['MIT：激光与光纤公开视频','https://ocw.mit.edu/courses/res-6-005-understanding-lasers-and-fiberoptics-spring-2008/resources/videos/']
+};
+const W=[
+ {name:'光学总图与传播',core:'光线 / 波 / 光子；波长、频率、折射率、色散',why:'先给所有后续概念一个位置。',test:'不看资料，画出“光源 → 介质 → 光学元件 → 探测器”；解释折射与色散，并算出 500 nm 真空光的频率约 6×10¹⁴ Hz。',days:[
+  ['画起点地图','视频：北大《光学》绪论；阅读：教材第 1 章导言。','闭卷写下已知的 15 个光学词，并把它们放进“传播 / 控制 / 应用”三栏。',['pku','os1']],
+  ['波长、频率、光谱','视频：光的电磁波性质；阅读：教材 1.1。','用 c=λν 算 400、500、700 nm 对应的真空频率；标注单位。',['pku','os1']],
+  ['反射与折射','视频：反射、折射；阅读：教材 1.2–1.3。','画出空气入玻璃的光路，先预测偏向法线还是远离法线，再核查。',['pku','os1']],
+  ['折射率与全反射','视频：全反射；阅读：教材 1.3–1.4。','用两组折射率画临界角示意图；列出全反射必须满足的两个条件。',['njut','os1']],
+  ['色散、吸收、散射','视频：色散与介质；阅读：教材 1.5。','用棱镜、墨镜、雾天各举一例，写清哪种物理过程占主导。',['pku','os1']],
+  ['三种描述方式','视频：课程中检索“几何光学/波动光学”；阅读：教材 1.6。','制作一张“光线模型、波模型、光子描述各能回答什么问题”对照卡。',['pku','os1']],
+  ['周检与补漏','回看本周做错的概念；重读有疑问的教材段落。','闭卷画知识图并录 3 分钟讲解；只补 3 个最弱概念。',['os1']]]},
+ {name:'几何成像',core:'物、像、焦距、放大率、光阑、像差',why:'把“镜头为什么成像”讲清楚。',test:'画薄透镜三条典型光线；算 f=50 mm、物距=500 mm 的像距约 55.6 mm；说出光阑改变什么。',days:[
+  ['实像与虚像','视频：应用光学的理想成像；阅读：教材 2.1–2.3。','用“屏幕能否接到像”解释实像与虚像，画两个光路图。',['cust','os2']],
+  ['薄透镜与焦距','视频：薄透镜；阅读：教材 2.4。','完成两道物距不同的薄透镜题，明确所用符号约定。',['cust','os2','geo']],
+  ['放大率与两片透镜','视频：放大率和组合透镜；阅读：教材 2.4、2.8。','手画两片透镜的中间像和最终像，标出正倒、大小。',['cust','os2']],
+  ['光阑、孔径和视场','视频：应用光学课程中检索“光阑/入瞳”；阅读：教材 2.6。','画相机光路，标出孔径光阑与像面；说出 F 数变小时可能发生的两件事。',['cust','os2']],
+  ['典型仪器','视频：照相机、显微镜或望远镜；阅读：教材 2.6–2.8。','用“物体在哪、先在哪里成像、谁接收图像”比较三种仪器。',['cust','os2']],
+  ['像差入门','视频：应用光学的初级像差；阅读：课程的初级像差部分。','给球差、色差、畸变各画一张“理想/实际”示意图，不急于背公式。',['cust']],
+  ['周检与补漏','回看错题和 PhET 仿真。','闭卷做 3 道成像题；把软件中“改曲率→焦点怎么动”的预测写在操作前。',['os2','geo']]]},
+ {name:'干涉与衍射',core:'相位、相干、干涉条纹、衍射、分辨率',why:'理解几何光学解释不了的现象。',test:'能解释双缝亮暗纹为什么出现；预测缝距变大时条纹间距怎样变；说明缩小孔径为何可能使衍射更明显。',days:[
+  ['波的叠加与相位','视频：物理光学“光波叠加”；阅读：教材 3.1。','画同相与反相波叠加，分别说明振幅和亮度趋势。',['njut','os3']],
+  ['双缝干涉','视频：杨氏实验；阅读：教材 3.1–3.2。','在 PhET 中改变波长，先预测再记录条纹间距变化。',['njut','os3','wave']],
+  ['相干性','视频：干涉条件、时间相干性；阅读：教材 3.1。','用一句话分别解释“同频”“相位关系稳定”，写出白光也能看到干涉的限定场景。',['njut','os3']],
+  ['薄膜与干涉仪','视频：薄膜干涉或迈克耳孙干涉仪；阅读：教材 3.4–3.5。','画两束光的路径，并标出光程差从哪里产生。',['njut','os3']],
+  ['单缝与圆孔衍射','视频：衍射；阅读：教材 4.1、4.5。','比较宽缝和窄缝的衍射图样；写出观察条件。',['njut','os4','wave']],
+  ['分辨率与光栅','视频：分辨本领、衍射光栅；阅读：教材 4.4–4.5。','用一句话区分“把两个点分开”与“把两种波长分开”。',['njut','os4']],
+  ['周检与补漏','重做双缝与衍射仿真。','闭卷画双缝、单缝、圆孔三种图样；每种写出改变一个参数的预测。',['os3','os4','wave']]]},
+ {name:'偏振与像质',core:'偏振、马吕斯定律、像差、PSF、MTF',why:'把光的方向特性与成像质量接起来。',test:'解释偏振片为何能减弱反光；区分几何像差、衍射和离焦；说清 MTF 曲线横纵轴。',days:[
+  ['线偏振','视频：物理光学“偏振概述”；阅读：教材 1.7。','画非偏振光与线偏振光示意；举偏光镜的例子。',['njut','os1']],
+  ['马吕斯定律','视频：偏振片；阅读：教材 1.7。','算理想线偏振光通过与偏振方向夹 60° 的检偏器后强度为原来的多少。',['njut','os1']],
+  ['反射偏振与波片','视频：反射偏振、波片；阅读：教材 1.7。','写出偏振片和波片各改变光的什么属性；画入射、输出状态。',['njut','os1']],
+  ['像差与离焦','视频：应用光学“初级像差”；阅读：Ansys 成像分析简介。','比较球差、色差、离焦的图像表现，列出一个验证办法。',['cust','zemax']],
+  ['点扩散函数 PSF','视频：成像系统像质相关章节；阅读：Ansys 成像分析。','画理想点物到像面的光斑；解释光斑变宽代表什么。',['cust','zemax']],
+  ['调制传递函数 MTF','视频：像质评价；阅读：Ansys 成像分析。','找一张 MTF 曲线，标出空间频率、对比度传递与不同视场曲线。',['cust','zemax']],
+  ['半程检查','回看前 4 周知识地图。','闭卷讲 8 分钟“光线模型何时够用、何时必须用波模型”；自评弱点。',['os1','os2','os3','os4']]]},
+ {name:'光源与探测',core:'LED、激光、光电探测器、像元、量子效率、噪声',why:'看清光学系统的起点和终点。',test:'画“光源→光学系统→探测器→信号”的完整链；解释亮度不足、失焦和噪声为什么是三类问题。',days:[
+  ['光源全貌','视频：北大课程“光源”；阅读：光电检测课程第 1 章。','比较太阳光、LED、激光在光谱宽度、方向性、相干性上的典型差别。',['pku','detect']],
+  ['激光最小原理','视频：厦大课程“激光基本原理”；阅读：课程概述。','画“泵浦→增益介质→谐振腔→输出”的框图；解释每块的作用。',['laser','mit']],
+  ['光电二极管','视频：光电检测“探测器”；阅读：探测课程相关章节。','解释光子到电子信号的路径；画点探测器与阵列探测器。',['detect']],
+  ['CCD 与 CMOS','视频：光电检测“图像传感器”；阅读：Hamamatsu 技术指南。','用表格比两者的读出方式，不把“CMOS 一定更好”当结论。',['detect','sensor']],
+  ['量子效率与噪声','视频：光电检测“量子效率/噪声”；阅读：Hamamatsu 技术指南。','解释量子效率的含义；在 100 个入射光子、40% QE 的理想化例子中求平均产生电子数。',['detect','sensor']],
+  ['完整成像链','视频：北大课程“光探测器”；阅读：教材 2.6。','画相机从场景到数字图像的 6 个环节，每环节写 1 个可能限制。',['pku','os2','sensor']],
+  ['周检与补漏','回看源—镜头—探测器示意。','闭卷解释“变大光圈能否同时解决暗、失焦和噪声”；用条件化语言回答。',['os2','sensor']]]},
+ {name:'激光与光纤',core:'受激辐射、谐振腔、光束、导光、损耗、色散',why:'体验光学的产生与传输方向。',test:'画点到点光纤链路；解释为什么光纤能导光、为什么远距离仍需考虑损耗和色散。',days:[
+  ['激光三条件','视频：厦大“激光产生的基本原理”；阅读：课程相应小节。','写出增益、反馈、泵浦各解决什么问题；与 LED 对照。',['laser','mit']],
+  ['激光束与应用','视频：厦大“激光传输特性”；阅读：MIT 激光视频说明。','画激光加工、测距、通信三种应用各需要的不同指标。',['laser','mit']],
+  ['光纤导光','视频：华科“光纤结构及传输”；阅读：课程相关小节。','画纤芯/包层和全反射路径；解释折射率分布的作用。',['fiber','mit']],
+  ['数值孔径与耦合','视频：华科“光纤传输”；阅读：MIT 光纤基础视频。','画激光进入光纤的光路，标出为什么并非所有入射角都能导入。',['fiber','mit']],
+  ['损耗与色散','视频：华科“光纤传输特性”；阅读：课程相关小节。','分别解释“信号变弱”和“脉冲变宽”；不要混为一谈。',['fiber']],
+  ['通信链路','视频：华科“发射机/接收机”；阅读：课程概述。','画发送端、光纤、接收端，标出光与电信号在哪里转换。',['fiber','detect']],
+  ['周检与补漏','回看第 1 周全反射知识。','用 5 分钟给初学者讲清“光纤通信不是把电流直接塞进玻璃”。',['fiber','os1']]]},
+ {name:'照明、光谱与测量',core:'光通量、照度、光谱仪、光栅、干涉测量',why:'体验非成像设计与测量方向。',test:'区分照明的均匀度与成像的清晰度；画出简化光谱仪；说明干涉仪测量什么。',days:[
+  ['辐射量与光度量','视频：应用光学课程“光度学”；阅读：NIST 综述。','写出 W 与 lm、W/m² 与 lx 的用途差别，标出是否考虑人眼响应。',['cust','nist']],
+  ['照明设计','视频：Ansys 照明基础中的例子；阅读：照明系统简介。','画 LED→透镜/反射器→目标面的路径；明确“均匀”和“效率”两个指标。',['illum']],
+  ['成像与非成像','视频：应用光学或 Ansys 照明教程；阅读：照明背景理论。','比较相机镜头与台灯的目标函数和常见评价图。',['cust','illum']],
+  ['光谱仪原理','视频：物理光学“衍射光栅”；阅读：Ansys 光谱仪理论。','画狭缝→准直→光栅→聚焦→探测器，并写每块作用。',['njut','spec']],
+  ['分辨率与杂散光','视频：光谱仪教程；阅读：Ansys 光谱仪实现简介。','说明光谱仪中“两个谱线分得开”和“背景杂光少”是不同指标。',['spec']],
+  ['干涉测量','视频：物理光学“干涉仪”；阅读：教材 3.5。','画迈克耳孙干涉仪两臂，写出它如何把长度变化变成条纹变化。',['njut','os3']],
+  ['周检与补漏','整理本周三个小系统。','各用 2 分钟讲解照明、光谱仪和干涉测量的输入、输出、关键指标。',['illum','spec','os3']]]},
+ {name:'职业方向试验与总复盘',core:'用任务判断方向，不靠想象选择',why:'把两个月知识变成下一阶段的决策依据。',test:'交一份 4–6 页“光学全景与方向选择”报告：知识地图、3 个小案例、强弱项、1–2 个下一阶段方向。',days:[
+  ['成像设计试验','阅读：Ansys 单透镜教程；可用 Zemax 者按教程建立单透镜，无软件者用 PhET。','预测焦距/光阑改动的后果，截图或画图，解释结果。',['zemax','geo']],
+  ['照明设计试验','阅读：Ansys 简单非序列系统或照明原理。','画一个桌面照明方案，写均匀度、效率、眩光各如何检验。',['illum']],
+  ['激光与光纤试验','回看厦大和华科课程的应用章节。','画一个光纤测距或通信链路，列出光源、耦合、传输、探测四处风险。',['laser','fiber']],
+  ['检测与光谱试验','阅读：Hamamatsu 传感器和 Ansys 光谱仪简介。','为“测两种颜色是否能分开”选择光栅和探测器，并说明还缺哪些参数。',['sensor','spec']],
+  ['概念盲测','不看资料，从知识地图任取 20 个术语。','每个术语用一句话解释、一个系统举例；标记“不会/模糊/能讲清”。',['pku','os1']],
+  ['方向评分','回看第 1–7 周交付物。','对成像、照明、激光、光纤、探测测量五方向，按兴趣/理解/练习意愿各打 1–5 分；写出证据。',['cust','laser','fiber','detect']],
+  ['最终交付','用 2 小时整理总报告。','提交 4–6 页：一张全景图、三项小案例、20 词盲测结果、方向选择、下一步需补的课程/项目。',['pku','zemax','illum']]]}
+];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const link=id=>`<a href="${R[id][1]}" target="_blank" rel="noopener noreferrer">${esc(R[id][0])} ↗</a>`;
+const key='optics-roadmap-2026-v1';let state={};try{state=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){state={}}
+document.querySelector('#resourceList').innerHTML=Object.keys(R).map(id=>`<li>${link(id)}</li>`).join('');
+document.querySelector('#weekNav').innerHTML=W.map((w,i)=>`<a href="#week${i+1}">第 ${i+1} 周　${esc(w.name)}<small id="n${i}">0/7</small></a>`).join('');
+document.querySelector('#weeks').innerHTML=W.map((w,i)=>`<section class="panel week" id="week${i+1}"><div class="week-head"><div><span class="pill">WEEK ${String(i+1).padStart(2,'0')}</span><h2 style="margin-top:8px">${esc(w.name)}</h2></div><span class="pill" id="w${i}">0 / 7</span></div><p class="subtitle">${esc(w.why)}</p><div class="tag-row"><span class="pill">核心：${esc(w.core)}</span></div><details ${i===0?'open':''}><summary>展开每日任务</summary><div class="days">${w.days.map((d,j)=>{const id=`${i}-${j}`;return `<div class="day" id="day${id}"><div class="day-index">DAY ${i*7+j+1}</div><div><div class="day-title">${esc(d[0])}</div><p>学：${esc(d[1])}</p><p class="output">做：${esc(d[2])}</p><div class="sources">${d[3].map(link).join('')}</div><label class="check"><input type="checkbox" data-day="${id}" ${state[id]?'checked':''}>独立完成并记录疑问</label></div></div>`}).join('')}</div></details><div class="checkpoint"><strong>周检：</strong>${esc(w.test)}</div></section>`).join('');
+function update(){let total=0;W.forEach((w,i)=>{let n=0;w.days.forEach((_,j)=>{if(state[`${i}-${j}`]){n++;document.getElementById(`day${i}-${j}`).classList.add('done')}else document.getElementById(`day${i}-${j}`).classList.remove('done')});total+=n;document.getElementById(`w${i}`).textContent=`${n} / 7`;document.getElementById(`n${i}`).textContent=`${n}/7`});document.getElementById('doneCount').textContent=`${total} / 56`;document.getElementById('progressFill').style.width=`${Math.round(total/56*100)}%`;document.getElementById('progressText').textContent=`${Math.round(total/56*100)}% · 已完成 ${total} 天`}
+document.addEventListener('change',e=>{if(e.target.matches('[data-day]')){state[e.target.dataset.day]=e.target.checked;try{localStorage.setItem(key,JSON.stringify(state))}catch(err){}update()}});
+document.getElementById('resetBtn').addEventListener('click',()=>{if(confirm('清空 56 天的勾选记录？')){state={};try{localStorage.removeItem(key)}catch(err){}document.querySelectorAll('[data-day]').forEach(x=>x.checked=false);update()}});
+update();
+</script>
+</body>
+</html>
