@@ -595,7 +595,8 @@
             canvas.width = BOARD_PX * dpr;
             canvas.height = BOARD_PX * dpr;
             canvas.style.width = BOARD_PX + 'px';
-            canvas.style.height = BOARD_PX + 'px';
+            // Preserve the square canvas ratio when max-width shrinks it on phones.
+            canvas.style.height = 'auto';
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             // Background
