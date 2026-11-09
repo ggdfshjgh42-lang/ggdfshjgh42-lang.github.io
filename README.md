@@ -1,6 +1,6 @@
 # Fantastic Matrix
 
-个人博客和五子棋，托管在 GitHub Pages。
+个人博客、光学学习室与小游戏（五子棋、中国象棋），托管在 GitHub Pages。
 
 ## 不用改代码，直接编辑文章
 
@@ -36,3 +36,5 @@ Chrome 中已登录 GitHub，并不会自动为其他网站提供 API 授权。�
 GitHub Pages 的发布分支应指向 `main`，目录为仓库根目录（Settings → Pages）。原有站点若使用 Actions，应保持原有发布流程能包含这些静态文件。
 
 参考：[GitHub 内容 API](https://docs.github.com/en/rest/repos/contents)，[访问令牌管理](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)。
+
+象棋规则测试：运行 `node --test tests/xiangqi.test.cjs`。象棋采用休闲和棋规则（三次重复局面或连续 60 回合无吃子），不裁定竞赛中的长将、长捉。
