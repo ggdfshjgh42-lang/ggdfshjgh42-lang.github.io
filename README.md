@@ -25,6 +25,7 @@ Chrome 中已登录 GitHub，并不会自动为其他网站提供 API 授权。�
 - `content.json`：四篇原有文章及网站文字，编辑器只更新这个文件。
 - `content.js`：共享的数据校验、正文清理及 GitHub 编码。
 - `admin.html` / `admin.css` / `admin.js`：浏览器中的内容管理页。
+- `optics-roadmap.html` / `optics.css` / `optics.js` / `optics-data.js`：光学学习室，含 8 周 56 课、例题解析、薄透镜实验与公式速查。原有学习进度自动保留；学习笔记保存在当前浏览器，可导出 Markdown 记录。
 - `gomoku.html`：原有五子棋。
 - `CNAME`：自定义域名。
 
