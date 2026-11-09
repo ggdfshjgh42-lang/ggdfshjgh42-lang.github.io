@@ -1,2 +1,2 @@
-// npm run deploy in multiplayer/ fills in the public service URL after deployment.
-window.GOMOKU_SERVICE_URL = '';
+// Public room service endpoint; no account credentials belong in this file.
+window.GOMOKU_SERVICE_URL = 'https://fantastic-matrix-gomoku.fantastic-matrix-gomoku-rooms.workers.dev';

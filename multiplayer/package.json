@@ -8,7 +8,7 @@
     "deploy": "node deploy.mjs"
   },
   "devDependencies": {
-    "wrangler": "4.158.0",
-    "miniflare": "4.20260730.0"
+    "miniflare": "4.20260730.0",
+    "wrangler": "4.158.0"
   }
 }

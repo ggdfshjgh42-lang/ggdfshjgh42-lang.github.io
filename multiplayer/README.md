@@ -7,7 +7,7 @@
 ## 首次部署
 
 1. 注册并登录 [Cloudflare](https://dash.cloudflare.com/sign-up)，使用 Workers Free 计划。此项目的 SQLite Durable Objects 和 WebSocket Hibernation 可使用免费额度；超额时服务会受限。不要为了部署选择付费计划。
-2. 在本目录运行 `npm ci`（Node.js 22 或更新版本），再运行 `npx wrangler login`。在浏览器完成自己的账号授权，密码或令牌不需要交给别人。
+2. 在本目录运行 `npm ci`（需 Node.js 22 或更新版本及 curl），再运行 `npx wrangler login`。远程环境可使用 `npx wrangler login --device --browser=false`，在自己的浏览器完成授权，密码或令牌不需要交给别人。
 3. 运行 `npm test`，通过后运行 `npm run deploy`。
 4. 部署脚本会检查服务并自动把公开地址写进仓库根目录的 `gomoku-config.js`。该文件只包含服务网址，不包含密钥。
 5. 将 `gomoku.html`、`gomoku-online.js`、`gomoku-config.js` 发布到原 GitHub Pages 站点。两台设备分别选择「在线对战」，一方建房、一方输入六位房间码。

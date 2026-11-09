@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
@@ -18,8 +18,9 @@ child.on('close', async code => {
     const matches = output.match(/https:\/\/fantastic-matrix-gomoku\.[a-z0-9-]+\.workers\.dev\b/g);
     if (!matches?.length) throw new Error('服务已部署，但未能自动获取地址。请从 Cloudflare 控制台复制地址到 gomoku-config.js。');
     const endpoint = matches.at(-1);
-    const health = await fetch(endpoint + '/health', { signal: AbortSignal.timeout(15000) });
-    if (!health.ok || (await health.json()).service !== 'fantastic-matrix-gomoku') {
+    // curl preserves the system proxy and CA settings on local and managed machines.
+    const health = execFileSync('curl', ['--fail', '--silent', '--show-error', '--retry', '5', '--retry-all-errors', '--retry-delay', '2', '--retry-max-time', '30', '--max-time', '15', endpoint + '/health'], { encoding: 'utf8' });
+    if (JSON.parse(health).service !== 'fantastic-matrix-gomoku') {
       throw new Error('服务已部署，但健康检查未通过。请稍后检查 /health，再填写 gomoku-config.js。');
     }
     const config = '// Public room service endpoint; no account credentials belong in this file.\n' +
