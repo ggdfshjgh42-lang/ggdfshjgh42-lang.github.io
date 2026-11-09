@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fantastic-matrix-gomoku",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-07-01",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://fantasticmatrix.xyz,https://www.fantasticmatrix.xyz,https://ggdfshjgh42-lang.github.io,http://localhost:8080,http://127.0.0.1:8080"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "GomokuRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GomokuRoom"] }]
+}

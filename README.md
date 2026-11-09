@@ -25,7 +25,9 @@ Chrome 中已登录 GitHub，并不会自动为其他网站提供 API 授权。�
 - `content.json`：四篇原有文章及网站文字，编辑器只更新这个文件。
 - `content.js`：共享的数据校验、正文清理及 GitHub 编码。
 - `admin.html` / `admin.css` / `admin.js`：浏览器中的内容管理页。
-- `gomoku.html`：原有五子棋。
+- `gomoku.html` / `gomoku-online.js`：五子棋及 WebSocket 联机界面。
+- `gomoku-config.js`：公开的联机服务地址。
+- `multiplayer/`：免费计划可用的 Cloudflare 房间服务、测试及部署说明，详见 [联机服务部署](multiplayer/README.md)。
 - `CNAME`：自定义域名。
 
 本地预览：在此目录运行 `python -m http.server 8080`，然后打开 `http://localhost:8080/admin.html`。不要直接双击 HTML 文件，否则浏览器无法加载内容文件。

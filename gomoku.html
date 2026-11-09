@@ -193,6 +193,8 @@
             background: #a93226;
             transform: translateY(-1px);
         }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
         .btn:active {
             transform: translateY(0);
         }
@@ -444,7 +446,7 @@
             canvas { max-width: 100%; height: auto; }
         }
     </style>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="gomoku-config.js"></script>
 </head>
 <body>
 
@@ -484,24 +486,26 @@
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-secondary" onclick="undo()">↩ 悔棋</button>
-                <button class="btn btn-primary" onclick="newGame()">🔄 新游戏</button>
-                <button class="btn btn-accent" onclick="resetScore()">🗑 重置比分</button>
+                <button class="btn btn-secondary" id="undo-button" onclick="undo()">↩ 悔棋</button>
+                <button class="btn btn-primary" id="new-game-button" onclick="newGame()">🔄 新游戏</button>
+                <button class="btn btn-accent" id="reset-score-button" onclick="resetScore()">🗑 重置比分</button>
             </div>
         </div>
 
         <!-- Room Panel (online mode) -->
         <div class="room-panel" id="room-panel">
             <h3>🌐 在线对战</h3>
-            <div class="conn-status" id="conn-status">
+            <div class="conn-status" id="conn-status" role="status" aria-live="polite">
                 <span class="conn-dot" id="conn-dot"></span>
                 <span id="conn-text">等待连接...</span>
             </div>
 
+            <button class="btn btn-secondary" id="reconnect-button" onclick="retryRoomConnection()" hidden>重新连接</button>
+
             <!-- Create room view -->
             <div id="create-view">
                 <p style="font-size:14px;color:var(--text-secondary);">创建一个房间，把房间码发给朋友</p>
-                <button class="btn-online" onclick="createRoom()" style="width:100%;">🎮 创建房间</button>
+                <button class="btn-online" id="create-room-button" onclick="createRoom()" style="width:100%;">🎮 创建房间</button>
             </div>
 
             <!-- Room created view -->
@@ -519,12 +523,13 @@
             <!-- Join room view -->
             <div id="join-view" style="width:100%;">
                 <p style="font-size:14px;color:var(--text-secondary);margin-bottom:4px;">输入朋友分享的房间码</p>
-                <input type="text" class="room-input" id="room-input" placeholder="输入房间码" maxlength="6" autocomplete="off">
-                <button class="btn-online" onclick="joinRoom()" style="width:100%;margin-top:10px;">🚪 加入房间</button>
+                <input type="text" class="room-input" id="room-input" placeholder="输入房间码" aria-label="房间码" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <button class="btn-online" id="join-room-button" onclick="joinRoom()" style="width:100%;margin-top:10px;">🚪 加入房间</button>
             </div>
 
             <!-- Connected game view -->
             <div id="online-game-view" style="display:none;width:100%;text-align:center;">
+                <p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">房间 <span id="room-code-active"></span></p>
                 <p style="font-size:14px;color:var(--text-secondary);">你执 <span id="my-color-display" style="font-weight:700;"></span></p>
                 <button class="btn-leave" onclick="leaveRoom()" style="width:100%;">退出房间</button>
             </div>
@@ -565,12 +570,11 @@
         let scoreBlack = 0;
         let scoreWhite = 0;
         let aiThinking = false;
+        let aiTimer = null;
         let lastMove = null;
 
         // ========== Online state ==========
         let myColor = null;       // BLACK or WHITE (which color I play)
-        let peer = null;
-        let conn = null;
         let roomCode = null;
         let onlineConnected = false;
 
@@ -578,6 +582,8 @@
         const ctx = canvas.getContext('2d');
 
         function initBoard() {
+            clearTimeout(aiTimer);
+            aiTimer = null;
             board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(EMPTY));
             currentPlayer = BLACK;
             history = [];
@@ -791,6 +797,10 @@
             if (distX > CELL_SIZE * 0.45 || distY > CELL_SIZE * 0.45) return;
             if (!isValidMove(r, c)) return;
 
+            if (mode === 'online') {
+                if (board[r][c] === EMPTY) sendOnlineAction('move', { r, c });
+                return;
+            }
             placeStone(r, c);
         });
 
@@ -836,17 +846,12 @@
             updateStatus();
             draw();
 
-            // Online mode: send move to opponent
-            if (mode === 'online' && conn && conn.open) {
-                conn.send({ type: 'move', r, c, player: board[r][c] });
-            }
-
             // AI move
             if (mode === 'ai' && currentPlayer === WHITE && !gameOver) {
                 aiThinking = true;
                 updateStatus();
                 draw();
-                setTimeout(aiMove, 300);
+                aiTimer = setTimeout(aiMove, 300);
             }
         }
 
@@ -888,7 +893,7 @@
 
         // ========== AI ==========
         function aiMove() {
-            if (gameOver) { aiThinking = false; return; }
+            if (mode !== 'ai' || gameOver) { aiThinking = false; return; }
 
             const move = findBestMove();
             if (move) {
@@ -979,6 +984,11 @@
         function updateStatus(type) {
             const statusEl = document.getElementById('status-text');
             const hintEl = document.getElementById('turn-hint');
+            if (mode === 'online' && !onlineConnected) {
+                statusEl.textContent = '在线对战';
+                hintEl.textContent = roomCode ? '双方连接后即可落子' : '请先创建或加入房间';
+                return;
+            }
             if (type === 'draw') {
                 statusEl.textContent = '平局！';
                 hintEl.textContent = '棋盘已满';
@@ -1035,12 +1045,13 @@
             newGame();
         }
 
-        function newGame(silent) {
+        function newGame() {
+            if (mode === 'online') {
+                sendOnlineAction('newgame');
+                return;
+            }
             document.getElementById('winner-overlay').classList.remove('show');
             initBoard();
-            if (!silent && mode === 'online' && conn && conn.open) {
-                conn.send({ type: 'newgame' });
-            }
         }
 
         function undo() {
@@ -1062,6 +1073,10 @@
         }
 
         function resetScore() {
+            if (mode === 'online') {
+                sendOnlineAction('reset_score');
+                return;
+            }
             scoreBlack = 0;
             scoreWhite = 0;
             updateScores();
@@ -1069,6 +1084,7 @@
         }
 
         function setMode(newMode) {
+            if (newMode === mode) return;
             if (mode === 'online' && newMode !== 'online') {
                 leaveRoom();
             }
@@ -1083,267 +1099,18 @@
 
             // Show/hide panels
             const roomPanel = document.getElementById('room-panel');
-            const sidePanel = document.querySelector('.side-panel');
-            const boardWrapper = document.querySelector('.board-wrapper');
 
             if (newMode === 'online') {
                 roomPanel.classList.add('show');
-                // Hide side panel game controls in online mode, keep board visible
                 document.getElementById('status-text').textContent = '在线对战';
                 document.getElementById('turn-hint').textContent = '请先创建或加入房间';
-                resetOnlineUI();
+                prepareOnlineMode();
             } else {
                 roomPanel.classList.remove('show');
             }
 
-            newGame();
-        }
-
-        // ========== Online Multiplayer ==========
-        function resetOnlineUI() {
-            document.getElementById('create-view').style.display = 'block';
-            document.getElementById('room-view').style.display = 'none';
-            document.getElementById('join-view').style.display = 'block';
-            document.getElementById('online-game-view').style.display = 'none';
-            document.getElementById('room-input').value = '';
-            document.getElementById('conn-text').textContent = '等待连接...';
-            document.getElementById('conn-dot').className = 'conn-dot';
-            document.getElementById('copy-hint').style.display = 'none';
-        }
-
-        function updateConnStatus(status, text) {
-            const dot = document.getElementById('conn-dot');
-            const txt = document.getElementById('conn-text');
-            dot.className = 'conn-dot ' + status;
-            txt.textContent = text;
-        }
-
-        function generateRoomCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars[Math.floor(Math.random() * chars.length)];
-            }
-            return code;
-        }
-
-        function createRoom() {
-            roomCode = generateRoomCode();
-            const peerId = 'gomoku-' + roomCode;
-
-            // Clean up existing connection
-            if (peer) { peer.destroy(); }
-
-            peer = new Peer(peerId);
-
-            peer.on('open', function(id) {
-                document.getElementById('create-view').style.display = 'none';
-                document.getElementById('join-view').style.display = 'none';
-                document.getElementById('room-view').style.display = 'block';
-                document.getElementById('room-code-display').textContent = roomCode;
-                updateConnStatus('', '等待对手加入...');
-            });
-
-            peer.on('connection', function(connection) {
-                setupConnection(connection);
-            });
-
-            peer.on('error', function(err) {
-                console.error('Peer error:', err);
-                updateConnStatus('red', '连接失败，请重试');
-                if (err.type === 'unavailable-id') {
-                    // Retry with new code
-                    createRoom();
-                }
-            });
-
-            peer.on('disconnected', function() {
-                peer.reconnect();
-            });
-        }
-
-        function joinRoom() {
-            const input = document.getElementById('room-input');
-            const code = input.value.trim().toUpperCase();
-            if (!code || code.length < 4) {
-                updateConnStatus('red', '请输入有效的房间码');
-                return;
-            }
-
-            roomCode = code;
-            const peerId = 'gomoku-' + code;
-
-            if (peer) { peer.destroy(); }
-
-            // Joiner uses a random ID
-            const myPeerId = 'gomoku-join-' + generateRoomCode();
-            peer = new Peer(myPeerId);
-
-            peer.on('open', function() {
-                updateConnStatus('', '正在连接房间...');
-                const connection = peer.connect(peerId, {
-                    reliable: true
-                });
-                setupConnection(connection);
-            });
-
-            peer.on('error', function(err) {
-                console.error('Peer error:', err);
-                if (err.type === 'peer-unavailable') {
-                    updateConnStatus('red', '找不到该房间，请检查房间码');
-                } else {
-                    updateConnStatus('red', '连接失败，请重试');
-                }
-            });
-
-            peer.on('disconnected', function() {
-                peer.reconnect();
-            });
-        }
-
-        function setupConnection(connection) {
-            conn = connection;
-
-            conn.on('open', function() {
-                onlineConnected = true;
-
-                // Host (creator) is Black, Joiner is White
-                // If we created the room, we're the host
-                const isHost = !peer.id.startsWith('gomoku-join-');
-
-                if (isHost) {
-                    myColor = BLACK;
-                    conn.send({ type: 'start', hostColor: BLACK, guestColor: WHITE });
-                }
-
-                document.getElementById('create-view').style.display = 'none';
-                document.getElementById('room-view').style.display = 'none';
-                document.getElementById('join-view').style.display = 'none';
-                document.getElementById('online-game-view').style.display = 'block';
-
-                document.getElementById('my-color-display').textContent = myColor === BLACK ? '⚫ 黑棋' : '⚪ 白棋';
-                document.getElementById('my-color-display').innerHTML = myColor === BLACK
-                    ? '<span class="online-color-badge black"></span> 黑棋（先手）'
-                    : '<span class="online-color-badge white"></span> 白棋（后手）';
-
-                updateConnStatus('green', '已连接');
-
-                initBoard();
-                updateStatus();
-                draw();
-            });
-
-            conn.on('data', function(data) {
-                handleRemoteData(data);
-            });
-
-            conn.on('close', function() {
-                onlineConnected = false;
-                updateConnStatus('red', '对手已断开');
-                document.getElementById('turn-hint').textContent = '对手离开了房间';
-            });
-
-            conn.on('error', function(err) {
-                console.error('Connection error:', err);
-                updateConnStatus('red', '连接出错');
-            });
-        }
-
-        function handleRemoteData(data) {
-            switch (data.type) {
-                case 'start':
-                    // I'm the joiner, host assigned colors
-                    myColor = data.guestColor;
-                    document.getElementById('my-color-display').innerHTML = myColor === BLACK
-                        ? '<span class="online-color-badge black"></span> 黑棋（先手）'
-                        : '<span class="online-color-badge white"></span> 白棋（后手）';
-                    document.getElementById('online-game-view').style.display = 'block';
-                    updateConnStatus('green', '已连接');
-                    initBoard();
-                    updateStatus();
-                    draw();
-                    break;
-
-                case 'move':
-                    // Opponent made a move
-                    if (gameOver) return;
-                    if (data.r !== undefined && data.c !== undefined) {
-                        board[data.r][data.c] = data.player;
-                        lastMove = [data.r, data.c];
-
-                        const win = checkWin(data.r, data.c, data.player);
-                        if (win) {
-                            gameOver = true;
-                            winLine = win;
-                            if (data.player === BLACK) scoreBlack++;
-                            else scoreWhite++;
-                            updateScores();
-                            updateStatus();
-                            draw();
-                            showWinner(data.player);
-                        } else if (isBoardFull()) {
-                            gameOver = true;
-                            updateStatus('draw');
-                            draw();
-                        } else {
-                            currentPlayer = data.player === BLACK ? WHITE : BLACK;
-                            updateStatus();
-                            draw();
-                        }
-                    }
-                    break;
-
-                case 'newgame':
-                    newGame(true);
-                    break;
-            }
-        }
-
-        function copyRoomCode() {
-            if (!roomCode) return;
-            navigator.clipboard.writeText(roomCode).then(function() {
-                document.getElementById('copy-hint').style.display = 'block';
-                setTimeout(function() {
-                    document.getElementById('copy-hint').style.display = 'none';
-                }, 3000);
-            }).catch(function() {
-                // Fallback
-                const input = document.createElement('input');
-                input.value = roomCode;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                document.body.removeChild(input);
-                document.getElementById('copy-hint').style.display = 'block';
-                setTimeout(function() {
-                    document.getElementById('copy-hint').style.display = 'none';
-                }, 3000);
-            });
-        }
-
-        function leaveRoom() {
-            if (conn) {
-                conn.close();
-                conn = null;
-            }
-            if (peer) {
-                peer.destroy();
-                peer = null;
-            }
-            onlineConnected = false;
-            myColor = null;
-            roomCode = null;
-            resetOnlineUI();
-            // Switch back to PvP mode
-            mode = 'pvp';
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                if (btn.textContent.includes('双人')) btn.classList.add('active');
-            });
-            document.getElementById('room-panel').classList.remove('show');
-            updateConnStatus('', '等待连接...');
-            document.getElementById('conn-dot').className = 'conn-dot';
-            newGame();
+            initBoard();
+            updateOnlineControls();
         }
 
         // ========== Init ==========
@@ -1352,5 +1119,6 @@
         // Redraw on DPR change (e.g., moving between monitors)
         window.addEventListener('resize', draw);
     </script>
+    <script src="gomoku-online.js"></script>
 </body>
 </html>
