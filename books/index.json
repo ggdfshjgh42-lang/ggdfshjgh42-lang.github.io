@@ -1,0 +1,9 @@
+---
+layout: null
+---
+{
+  "version": 1,
+  "books": [{% assign first_book = true %}{% for file in site.static_files %}{% assign prefix = file.path | slice: 0, 7 %}{% assign extension = file.extname | downcase %}{% if prefix == '/books/' %}{% if extension == '.epub' or extension == '.pdf' or extension == '.txt' %}{% unless first_book %},{% endunless %}
+    {"path": {{ file.path | remove_first: '/' | jsonify }}}{% assign first_book = false %}{% endif %}{% endif %}{% endfor %}
+  ]
+}

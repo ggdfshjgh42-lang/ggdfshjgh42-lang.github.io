@@ -231,8 +231,16 @@ footer p { font-size: 10px; color: var(--text-secondary); margin-top: 5px; }
     .nav-links { gap: 10px; }
     .brand-mark { display: none; }
 }
+/* Four navigation entries fit without shrinking the reading area. */
+@media (min-width: 361px) and (max-width: 480px) {
+    .nav-inner { gap: 8px; }
+    .nav-links { gap: 12px; }
+    .nav-logo { font-size: 11px; }
+    .brand-mark { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .reveal-pending { opacity: 1; transform: none; }
 }
+

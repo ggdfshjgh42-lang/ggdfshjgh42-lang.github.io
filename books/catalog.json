@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "books": [
+    {
+      "path": "books/开始阅读.txt",
+      "title": "从这一页开始",
+      "author": "Fantastic Matrix",
+      "category": "书架指南",
+      "description": "一份很短的阅读示例，也告诉你怎样把自己的书放上书架。"
+    }
+  ]
+}

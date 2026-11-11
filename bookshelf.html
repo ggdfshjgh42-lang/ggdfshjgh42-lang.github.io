@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8f2">
+    <meta name="description" content="Fantastic Matrix 私人书架。挑一本书，慢慢读，保存属于自己的阅读进度。">
+    <title>书架 | Fantastic Matrix</title>
+    <link rel="stylesheet" href="blog.css">
+    <link rel="stylesheet" href="bookshelf.css">
+    <script src="book-library.js" defer></script>
+    <script src="bookshelf.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#my-books">跳到书籍列表</a>
+    <nav aria-label="主导航"><div class="nav-inner">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f</span><span class="nav-logo">Fantastic Matrix</span></a>
+        <ul class="nav-links"><li><a href="index.html">博客</a></li><li><a href="optics-roadmap.html">光学学习 <span aria-hidden="true">↗</span></a></li><li><a href="bookshelf.html" class="is-active" aria-current="page">书架 <span class="nav-dot" aria-hidden="true"></span></a></li><li><a href="games.html">小游戏 <span aria-hidden="true">↗</span></a></li></ul>
+    </div></nav>
+    <main class="container shelf-home">
+        <header class="shelf-hero">
+            <div class="shelf-hero-copy"><p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> A LITTLE ROOM FOR READING</p><h1>把时间，<br>留给一本书<span>。</span></h1><p>收藏想读的，也重读喜欢的。<br>从上次停下的那一页，接着往下看。</p><a href="#my-books" class="explore-link">去书架看看 <span aria-hidden="true">↓</span></a></div>
+            <div class="shelf-art" aria-hidden="true"><div class="book-stack"><div class="art-book art-book-one"><span>保持<br>好奇</span><i>FANTASTIC MATRIX</i></div><div class="art-book art-book-two"><span>慢慢<br>读</span><i>A SMALL LIBRARY</i></div><div class="art-book art-book-three"><span>翻开<br>一页</span><i>ONE PAGE AT A TIME</i></div></div><div class="art-shelf-line"></div><span class="shelf-art-note">✳ &nbsp; 读到哪里，都算有收获</span></div>
+        </header>
+        <section class="continue-panel" id="continue-reading" aria-label="继续阅读" hidden><div><p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p><h2 id="resume-title"></h2><p id="resume-detail"></p></div><a id="resume-book" class="shelf-button" href="bookshelf.html">继续阅读 <span aria-hidden="true">→</span></a></section>
+        <section id="my-books" aria-labelledby="shelf-title">
+            <div class="shelf-heading"><div><p class="eyebrow">THE BOOKSHELF</p><h2 id="shelf-title">我的书架<span>。</span></h2></div><span id="shelf-count">正在整理书籍…</span></div>
+            <div class="shelf-toolbar"><label class="search-wrap" for="book-search"><span aria-hidden="true">⌕</span><input id="book-search" type="search" placeholder="搜书名、作者或关键词" autocomplete="off"><span class="sr-only">搜索书籍</span></label><label class="filter-wrap"><span class="sr-only">书籍格式</span><select id="format-filter"><option value="all">全部格式</option><option value="epub">EPUB</option><option value="pdf">PDF</option><option value="txt">TXT</option></select></label><label class="filter-wrap"><span class="sr-only">书籍分类</span><select id="category-filter"><option value="all">全部分类</option></select></label><button class="refresh-button" id="refresh-books" type="button" aria-label="刷新书架"><span aria-hidden="true">↻</span> 刷新</button></div>
+            <p class="shelf-warning" id="shelf-warning" role="status" hidden></p>
+            <p id="shelf-status" class="shelf-status" role="status" aria-live="polite">正在整理书架，请稍等…</p>
+            <div class="book-grid" id="book-grid"></div>
+            <div id="empty-shelf" class="empty-shelf" hidden><span class="empty-symbol" aria-hidden="true">▤</span><h3 id="empty-title">书架，等你放上第一本书。</h3><p id="empty-detail">导入喜欢的书，再从这里慢慢读。</p><a class="shelf-button secondary" id="empty-action" href="#add-books">看看怎么加书 <span aria-hidden="true">↗</span></a></div>
+            <noscript><p class="shelf-warning">请启用 JavaScript 以显示书架和打开在线阅读器。</p></noscript>
+        </section>
+        <details class="import-guide" id="add-books"><summary><span><span aria-hidden="true">＋</span> 给书架添一本书</span><span class="guide-chevron" aria-hidden="true">⌄</span></summary><div class="import-content"><p>将 <strong>EPUB、PDF 或 TXT</strong> 文件上传到网站仓库的 <code>books/</code> 文件夹。提交到 <code>main</code>，等待网站更新后，点击「刷新」，新书就会出现在这里。</p><p>文件名可以写成 <code>书名 - 作者.epub</code>，也可以按文件夹分类，例如 <code>books/文学/书名.epub</code>。封面、简介等资料可以在 <code>books/catalog.json</code> 中补充。</p><a class="import-link" href="https://github.com/ggdfshjgh42-lang/ggdfshjgh42-lang.github.io/upload/main/books" target="_blank" rel="noopener noreferrer">去 GitHub 上传书籍 <span aria-hidden="true">↗</span></a><p class="guide-footnote">阅读进度保存在当前浏览器，换设备不会自动同步。</p></div></details>
+    </main>
+    <footer><div class="container footer-inner"><div><a class="footer-wordmark" href="index.html">fantastic matrix</a><p>一页一页，读进自己的时间里。</p></div><div class="footer-details"><a href="index.html">返回博客 <span aria-hidden="true">↗</span></a></div></div></footer>
+</body>
+</html>

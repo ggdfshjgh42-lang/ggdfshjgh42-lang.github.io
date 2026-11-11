@@ -38,3 +38,10 @@ GitHub Pages 的发布分支应指向 `main`，目录为仓库根目录（Settin
 参考：[GitHub 内容 API](https://docs.github.com/en/rest/repos/contents)，[访问令牌管理](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)。
 
 象棋规则测试：运行 `node --test tests/xiangqi.test.cjs`。象棋采用休闲和棋规则（三次重复局面或连续 60 回合无吃子），不裁定竞赛中的长将、长捉。
+
+## 在线书架
+
+打开 [书架](https://fantasticmatrix.xyz/bookshelf.html)，可以在线阅读 EPUB、PDF 和 TXT。把书籍上传到仓库 `books/` 文件夹并提交到 `main`，等待 Pages 更新后刷新书架即可。支持子文件夹分类、书名与作者搜索、格式筛选、文字封面、继续阅读和本地阅读进度。书籍资料和上传方法见 [添加书籍说明](books/README.md)。
+
+EPUB/TXT 支持章节目录、字号与阅读主题；PDF 保留固定版式，支持页码跳转。阅读进度和偏好只保存在当前浏览器，不会跨设备自动同步。现有 Jekyll 发布流程自动生成 `books/index.json` 书单，本地预览时可回退至 GitHub 公开目录；同步错误时保留缓存及 `books/catalog.json` 备用书单。不需要向读者索取 GitHub 令牌。
+

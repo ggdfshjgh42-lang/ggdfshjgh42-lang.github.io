@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f2">
+  <meta name="description" content="Fantastic Matrix 在线阅读：在书页之间，留一点自己的时间。">
+  <title>在线阅读 | Fantastic Matrix</title>
+  <link rel="stylesheet" href="reader.css">
+  <script src="book-library.js" defer></script>
+  <script src="reader.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#reader-stage">跳到正文</a>
+  <header class="reader-header">
+    <a class="back-link" href="bookshelf.html"><span aria-hidden="true">←</span> 书架</a>
+    <div class="book-heading"><p id="book-format">FANTASTIC MATRIX / READING ROOM</p><h1 id="book-title">打开一本书</h1></div>
+    <a class="original-link" id="original-link" hidden target="_blank" rel="noopener">原文件 <span aria-hidden="true">↗</span></a>
+  </header>
+  <div class="reader-tools" aria-label="阅读设置">
+    <button type="button" id="directory-toggle" aria-expanded="false" aria-controls="reader-sidebar">☰ <span>目录</span></button>
+    <div class="tool-group" id="font-tools"><button type="button" id="font-smaller" aria-label="缩小字号">A−</button><output id="font-size">18</output><button type="button" id="font-larger" aria-label="放大字号">A＋</button></div>
+    <div class="tool-group theme-tools" role="group" aria-label="阅读配色"><button type="button" data-theme="paper" aria-label="纸张配色" title="纸张" aria-pressed="true">纸</button><button type="button" data-theme="light" aria-label="明亮配色" title="明亮" aria-pressed="false">日</button><button type="button" data-theme="dark" aria-label="深色配色" title="深色" aria-pressed="false">夜</button></div>
+    <label class="encoding-tool" id="encoding-tool" hidden>编码 <select id="text-encoding" aria-label="文字编码"><option value="auto">自动</option><option value="utf-8">UTF-8</option><option value="gb18030">GB18030 / GBK</option><option value="utf-16le">UTF-16</option></select></label>
+    <div class="tool-group pdf-tools" id="pdf-tools" hidden><button type="button" id="zoom-out" aria-label="缩小 PDF">−</button><output id="pdf-zoom">100%</output><button type="button" id="zoom-in" aria-label="放大 PDF">＋</button></div>
+  </div>
+  <div class="reader-layout" id="reader-layout">
+    <aside class="reader-sidebar" id="reader-sidebar" aria-label="书籍目录" hidden><div class="directory-heading"><h2>目录</h2><button type="button" id="directory-close" aria-label="关闭目录">×</button></div><p class="directory-info" id="directory-info">正在整理书页…</p><ol id="chapter-list"></ol></aside>
+    <button class="sidebar-backdrop" id="sidebar-backdrop" aria-label="关闭目录" hidden></button>
+    <main class="reader-stage" id="reader-stage" tabindex="-1">
+      <section class="reader-message" id="reader-message" role="status" aria-live="polite"><span class="message-mark" aria-hidden="true">✳</span><h2 id="message-title">正在打开书籍</h2><p id="message-detail">请稍等，让文字慢慢铺开。</p><button class="retry-button" id="reader-retry" type="button" hidden>重新打开</button><a href="bookshelf.html" class="message-back">返回书架 →</a></section>
+      <iframe id="reading-frame" title="书籍正文" sandbox="allow-same-origin" referrerpolicy="no-referrer" hidden></iframe>
+      <div class="pdf-view" id="pdf-view" hidden><canvas id="pdf-canvas" role="img" aria-label="PDF 书页"></canvas><div class="sr-only" id="pdf-text"></div></div>
+    </main>
+  </div>
+  <footer class="reader-footer">
+    <button type="button" id="previous-chapter" aria-label="上一章或上一页" disabled>← <span>上一章</span></button>
+    <div class="reading-status"><label id="page-label" hidden><input id="page-number" type="number" min="1" value="1" aria-label="跳转 PDF 页码"> / <span id="page-total">1</span> 页</label><span id="chapter-status">准备阅读</span><div class="progress-track" id="reading-progress" role="progressbar" aria-label="阅读进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="reading-progress-fill"></span></div><small id="progress-status">进度保存在当前设备</small></div>
+    <button type="button" id="next-chapter" aria-label="下一章或下一页" disabled><span>下一章</span> →</button>
+  </footer>
+  <div class="reader-toast" id="reader-toast" role="status" aria-live="polite"></div>
+</body>
+</html>
