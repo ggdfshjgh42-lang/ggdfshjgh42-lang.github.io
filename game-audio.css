@@ -1,0 +1,36 @@
+.game-sound-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 13px;
+    border: 1px solid var(--border, #ccd4c5);
+    border-radius: 8px;
+    background: var(--surface, #fffef8);
+    color: var(--text, #354438);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.game-sound-button:hover { background: #edf2e1; }
+.game-sound-button:focus-visible { outline: 2px solid #537747; outline-offset: 3px; }
+.chess-settings .game-sound-button { margin-top: 12px; }
+.gomoku-ai-settings { width: 100%; }
+.gomoku-ai-settings[hidden] { display: none; }
+.gomoku-ai-settings label { display: block; font-size: 12px; margin-bottom: 6px; color: var(--text-secondary, #65715e); }
+.gomoku-ai-settings select {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #ccd4c5;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #fffef8;
+    color: #354438;
+    font: inherit;
+    font-size: 13px;
+}
+.gomoku-ai-settings p { margin-top: 5px; font-size: 11px; color: var(--text-secondary, #65715e); }
+@media (max-width: 700px) {
+    .back-link { position: static; align-self: flex-start; margin-bottom: 14px; }
+}

@@ -120,3 +120,34 @@ test('deterministic playouts preserve piece counts, both generals, and legality'
         turn = X.other(turn);
     }
 });
+test('direct check detection agrees with geometric attacks over randomized legal games', () => {
+    let seed = 101;
+    for (let game = 0; game < 8; game++) {
+        let b = X.initialBoard(), turn = 'r';
+        for (let ply = 0; ply < 100; ply++) {
+            for (const side of ['r', 'b']) {
+                const king = b.indexOf(side + 'K');
+                const attacked = king < 0 || b.some((p, i) => p && p[0] !== side && X.pseudoMoves(b, i).some(m => m.to === king));
+                assert.equal(X.inCheck(b, side), attacked, `${game}:${ply}:${side}`);
+            }
+            const moves = X.legalMoves(b, turn); if (!moves.length) break;
+            seed = (seed * 1664525 + 1013904223) >>> 0;
+            b = X.applyMove(b, moves[seed % moves.length]); turn = X.other(turn);
+        }
+    }
+});
+test('capture continuation sees a poisoned pawn beyond a one-ply horizon', () => {
+    const b = fixture([[0, 3, 'bK'], [9, 4, 'rK'], [7, 0, 'rR'], [4, 0, 'bP'], [4, 2, 'bR']]), original = b.slice();
+    const m = X.findBestMove(b, 'r', {depth: 1, timeMs: 2000});
+    assert.notDeepEqual([m.from, m.to], [at(7, 0), at(4, 0)], 'a pawn is not worth losing a rook on the next capture');
+    assert.deepEqual(b, original);
+});
+test('search respects supplied repetition history and does not mutate it', () => {
+    const b = X.initialBoard();
+    const history = [X.positionKey(b, 'r')];
+    for (const m of X.legalMoves(b, 'r')) {
+        const key = X.positionKey(X.applyMove(b, m), 'b'); history.push(key, key);
+    }
+    const original = history.slice(), m = X.findBestMove(b, 'r', {depth: 2, timeMs: 1000, history});
+    assert.equal(m.score, 0); assert.equal(m.depth, 2); assert.deepEqual(history, original);
+});

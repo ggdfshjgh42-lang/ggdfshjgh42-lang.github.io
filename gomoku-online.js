@@ -256,6 +256,7 @@ function sendOnlineAction(type, extra = {}) {
 }
 
 function applyOnlineState(data) {
+    const moved = roomCode === data.code && onlineRound === data.round && data.moves === onlineMoveNumber + 1;
     clearTimeout(onlineMoveTimer);
     onlinePendingMove = false;
     myColor = data.color;
@@ -289,6 +290,11 @@ function applyOnlineState(data) {
     }
     updateOnlineControls();
     draw();
+    if (moved) {
+        GameAudio.play('move');
+        if (data.winner) GameAudio.play(data.winner === myColor ? 'win' : 'lose', 0.12);
+        else if (data.draw) GameAudio.play('draw', 0.12);
+    }
     const winKey = roomCode + ':' + data.round;
     if (data.winner && onlineAnnouncedWin !== winKey) {
         onlineAnnouncedWin = winKey;

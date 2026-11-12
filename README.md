@@ -27,6 +27,9 @@ Chrome 中已登录 GitHub，并不会自动为其他网站提供 API 授权。�
 - `admin.html` / `admin.css` / `admin.js`：浏览器中的内容管理页。
 - `optics-roadmap.html` / `optics.css` / `optics.js` / `optics-data.js`：光学学习室，含 8 周 56 课、例题解析、薄透镜实验与公式速查。原有学习进度自动保留；学习笔记保存在当前浏览器，可导出 Markdown 记录。
 - `gomoku.html` / `gomoku-online.js`：五子棋及 WebSocket 联机界面。
+- `gomoku-engine.js` / `gomoku-worker.js`：五子棋多步搜索、成五优先、防守跳四和双重威胁；在 Worker 中运行。
+- `xiangqi.html` / `xiangqi.js` / `xiangqi-engine.js` / `xiangqi-worker.js`：中国象棋、走法提示及人机搜索；包含吃子延伸、局面缓存、走法排序及重复局面判断。
+- `game-audio.js` / `game-audio.css`：两种棋共用的落子、吃子、将军与胜负音效，以及静音按钮；浏览器本地合成，无外部音频依赖。
 - `gomoku-config.js`：公开的联机服务地址。
 - `multiplayer/`：免费计划可用的 Cloudflare 房间服务、测试及部署说明，详见 [联机服务部署](multiplayer/README.md)。
 - `CNAME`：自定义域名。
@@ -37,7 +40,9 @@ GitHub Pages 的发布分支应指向 `main`，目录为仓库根目录（Settin
 
 参考：[GitHub 内容 API](https://docs.github.com/en/rest/repos/contents)，[访问令牌管理](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)。
 
-象棋规则测试：运行 `node --test tests/xiangqi.test.cjs`。象棋采用休闲和棋规则（三次重复局面或连续 60 回合无吃子），不裁定竞赛中的长将、长捉。
+两种棋均提供入门、普通、挑战三档难度，可以在对局中切换。搜索有时间与节点上限，取最后一轮完整搜索的结果；Worker 不可用时回退到短时本地搜索。音效在首次点击或按键后启用，静音选择保存在当前浏览器并在两种棋间共用，不播放背景音乐。
+
+规则与战术测试：`node --test tests/xiangqi.test.cjs tests/gomoku.test.cjs`。浏览器回归：安装 Playwright 和 Chromium 后运行 `python tests/games.browser.py`，覆盖桌面和手机、Worker 取消、回退、难度切换、静音保存、音频波形及联机状态重播。象棋采用休闲和棋规则（三次重复局面或连续 60 回合无吃子），不裁定竞赛中的长将、长捉。
 
 ## 在线书架
 

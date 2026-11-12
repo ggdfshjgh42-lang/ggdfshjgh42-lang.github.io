@@ -8,8 +8,10 @@
     <title>中国象棋 · 小游戏 | Fantastic Matrix</title>
     <link rel="stylesheet" href="blog.css">
     <link rel="stylesheet" href="games.css">
-    <script src="xiangqi-engine.js" defer></script>
-    <script src="xiangqi.js" defer></script>
+    <link rel="stylesheet" href="game-audio.css?v=20261112-ai2">
+    <script src="game-audio.js?v=20261112-ai2" defer></script>
+    <script src="xiangqi-engine.js?v=20261112-ai2" defer></script>
+    <script src="xiangqi.js?v=20261112-ai2" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#chess-board">跳到棋盘</a>
@@ -37,7 +39,7 @@
             </section>
             <aside class="chess-sidebar" aria-label="对局控制">
                 <section class="game-status" aria-live="polite" aria-atomic="true"><p class="eyebrow" id="round-label">第 1 回合</p><div class="status-title"><span id="turn-indicator" class="player-dot red-dot"></span><h2 id="game-status">红方先行</h2></div><p id="game-hint">你执红棋，选择一枚棋子开始。</p></section>
-                <section class="chess-settings"><h2 class="small-heading">这盘怎么下</h2><label for="game-mode">对战模式</label><select id="game-mode"><option value="ai">人机对战</option><option value="pvp">本地双人</option></select><div id="ai-settings" class="ai-settings"><div><label for="human-side">我方执子</label><select id="human-side"><option value="r">红方 · 先手</option><option value="b">黑方 · 后手</option></select></div><div><label for="difficulty">电脑难度</label><select id="difficulty"><option value="easy">入门</option><option value="normal" selected>普通</option></select></div></div><label class="hint-toggle"><input id="show-hints" type="checkbox" checked> 显示合法走法</label><p class="settings-note">切换模式或执子，将开始新对局。</p></section>
+                <section class="chess-settings"><h2 class="small-heading">这盘怎么下</h2><label for="game-mode">对战模式</label><select id="game-mode"><option value="ai">人机对战</option><option value="pvp">本地双人</option></select><div id="ai-settings" class="ai-settings"><div><label for="human-side">我方执子</label><select id="human-side"><option value="r">红方 · 先手</option><option value="b">黑方 · 后手</option></select></div><div><label for="difficulty">电脑难度</label><select id="difficulty"><option value="easy">入门</option><option value="normal" selected>普通</option><option value="hard">挑战</option></select></div></div><label class="hint-toggle"><input id="show-hints" type="checkbox" checked> 显示合法走法</label><button type="button" class="game-sound-button" data-game-sound aria-pressed="true">🔊 音效：开</button><p class="settings-note">挑战难度思考稍久；切换难度不重开。</p><p class="settings-note">切换模式或执子，将开始新对局。</p></section>
                 <div class="chess-actions"><button class="primary-action" id="restart" type="button">↻ 重新开局</button><button id="undo" type="button" disabled>↶ 悔棋</button><button id="flip" type="button">⇅ 翻转棋盘</button><button id="resign" type="button">认输</button></div>
                 <section class="move-panel"><div class="move-heading"><h2 class="small-heading">对局记录</h2><span id="move-count">0 步</span></div><div class="move-history" id="move-history" tabindex="0" aria-label="走棋记录"><p class="empty-history">棋盘已摆好，等你落子。</p></div></section>
             </aside>

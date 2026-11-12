@@ -79,8 +79,38 @@
     function inCheck(board, side) {
         const king = board.indexOf(side + 'K');
         if (king < 0) return true;
-        for (let i = 0; i < 90; i++) {
-            if (board[i] && board[i][0] !== side && pseudoMoves(board, i).some(m => m.to === king)) return true;
+        const enemy = other(side), r = Math.floor(king / 9), c = king % 9;
+        // Test attacks on the general directly, without generating every enemy move.
+        for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            let screen = false;
+            for (let y = r + dy, x = c + dx; inside(y, x); y += dy, x += dx) {
+                const p = board[y * 9 + x];
+                if (!p) continue;
+                if (!screen) {
+                    if (p === enemy + 'R' || p === enemy + 'K' && (dx === 0 || Math.abs(x - c) === 1 && palace(r, c, enemy))) return true;
+                    screen = true;
+                } else {
+                    if (p === enemy + 'C') return true;
+                    break;
+                }
+            }
+        }
+        for (const [dy, dx] of [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [-1, 2], [1, -2], [-1, -2]]) {
+            const y = r + dy, x = c + dx;
+            if (!inside(y, x) || board[y * 9 + x] !== enemy + 'N') continue;
+            const legR = y - (Math.abs(dy) === 2 ? Math.sign(dy) : 0);
+            const legC = x - (Math.abs(dx) === 2 ? Math.sign(dx) : 0);
+            if (!board[legR * 9 + legC]) return true;
+        }
+        const pawnR = r + (enemy === 'r' ? 1 : -1);
+        if (inside(pawnR, c) && board[pawnR * 9 + c] === enemy + 'P') return true;
+        if (enemy === 'r' ? r <= 4 : r >= 5) {
+            for (const x of [c - 1, c + 1]) if (inside(r, x) && board[r * 9 + x] === enemy + 'P') return true;
+        }
+        for (const [dy, dx] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+            if (inside(r + dy, c + dx) && palace(r, c, enemy) && board[(r + dy) * 9 + c + dx] === enemy + 'A') return true;
+            const y = r + 2 * dy, x = c + 2 * dx;
+            if (inside(y, x) && (enemy === 'r' ? r >= 5 : r <= 4) && board[y * 9 + x] === enemy + 'B' && !board[(r + dy) * 9 + c + dx]) return true;
         }
         return false;
     }
@@ -118,13 +148,27 @@
     }
     function evaluate(board, side) {
         let total = 0;
+        const material = board.reduce((sum, p) => sum + (p && ['R', 'C', 'N'].includes(p[1]) ? VALUES[p[1]] : 0), 0);
+        const endgame = 1 - Math.min(1, material / 5000);
         for (let i = 0; i < 90; i++) {
             const p = board[i]; if (!p) continue;
             const r = Math.floor(i / 9), c = i % 9, advance = p[0] === 'r' ? 9 - r : r;
             let value = VALUES[p[1]];
-            if (p[1] === 'P') value += advance * 7 + (advance >= 5 ? 65 + (4 - Math.abs(c - 4)) * 7 : 0);
-            if (p[1] === 'N' || p[1] === 'C') value += (4 - Math.abs(c - 4)) * 6 + Math.min(advance, 6) * 3;
-            if (p[1] === 'R') value += Math.min(advance, 6) * 2;
+            const center = 4 - Math.abs(c - 4);
+            if (p[1] === 'P') value += advance * 6 + (advance >= 5 ? 65 + center * 9 : center * 2) + endgame * 35;
+            if (p[1] === 'N') value += center * 9 + Math.min(advance, 6) * 5 + endgame * 35;
+            if (p[1] === 'C') value += center * 5 + Math.min(advance, 5) * 3 - endgame * 25;
+            if (p[1] === 'R') value += Math.min(advance, 6) * 3;
+            if (['R', 'C', 'N'].includes(p[1])) {
+                const mobility = pseudoMoves(board, i);
+                value += mobility.length * (p[1] === 'N' ? 5 : p[1] === 'R' ? 2 : 1);
+                const enemyKing = board.indexOf(other(p[0]) + 'K');
+                if (enemyKing >= 0) {
+                    const kr = Math.floor(enemyKing / 9), kc = enemyKing % 9;
+                    value += mobility.filter(m => Math.abs(Math.floor(m.to / 9) - kr) + Math.abs(m.to % 9 - kc) <= 2).length * 7;
+                }
+            }
+            if (p[1] === 'K') value -= Math.abs(c - 4) * 12 + Math.min(advance, 2) * 8;
             total += p[0] === side ? value : -value;
         }
         return total;
@@ -134,28 +178,88 @@
     }
     // Iterative deepening leaves a complete shallower result when the budget expires.
     function findBestMove(input, side, options) {
-        const settings = Object.assign({depth: 3, timeMs: 900, maxNodes: 60000}, options);
+        const settings = Object.assign({depth: 4, timeMs: 1000, maxNodes: 180000}, options);
         const board = input.slice(), start = Date.now(), stop = {}, rootMoves = legalMoves(board, side);
         if (!rootMoves.length) return null;
         rootMoves.sort((a, b) => movePriority(board, b) - movePriority(board, a));
-        let best = rootMoves[0], completedDepth = 0, nodes = 0;
-        function search(turn, depth, alpha, beta, ply) {
+        const table = new Map(), killers = [], history = new Int32Array(90 * 90 * 2), repetitions = new Map();
+        for (const key of settings.history || []) repetitions.set(key, (repetitions.get(key) || 0) + 1);
+        if (!repetitions.has(positionKey(board, side))) repetitions.set(positionKey(board, side), 1);
+        let best = rootMoves[0], bestScore = 0, completedDepth = 0, nodes = 0;
+        const same = (a, b) => a && b && a.from === b.from && a.to === b.to;
+        const historyIndex = (m, turn) => (turn === 'r' ? 0 : 8100) + m.from * 90 + m.to;
+        function visit() {
             nodes++;
-            if (nodes > settings.maxNodes || Date.now() - start > settings.timeMs) throw stop;
+            if (nodes > settings.maxNodes || Date.now() - start >= settings.timeMs) throw stop;
+        }
+        function ordered(moves, turn, ply, preferred) {
+            return moves.map(m => ({m, rank: same(m, preferred) ? 10000000 : board[m.to] ? 100000 + movePriority(board, m) :
+                same(m, killers[ply]) ? 90000 : history[historyIndex(m, turn)] + movePriority(board, m)}))
+                .sort((a, b) => b.rank - a.rank).map(item => item.m);
+        }
+        // Resolve captures and all check evasions before assessing a quiet position.
+        function quiesce(turn, alpha, beta, ply, remaining) {
+            visit();
             if (board.indexOf(turn + 'K') < 0) return -MATE + ply;
+            const key = positionKey(board, turn), seen = repetitions.get(key) || 0;
+            if (seen >= 2) return 0;
+            const check = inCheck(board, turn), moves = legalMoves(board, turn);
+            if (!moves.length) return -MATE + ply;
+            const stand = evaluate(board, turn);
+            if (ply >= 48 || remaining <= -4) return stand;
+            if (!check) {
+                if (stand >= beta) return stand;
+                alpha = Math.max(alpha, stand);
+                if (remaining <= 0) return alpha;
+            }
+            repetitions.set(key, seen + 1);
+            try {
+                for (const m of ordered(check ? moves : moves.filter(m => board[m.to]), turn, ply)) {
+                    const captured = makeMove(board, m);
+                    let score;
+                    try { score = -quiesce(other(turn), -beta, -alpha, ply + 1, remaining - 1); }
+                    finally { unmakeMove(board, m, captured); }
+                    if (score >= beta) return score;
+                    alpha = Math.max(alpha, score);
+                }
+                return alpha;
+            } finally { if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
+        }
+        // Mate values in the table are relative to the stored position, not root ply.
+        const storeScore = (score, ply) => score > MATE - 100 ? score + ply : score < -MATE + 100 ? score - ply : score;
+        const loadScore = (score, ply) => score > MATE - 100 ? score - ply : score < -MATE + 100 ? score + ply : score;
+        function search(turn, depth, alpha, beta, ply) {
+            if (depth <= 0) return quiesce(turn, alpha, beta, ply, 6);
+            visit();
+            if (board.indexOf(turn + 'K') < 0) return -MATE + ply;
+            const key = positionKey(board, turn), seen = repetitions.get(key) || 0;
+            if (seen >= 2) return 0;
+            const originalAlpha = alpha, cached = table.get(key);
+            if (!seen && cached && cached.depth >= depth) {
+                const value = loadScore(cached.score, ply);
+                if (cached.flag === 'exact') return value;
+                if (cached.flag === 'lower' && value >= beta || cached.flag === 'upper' && value <= alpha) return value;
+            }
             const moves = legalMoves(board, turn);
             if (!moves.length) return -MATE + ply;
-            if (depth <= 0) return evaluate(board, turn);
-            moves.sort((a, b) => movePriority(board, b) - movePriority(board, a));
-            let value = -Infinity;
-            for (const m of moves) {
-                const captured = makeMove(board, m);
-                let score;
-                try { score = -search(other(turn), depth - 1, -beta, -alpha, ply + 1); }
-                finally { unmakeMove(board, m, captured); }
-                value = Math.max(value, score); alpha = Math.max(alpha, score);
-                if (alpha >= beta) break;
-            }
+            let value = -Infinity, chosen = null;
+            repetitions.set(key, seen + 1);
+            try {
+                for (const m of ordered(moves, turn, ply, cached && cached.move)) {
+                    const captured = makeMove(board, m);
+                    let score;
+                    try { score = -search(other(turn), depth - 1, -beta, -alpha, ply + 1); }
+                    finally { unmakeMove(board, m, captured); }
+                    if (score > value) { value = score; chosen = m; }
+                    alpha = Math.max(alpha, score);
+                    if (alpha >= beta) {
+                        if (!captured) { killers[ply] = m; history[historyIndex(m, turn)] += depth * depth; }
+                        break;
+                    }
+                }
+            } finally { if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
+            if (!seen && table.size < 60000) table.set(key, {depth, score: storeScore(value, ply), move: chosen,
+                flag: value <= originalAlpha ? 'upper' : value >= beta ? 'lower' : 'exact'});
             return value;
         }
         for (let depth = 1; depth <= settings.depth; depth++) {
@@ -169,11 +273,16 @@
                     finally { unmakeMove(board, m, captured); }
                     if (score > alpha) { alpha = score; iterationBest = m; }
                 }
-                best = iterationBest; completedDepth = depth;
+                best = iterationBest; bestScore = alpha; completedDepth = depth;
                 if (alpha > MATE - 100) break;
             } catch (error) { if (error !== stop) throw error; break; }
         }
-        return {from: best.from, to: best.to, depth: completedDepth, nodes};
+        return {from: best.from, to: best.to, depth: completedDepth, nodes, score: bestScore || 0};
     }
-    return {initialBoard, pseudoMoves, legalMoves, inCheck, applyMove, outcome, other, positionKey, findBestMove, NAMES};
+    const LEVELS = {
+        easy: {depth: 2, timeMs: 280, maxNodes: 25000},
+        normal: {depth: 4, timeMs: 1000, maxNodes: 180000},
+        hard: {depth: 6, timeMs: 2200, maxNodes: 400000}
+    };
+    return {initialBoard, pseudoMoves, legalMoves, inCheck, applyMove, outcome, other, positionKey, findBestMove, NAMES, LEVELS};
 });

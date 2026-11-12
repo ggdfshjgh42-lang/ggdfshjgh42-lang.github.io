@@ -446,6 +446,9 @@
             canvas { max-width: 100%; height: auto; }
         }
     </style>
+    <link rel="stylesheet" href="game-audio.css?v=20261112-ai2">
+    <script src="game-audio.js?v=20261112-ai2"></script>
+    <script src="gomoku-engine.js?v=20261112-ai2"></script>
     <script src="gomoku-config.js"></script>
 </head>
 <body>
@@ -465,6 +468,13 @@
                 <button class="mode-btn" onclick="setMode('ai')">人机对战</button>
                 <button class="mode-btn" onclick="setMode('online')">在线对战</button>
             </div>
+
+            <div class="gomoku-ai-settings" id="gomoku-ai-settings" hidden>
+                <label for="gomoku-difficulty">电脑难度</label>
+                <select id="gomoku-difficulty"><option value="easy">入门</option><option value="normal" selected>普通</option><option value="hard">挑战</option></select>
+                <p>挑战难度思考稍久；切换难度不重开。</p>
+            </div>
+            <button type="button" class="game-sound-button" data-game-sound aria-pressed="true">🔊 音效：开</button>
 
             <div class="status-box">
                 <div class="status-current" id="status-text">黑棋走</div>
@@ -571,6 +581,7 @@
         let scoreWhite = 0;
         let aiThinking = false;
         let aiTimer = null;
+        let aiWorker = null, aiWatchdog = null, aiJob = 0;
         let lastMove = null;
 
         // ========== Online state ==========
@@ -582,8 +593,8 @@
         const ctx = canvas.getContext('2d');
 
         function initBoard() {
-            clearTimeout(aiTimer);
-            aiTimer = null;
+            cancelAI();
+            GameAudio.stop();
             board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(EMPTY));
             currentPlayer = BLACK;
             history = [];
@@ -821,6 +832,7 @@
 
             board[r][c] = currentPlayer;
             lastMove = [r, c];
+            GameAudio.play('move');
 
             const win = checkWin(r, c, currentPlayer);
             if (win) {
@@ -831,18 +843,21 @@
                 updateScores();
                 updateStatus();
                 draw();
+                GameAudio.play(mode === 'ai' && currentPlayer === WHITE ? 'lose' : 'win', 0.12);
                 showWinner(currentPlayer);
                 return;
             }
 
             if (isBoardFull()) {
                 gameOver = true;
+                GameAudio.play('draw', 0.12);
                 updateStatus('draw');
                 draw();
                 return;
             }
 
             currentPlayer = currentPlayer === BLACK ? WHITE : BLACK;
+            aiThinking = false;
             updateStatus();
             draw();
 
@@ -851,7 +866,7 @@
                 aiThinking = true;
                 updateStatus();
                 draw();
-                aiTimer = setTimeout(aiMove, 300);
+                aiTimer = setTimeout(aiMove, 80);
             }
         }
 
@@ -892,92 +907,45 @@
         }
 
         // ========== AI ==========
+        function cancelAI() {
+            aiJob++;
+            clearTimeout(aiTimer); clearTimeout(aiWatchdog);
+            aiTimer = aiWatchdog = null;
+            if (aiWorker) aiWorker.terminate();
+            aiWorker = null; aiThinking = false;
+        }
+
         function aiMove() {
-            if (mode !== 'ai' || gameOver) { aiThinking = false; return; }
-
-            const move = findBestMove();
-            if (move) {
-                placeStone(move.r, move.c);
+            if (mode !== 'ai' || gameOver || currentPlayer !== WHITE) { aiThinking = false; return; }
+            aiThinking = true;
+            const id = ++aiJob;
+            function finish(move) {
+                if (id !== aiJob || mode !== 'ai' || gameOver || currentPlayer !== WHITE) return;
+                clearTimeout(aiWatchdog);
+                if (aiWorker) aiWorker.terminate(); aiWorker = null;
+                aiThinking = false;
+                if (move && isValidMove(move.r, move.c) && board[move.r][move.c] === EMPTY) placeStone(move.r, move.c);
+                updateStatus(); draw();
             }
-            aiThinking = false;
-        }
-
-        function findBestMove() {
-            // Score each empty position
-            const scores = [];
-            for (let r = 0; r < BOARD_SIZE; r++) {
-                for (let c = 0; c < BOARD_SIZE; c++) {
-                    if (board[r][c] !== EMPTY) continue;
-                    const score = evaluatePosition(r, c);
-                    scores.push({ r, c, score });
-                }
+            function fallback() {
+                if (id !== aiJob) return;
+                clearTimeout(aiWatchdog);
+                if (aiWorker) aiWorker.terminate(); aiWorker = null;
+                aiTimer = setTimeout(() => {
+                    if (id !== aiJob || mode !== 'ai' || gameOver || currentPlayer !== WHITE) return;
+                    finish(GomokuAI.findBestMove(board, WHITE, {depth: 2, timeMs: 150, width: 8, maxNodes: 3000}));
+                }, 20);
             }
-            if (scores.length === 0) return null;
-
-            // Sort by score descending
-            scores.sort((a, b) => b.score - a.score);
-
-            // Add slight randomness among top candidates
-            const topScore = scores[0].score;
-            const topMoves = scores.filter(s => s.score >= topScore * 0.95);
-            return topMoves[Math.floor(Math.random() * Math.min(topMoves.length, 3))];
-        }
-
-        function evaluatePosition(r, c) {
-            // Evaluate how valuable placing a stone at (r,c) would be
-            // Consider both offensive (placing white) and defensive (blocking black)
-            let score = 0;
-            const directions = [[1, 0], [0, 1], [1, 1], [1, -1]];
-
-            for (const [dr, dc] of directions) {
-                score += scoreDirection(r, c, dr, dc, WHITE, BLACK);   // offensive
-                score += scoreDirection(r, c, dr, dc, BLACK, WHITE);   // defensive (block black)
-            }
-            return score;
-        }
-
-        function scoreDirection(r, c, dr, dc, myColor, oppColor) {
-            let count = 1;    // the stone we would place
-            let openEnds = 0;
-            let blocked = 0;
-
-            // Forward
-            let fCount = 0, fOpen = false;
-            for (let i = 1; i <= 4; i++) {
-                const nr = r + dr * i;
-                const nc = c + dc * i;
-                if (!isValidMove(nr, nc)) { blocked++; break; }
-                if (board[nr][nc] === myColor) { fCount++; }
-                else if (board[nr][nc] === EMPTY) { fOpen = true; break; }
-                else { blocked++; break; }
-            }
-            count += fCount;
-            if (fOpen) openEnds++;
-
-            // Backward
-            let bCount = 0, bOpen = false;
-            for (let i = 1; i <= 4; i++) {
-                const nr = r - dr * i;
-                const nc = c - dc * i;
-                if (!isValidMove(nr, nc)) { blocked++; break; }
-                if (board[nr][nc] === myColor) { bCount++; }
-                else if (board[nr][nc] === EMPTY) { bOpen = true; break; }
-                else { blocked++; break; }
-            }
-            count += bCount;
-            if (bOpen) openEnds++;
-
-            // Scoring
-            if (count >= 5) return 100000;
-            if (blocked >= 2) return 0;
-            if (count === 4 && openEnds === 2) return 50000;
-            if (count === 4 && openEnds === 1) return 10000;
-            if (count === 3 && openEnds === 2) return 5000;
-            if (count === 3 && openEnds === 1) return 1000;
-            if (count === 2 && openEnds === 2) return 500;
-            if (count === 2 && openEnds === 1) return 100;
-            if (count === 1 && openEnds === 2) return 50;
-            return 10;
+            try {
+                aiWorker = new Worker('gomoku-worker.js?v=20261112-ai2');
+                aiWorker.onmessage = event => {
+                    if (event.data.id !== id) return;
+                    if (event.data.error) fallback(); else finish(event.data.move);
+                };
+                aiWorker.onerror = event => { event.preventDefault(); fallback(); };
+                aiWorker.postMessage({id, board, side: WHITE, difficulty: document.getElementById('gomoku-difficulty').value});
+                aiWatchdog = setTimeout(fallback, 5500);
+            } catch (_) { fallback(); }
         }
 
         // ========== UI ==========
@@ -1057,14 +1025,16 @@
         function undo() {
             if (mode === 'online') return; // No undo in online mode
             if (gameOver || history.length === 0) return;
-            // In AI mode, undo both AI's move and player's move
-            const steps = mode === 'ai' ? 2 : 1;
-            for (let i = 0; i < steps && history.length > 0; i++) {
-                const prev = history.pop();
+            cancelAI();
+            // If the computer is still thinking, only the human move needs undoing.
+            let prev;
+            do {
+                prev = history.pop();
                 board = prev.board;
                 currentPlayer = prev.player;
                 lastMove = prev.lastMove;
-            }
+            } while (mode === 'ai' && prev.player !== BLACK && history.length);
+            GameAudio.stop(); GameAudio.play('undo');
             gameOver = false;
             winLine = null;
             aiThinking = false;
@@ -1089,6 +1059,7 @@
                 leaveRoom();
             }
             mode = newMode;
+            document.getElementById('gomoku-ai-settings').hidden = mode !== 'ai';
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 const labels = { pvp: '双人', ai: '人机', online: '在线' };
@@ -1113,12 +1084,26 @@
             updateOnlineControls();
         }
 
+        document.getElementById('gomoku-difficulty').addEventListener('change', () => {
+            cancelAI();
+            if (mode === 'ai' && currentPlayer === WHITE && !gameOver) {
+                aiThinking = true; aiTimer = setTimeout(aiMove, 40);
+            }
+            updateStatus(); draw();
+        });
+        window.addEventListener('pagehide', cancelAI);
+        window.addEventListener('pageshow', event => {
+            if (event.persisted && mode === 'ai' && currentPlayer === WHITE && !gameOver) {
+                aiThinking = true; updateStatus(); aiTimer = setTimeout(aiMove, 40);
+            }
+        });
+
         // ========== Init ==========
         initBoard();
 
         // Redraw on DPR change (e.g., moving between monitors)
         window.addEventListener('resize', draw);
     </script>
-    <script src="gomoku-online.js"></script>
+    <script src="gomoku-online.js?v=20261112-ai2"></script>
 </body>
 </html>

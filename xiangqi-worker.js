@@ -1,9 +1,9 @@
 'use strict';
-importScripts('xiangqi-engine.js');
+importScripts('xiangqi-engine.js?v=20261112-ai2');
 self.onmessage = function (event) {
-    const {id, board, side, difficulty} = event.data;
+    const {id, board, side, difficulty, history} = event.data;
     try {
-        const options = difficulty === 'easy' ? {depth: 2, timeMs: 350, maxNodes: 15000} : {depth: 3, timeMs: 1100, maxNodes: 75000};
+        const options = Object.assign({}, Xiangqi.LEVELS[difficulty] || Xiangqi.LEVELS.normal, {history});
         self.postMessage({id, move: Xiangqi.findBestMove(board, side, options)});
     } catch (error) { self.postMessage({id, error: String(error)}); }
 };

@@ -61,12 +61,15 @@
         result = X.outcome(board, turn);
         if (!result && keys.filter(key => key === keys[keys.length - 1]).length >= 3) result = {winner: null, reason: 'repetition'};
         if (!result && halfmove >= 120) result = {winner: null, reason: 'no-capture'};
+        GameAudio.play(captured ? 'capture' : 'move');
+        if (result) GameAudio.play(!result.winner ? 'draw' : mode === 'ai' && result.winner !== human ? 'lose' : 'win', 0.12);
+        else if (X.inCheck(board, turn)) GameAudio.play('check', 0.1);
         render(); scheduleAI();
     }
     function selectSquare(i) {
         if (result || busy || mode === 'ai' && turn !== human) return;
         if (selected === i) { selected = null; render(); return; }
-        if (board[i] && board[i][0] === turn) { selected = i; render(); return; }
+        if (board[i] && board[i][0] === turn) { selected = i; GameAudio.play('select'); render(); return; }
         if (selected === null) return;
         const move = X.legalMoves(board, turn, selected).find(m => m.to === i);
         if (move) apply(move);
@@ -89,18 +92,18 @@
             if (worker) worker.terminate(); worker = null; clearTimeout(watchdog);
             fallbackTimer = setTimeout(() => {
                 if (id !== job || !busy) return;
-                finish(X.findBestMove(board, turn, {depth: 2, timeMs: 250, maxNodes: 12000}));
+                finish(X.findBestMove(board, turn, {depth: 2, timeMs: 180, maxNodes: 12000, history: keys}));
             }, 30);
         }
         try {
-            worker = new Worker('xiangqi-worker.js');
+            worker = new Worker('xiangqi-worker.js?v=20261112-ai2');
             worker.onmessage = event => {
                 if (event.data.id !== id) return;
                 if (event.data.error) fallback(); else finish(event.data.move);
             };
             worker.onerror = event => { event.preventDefault(); fallback(); };
-            worker.postMessage({id, board, side: turn, difficulty: $('difficulty').value});
-            watchdog = setTimeout(fallback, 4500);
+            worker.postMessage({id, board, side: turn, difficulty: $('difficulty').value, history: keys});
+            watchdog = setTimeout(fallback, 6000);
         } catch (_) { fallback(); }
     }
     function renderHistory() {
@@ -165,7 +168,7 @@
         renderHistory();
     }
     function startGame() {
-        cancelAI(); mode = $('game-mode').value; human = $('human-side').value;
+        cancelAI(); GameAudio.stop(); mode = $('game-mode').value; human = $('human-side').value;
         board = X.initialBoard(); turn = 'r'; selected = null; lastMove = null; history = []; halfmove = 0; result = null;
         keys = [X.positionKey(board, turn)]; flipped = mode === 'ai' && human === 'b';
         render(); scheduleAI();
@@ -189,6 +192,7 @@
         confirmAction('开始新的对局？', '更换对战模式或执子后，当前棋局会重新开始。', '开始新对局', startGame, () => { $('game-mode').value = mode; $('human-side').value = human; });
     }
     $('game-mode').addEventListener('change', changeSettings); $('human-side').addEventListener('change', changeSettings);
+    $('difficulty').addEventListener('change', () => { cancelAI(); render(); scheduleAI(); });
     $('show-hints').addEventListener('change', render);
     $('flip').addEventListener('click', () => { flipped = !flipped; render(); });
     $('undo').addEventListener('click', () => {
@@ -197,10 +201,12 @@
         let entry;
         do { entry = history.pop(); keys.pop(); } while (mode === 'ai' && entry.turn !== human && history.length);
         board = entry.board.slice(); turn = entry.turn; halfmove = entry.halfmove; lastMove = entry.lastMove; selected = null; result = null;
+        GameAudio.stop(); GameAudio.play('undo');
         render(); scheduleAI();
     });
     $('resign').addEventListener('click', () => confirmAction('确认认输？', sideName(turn) + '认输后，本局结束。', '确认认输', () => {
-        cancelAI(); selected = null; result = {winner: X.other(turn), reason: 'resign'}; render();
+        cancelAI(); selected = null; result = {winner: X.other(turn), reason: 'resign'};
+        GameAudio.play(mode === 'ai' && result.winner !== human ? 'lose' : 'win'); render();
     }));
     window.addEventListener('pagehide', cancelAI);
     window.addEventListener('pageshow', event => { if (event.persisted) { render(); scheduleAI(); } });
