@@ -58,3 +58,14 @@ test('zoom lock rejects scaling while keeping position and navigation methods av
   assert.equal(viewer.zoom, 1.75);
   assert.equal(typeof viewer.goTo, 'function'); assert.equal(typeof viewer.position, 'function');
 });
+
+test('layout adjustments do not count as a user scroll, but the next movement does', () => {
+  const viewer = Object.create(Viewer.prototype);
+  viewer.container = {scrollTop:1200,scrollLeft:35};
+  viewer.rememberAdjustment();
+  assert.equal(viewer.isPositionAdjustment(), true);
+  assert.equal(viewer.isPositionAdjustment(), true);
+  viewer.container.scrollTop += 50;
+  assert.equal(viewer.isPositionAdjustment(), false);
+  assert.equal(viewer.adjustment, null);
+});

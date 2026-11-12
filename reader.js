@@ -66,6 +66,7 @@
       // Font changes and restoring progress also scroll the document. Only a
       // reading gesture should dismiss the menu during those operations.
       if (gesture) gesture.moved = true;
+      if (surface === $('pdf-view') && state.pdfReader?.isPositionAdjustment()) return;
       if (performance.now() >= restoringScrollUntil) setReaderControls(false);
     }, {passive:true, capture:true});
     surface.addEventListener('wheel', () => setReaderControls(false), {passive:true});
@@ -447,13 +448,15 @@
     fillDirectory();
   }
   function syncPDFControls(position) {
+    const pageChanged = state.page !== position.page;
     state.page = position.page; state.zoom = position.zoom;
     if (document.activeElement !== $('page-number')) $('page-number').value = position.page;
     $('pdf-zoom').textContent = Math.round(position.zoom * 100) + '%';
     $('pdf-zoom-lock').textContent = position.locked ? '解锁缩放' : '锁定缩放';
     $('pdf-zoom-lock').setAttribute('aria-pressed', String(position.locked));
     for (const id of ['zoom-in','zoom-out','pdf-fit-width']) $(id).disabled = position.locked;
-    updateButtons(); scheduleSave();
+    if (pageChanged) updateButtons();
+    scheduleSave();
   }
   async function showPDFPage(pageNumber, saved = {}) {
     if (!state.pdfReader) {
@@ -491,7 +494,7 @@
       return;
     }
     if (/INPUT|SELECT|TEXTAREA/.test(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
-    if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) setReaderControls(false);
+    if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key) && !/BUTTON|A/.test(event.target.tagName)) setReaderControls(false);
     if (event.key === 'Escape') { closeDirectory(); setReaderControls(false); }
     else if (event.key === 'ArrowRight') { event.preventDefault(); $('next-chapter').click(); }
     else if (event.key === 'ArrowLeft') { event.preventDefault(); $('previous-chapter').click(); }

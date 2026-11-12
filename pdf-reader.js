@@ -96,7 +96,17 @@
         const position = anchorScroll(this.layout, this.width, this.inset(), anchor);
         this.container.scrollTop = position.y;
         this.container.scrollLeft = position.x;
+        this.rememberAdjustment();
       }
+    }
+    rememberAdjustment() {
+      this.adjustment = {top:this.container.scrollTop, left:this.container.scrollLeft};
+    }
+    isPositionAdjustment() {
+      const position = this.adjustment;
+      if (position && Math.abs(position.top - this.container.scrollTop) < 1 && Math.abs(position.left - this.container.scrollLeft) < 1) return true;
+      this.adjustment = null;
+      return false;
     }
     position() {
       if (!this.layout.length) return {page:1, offset:0, horizontal:0};
@@ -107,6 +117,7 @@
       const index = Math.floor(clamp(page, 1, this.metrics.length)) - 1;
       this.container.scrollTop = this.layout[index].top + clamp(offset, 0, 1) * this.layout[index].height;
       if (horizontal !== null) this.container.scrollLeft = clamp(horizontal, 0, 1) * Math.max(0, this.container.scrollWidth - this.container.clientWidth);
+      this.rememberAdjustment();
       this.update();
       return this.waitFor(this.current);
     }
