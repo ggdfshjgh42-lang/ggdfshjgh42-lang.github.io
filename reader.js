@@ -10,7 +10,64 @@
   const state = { book: null, chapters: [], chapter: 0, ratio: 0, zip: null, pdf: null, page: 1, zoom: 1, textBytes: null, blobs: [], saving: false, ready: false, renderToken: 0, storageWarned: false };
   const savedSettings = library ? library.loadSettings() : {};
   const settings = { theme: ['paper','light','dark'].includes(savedSettings.theme) ? savedSettings.theme : 'paper', fontSize: clamp(savedSettings.fontSize || 18, 14, 30) };
-  let saveTimer, toastTimer, resizeTimer;
+  let saveTimer, toastTimer, resizeTimer, controlsTimer;
+  let keyboardControls = false;
+  const controlsHidden = () => document.body.classList.contains('reader-controls-hidden');
+  const immersive = () => document.body.classList.contains('reader-immersive');
+  const chrome = [$('reader-topbar'), $('reader-footer')];
+
+  function scheduleControlsHide() {
+    clearTimeout(controlsTimer);
+    if (!immersive() || controlsHidden()) return;
+    controlsTimer = setTimeout(() => {
+      // A directory or a keyboard/text-input interaction must stay usable.
+      if (!$('reader-sidebar').hidden || keyboardControls || document.activeElement?.matches('input, select, textarea')) return;
+      setReaderControls(false);
+    }, 4000);
+  }
+  function setReaderControls(visible) {
+    if (!visible && !immersive()) return;
+    clearTimeout(controlsTimer);
+    if (!visible && [...chrome, $('reader-sidebar'), $('reader-controls-toggle')].some(node => node.contains(document.activeElement))) $('reader-stage').focus({preventScroll:true});
+    document.body.classList.toggle('reader-controls-hidden', !visible);
+    chrome.forEach(node => {
+      node.inert = !visible;
+      if (visible) node.removeAttribute('aria-hidden');
+      else node.setAttribute('aria-hidden', 'true');
+    });
+    $('reader-controls-toggle').setAttribute('aria-expanded', String(visible));
+    $('reader-controls-toggle').textContent = visible ? '收起阅读菜单' : '显示阅读菜单';
+    if (visible) scheduleControlsHide();
+    else closeDirectory();
+  }
+  function enterReadingMode() {
+    if (immersive()) return;
+    document.body.classList.add('reader-immersive');
+    setReaderControls(false);
+  }
+  function bindReadingSurface(surface, selection) {
+    let gesture;
+    surface.addEventListener('pointerdown', event => {
+      keyboardControls = false;
+      gesture = event.isPrimary && event.button === 0 ? {id:event.pointerId, x:event.clientX, y:event.clientY, time:event.timeStamp, moved:false} : null;
+    }, {passive:true});
+    surface.addEventListener('pointermove', event => {
+      if (gesture && event.pointerId === gesture.id && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 10) gesture.moved = true;
+    }, {passive:true});
+    surface.addEventListener('pointercancel', () => { if (gesture) gesture.moved = true; }, {passive:true});
+    surface.addEventListener('click', event => {
+      if (!immersive() || event.defaultPrevented || event.detail > 1 || event.target.closest('a, button, input, select, textarea, label, [contenteditable]')) return;
+      if (event.detail && (!gesture || gesture.moved || event.timeStamp - gesture.time > 600)) return;
+      if (selection()?.isCollapsed === false) return;
+      setReaderControls(controlsHidden());
+    });
+    surface.addEventListener('scroll', () => {
+      // Font changes and restoring progress also scroll the document. Only a
+      // reading gesture should dismiss the menu during those operations.
+      if (gesture?.moved) setReaderControls(false);
+    }, {passive:true, capture:true});
+    surface.addEventListener('wheel', () => setReaderControls(false), {passive:true});
+  }
 
   function toast(message) {
     $('reader-toast').textContent = message;
@@ -19,6 +76,7 @@
     toastTimer = setTimeout(() => $('reader-toast').classList.remove('visible'), 3500);
   }
   function message(title, detail, retry = false) {
+    setReaderControls(true);
     $('reader-message').hidden = false;
     $('message-title').textContent = title;
     $('message-detail').textContent = detail;
@@ -37,15 +95,18 @@
     $('reader-sidebar').hidden = true;
     $('sidebar-backdrop').hidden = true;
     $('directory-toggle').setAttribute('aria-expanded', 'false');
+    scheduleControlsHide();
   }
   function openDirectory() {
+    setReaderControls(true);
+    clearTimeout(controlsTimer);
     $('reader-sidebar').hidden = false;
     $('sidebar-backdrop').hidden = false;
     $('directory-toggle').setAttribute('aria-expanded', 'true');
   }
   function themeCSS() {
     const colors = settings.theme === 'dark' ? ['#202b23','#dce5d8','#a0af9f','#b3ce94','#3b493d'] : settings.theme === 'light' ? ['#fff','#292d29','#727872','#356344','#e0e4e0'] : ['#fffefa','#25372d','#667066','#356344','#dfe4d7'];
-    return `:root{color-scheme:${settings.theme === 'dark' ? 'dark' : 'light'};background:${colors[0]};color:${colors[1]};font-size:${settings.fontSize}px}*{box-sizing:border-box}html{overflow-wrap:anywhere;scroll-behavior:auto;scrollbar-color:${colors[4]} ${colors[0]}}body{max-width:800px;margin:0 auto;padding:48px 54px 70px;font-family:"Noto Serif SC","Songti SC",SimSun,serif;line-height:2;letter-spacing:.02em}p{margin:0 0 1em}h1,h2,h3,h4,h5,h6{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:600;line-height:1.6;margin:1.6em 0 1em}h1:first-child,h2:first-child{margin-top:0}h1{font-size:1.65em}h2{font-size:1.35em}h3{font-size:1.15em}a{color:${colors[3]};text-underline-offset:3px}img{max-width:100%;height:auto;display:block;margin:1.5em auto}figure{margin:1.5em 0}figcaption{font-size:.8em;color:${colors[2]};text-align:center}blockquote{border-left:3px solid ${colors[4]};padding-left:1em;margin:1.5em 0;color:${colors[2]}}pre{overflow-x:auto;white-space:pre-wrap;font-size:.8em;border:1px solid ${colors[4]};padding:1em;border-radius:8px}table{display:block;overflow-x:auto;border-collapse:collapse;font-size:.85em;margin:1.5em 0}td,th{border:1px solid ${colors[4]};padding:.45em .7em}hr{border:0;border-top:1px solid ${colors[4]};margin:2em 0}ul,ol{padding-left:1.5em}li{margin:.35em 0}ruby{ruby-align:center}rt{font-size:.55em}.txt-paragraph{text-indent:2em;white-space:pre-wrap}.reader-chapter-title{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:1.4em;line-height:1.6;margin:0 0 2em}.reader-end{margin-top:3em;text-align:center;font-size:.75em;color:${colors[2]}}@media(max-width:600px){body{padding:30px 23px 55px;line-height:1.95}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}`;
+    return `:root{color-scheme:${settings.theme === 'dark' ? 'dark' : 'light'};background:${colors[0]};color:${colors[1]};font-size:${settings.fontSize}px}*{box-sizing:border-box}html{overflow-wrap:anywhere;scroll-behavior:auto;scrollbar-color:${colors[4]} ${colors[0]};scrollbar-width:none}html::-webkit-scrollbar{display:none}body{max-width:800px;margin:0 auto;padding:48px 54px 70px;font-family:"Noto Serif SC","Songti SC",SimSun,serif;line-height:2;letter-spacing:.02em}p{margin:0 0 1em}h1,h2,h3,h4,h5,h6{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:600;line-height:1.6;margin:1.6em 0 1em}h1:first-child,h2:first-child{margin-top:0}h1{font-size:1.65em}h2{font-size:1.35em}h3{font-size:1.15em}a{color:${colors[3]};text-underline-offset:3px}img{max-width:100%;height:auto;display:block;margin:1.5em auto}figure{margin:1.5em 0}figcaption{font-size:.8em;color:${colors[2]};text-align:center}blockquote{border-left:3px solid ${colors[4]};padding-left:1em;margin:1.5em 0;color:${colors[2]}}pre{overflow-x:auto;white-space:pre-wrap;font-size:.8em;border:1px solid ${colors[4]};padding:1em;border-radius:8px}table{display:block;overflow-x:auto;border-collapse:collapse;font-size:.85em;margin:1.5em 0}td,th{border:1px solid ${colors[4]};padding:.45em .7em}hr{border:0;border-top:1px solid ${colors[4]};margin:2em 0}ul,ol{padding-left:1.5em}li{margin:.35em 0}ruby{ruby-align:center}rt{font-size:.55em}.txt-paragraph{text-indent:2em;white-space:pre-wrap}.reader-chapter-title{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:1.4em;line-height:1.6;margin:0 0 2em}.reader-end{margin-top:3em;text-align:center;font-size:.75em;color:${colors[2]}}@media(max-width:600px){body{padding:30px 23px 55px;line-height:1.95}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}`;
   }
   function applySettings() {
     document.body.dataset.theme = settings.theme;
@@ -120,7 +181,7 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = item.title || '第 ' + (index + 1) + ' 章';
-      button.addEventListener('click', () => { persist(); (state.pdf ? showPDFPage(index + 1) : showChapter(index)).catch(errorMessage); if (matchMedia('(max-width:700px)').matches) closeDirectory(); });
+      button.addEventListener('click', () => { persist(); (state.pdf ? showPDFPage(index + 1) : showChapter(index)).catch(errorMessage); closeDirectory(); setReaderControls(false); });
       li.append(button); fragment.append(li);
     });
     list.append(fragment);
@@ -314,6 +375,8 @@
       frame.onload = () => {
         if (token !== state.renderToken) { resolve(); return; }
         const doc = frame.contentDocument;
+        bindReadingSurface(doc, () => doc.getSelection());
+        enterReadingMode();
         const restore = () => { restoreRatio(state.ratio); if (hash) { const target = doc.getElementById(hash); if (target) target.scrollIntoView(); } };
         restore(); requestAnimationFrame(restore);
         doc.addEventListener('scroll', scheduleSave, {passive:true});
@@ -397,8 +460,11 @@
       const page = await state.pdf.getPage(targetPage);
       if (token !== state.renderToken) return;
       $('reader-message').hidden = true; frame.hidden = true; $('pdf-view').hidden = false;
+      enterReadingMode();
       const viewport = page.getViewport({scale:1});
-      const available = $('pdf-view').clientWidth - (matchMedia('(max-width:700px)').matches ? 16 : 44);
+      // Read the actual padding: immersive mode removes the old PDF surround.
+      const padding = getComputedStyle($('pdf-view'));
+      const available = $('pdf-view').clientWidth - parseFloat(padding.paddingLeft) - parseFloat(padding.paddingRight);
       const width = Math.max(240, Math.min(available, 850)) * state.zoom;
       const scaled = page.getViewport({scale:width / viewport.width});
       // Stay within common mobile canvas limits, including unusually long pages.
@@ -427,8 +493,18 @@
     }
   }
   function keyboard(event) {
+    if (event.key === 'Tab' && immersive()) {
+      keyboardControls = true;
+      if (controlsHidden()) {
+        event.preventDefault();
+        setReaderControls(true);
+        $('reader-controls-toggle').focus({preventScroll:true});
+      }
+      return;
+    }
     if (/INPUT|SELECT|TEXTAREA/.test(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
-    if (event.key === 'Escape') closeDirectory();
+    if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) setReaderControls(false);
+    if (event.key === 'Escape') { closeDirectory(); setReaderControls(false); }
     else if (event.key === 'ArrowRight') { event.preventDefault(); $('next-chapter').click(); }
     else if (event.key === 'ArrowLeft') { event.preventDefault(); $('previous-chapter').click(); }
   }
@@ -457,7 +533,6 @@
       } else throw new Error('请选择 EPUB、PDF 或 TXT 格式的书籍。');
       fillDirectory(); await showChapter(saved.chapter || 0, saved.scrollRatio || 0);
     }
-    if (saved.updatedAt) toast('已回到上次阅读的位置');
   }
   $('directory-toggle').addEventListener('click', () => { $('reader-sidebar').hidden ? openDirectory() : closeDirectory(); });
   $('directory-close').addEventListener('click', closeDirectory);
@@ -476,6 +551,17 @@
   $('zoom-in').addEventListener('click', () => { state.zoom = clamp(state.zoom + .25,.5,2); if (state.pdf) showPDFPage(state.page).catch(errorMessage); });
   $('zoom-out').addEventListener('click', () => { state.zoom = clamp(state.zoom - .25,.5,2); if (state.pdf) showPDFPage(state.page).catch(errorMessage); });
   $('reader-retry').addEventListener('click', () => location.reload());
+  $('reader-controls-hide').addEventListener('click', () => setReaderControls(false));
+  $('reader-controls-toggle').addEventListener('focus', () => { keyboardControls = true; setReaderControls(true); });
+  $('reader-controls-toggle').addEventListener('click', () => setReaderControls(controlsHidden()));
+  document.addEventListener('pointerdown', () => { keyboardControls = false; }, {passive:true});
+  chrome.forEach(node => {
+    node.addEventListener('pointerdown', scheduleControlsHide, {passive:true});
+    node.addEventListener('click', scheduleControlsHide);
+    node.addEventListener('input', scheduleControlsHide);
+    node.addEventListener('focusout', scheduleControlsHide);
+  });
+  bindReadingSurface($('pdf-view'), () => document.getSelection());
   document.addEventListener('keydown', keyboard);
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   window.addEventListener('pagehide', persist);

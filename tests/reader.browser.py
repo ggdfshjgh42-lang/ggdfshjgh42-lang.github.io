@@ -87,8 +87,29 @@ def path_for(card):
     return parse_qs(urlsplit(card.get_attribute("href")).query)["book"][0]
 
 
+def show_controls(reader):
+    if not reader.locator("#reader-topbar").is_visible():
+        # The keyboard menu remains reachable even with all visual chrome hidden.
+        reader.locator("#reader-controls-toggle").focus()
+    expect(reader.locator("#reader-topbar")).to_be_visible()
+
+
+def check_full_page(reader):
+    expect(reader.locator("#reader-topbar")).to_be_hidden()
+    expect(reader.locator("#reader-footer")).to_be_hidden()
+    expect(reader.locator("#reader-sidebar")).to_be_hidden()
+    metrics = reader.evaluate("""() => {
+      const stage = document.getElementById('reader-stage').getBoundingClientRect();
+      return {x:stage.x, y:stage.y, width:stage.width, height:stage.height,
+              vw:innerWidth, vh:innerHeight};
+    }""")
+    assert metrics["x"] == metrics["y"] == 0, metrics
+    assert metrics["width"] == metrics["vw"] and metrics["height"] == metrics["vh"], metrics
+
+
 def next_pages(reader, count=3):
     for _ in range(count):
+        show_controls(reader)
         button = reader.locator("#next-chapter")
         if button.is_disabled():
             break
@@ -104,6 +125,7 @@ def next_pages(reader, count=3):
 
 
 def close_to_shelf(page, reader, book_path):
+    show_controls(reader)
     reader.locator(".back-link").click()
     expect(page.locator(".reading-overlay")).to_have_count(0, timeout=5_000)
     page.wait_for_function("() => !document.fullscreenElement")
@@ -142,6 +164,7 @@ def check_site(browser, origin, books, artifacts):
         reader = wait_reader(page)
         page.wait_for_function("() => !!document.fullscreenElement")
         expect(reader.locator("#fullscreen-toggle")).to_have_attribute("aria-pressed", "true")
+        check_full_page(reader)
         next_pages(reader)
         # Multiple chapter changes must not add inner history entries that consume
         # the shelf back action. One click should always dismiss the reader.
@@ -192,6 +215,7 @@ def check_site(browser, origin, books, artifacts):
     bounds = page.locator(".reading-overlay").bounding_box()
     assert bounds["x"] == bounds["y"] == 0
     assert bounds["width"] == 1280 and bounds["height"] == 900
+    check_full_page(reader)
     close_to_shelf(page, reader, tested["txt"][0])
     page.select_option("#format-filter", "all")
     for width in (390, 320):

@@ -7,7 +7,7 @@
   const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
   function requestScreen(element) {
     const request = element.requestFullscreen || element.webkitRequestFullscreen;
-    try { return Promise.resolve(request && request.call(element)).catch(() => {}); }
+    try { return Promise.resolve(request && (element.requestFullscreen ? request.call(element, { navigationUI: 'hide' }) : request.call(element))).catch(() => {}); }
     catch { return Promise.resolve(); }
   }
   function exitScreen() {
