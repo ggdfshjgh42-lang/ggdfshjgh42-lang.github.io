@@ -6,10 +6,11 @@
   <meta name="theme-color" content="#f7f8f2">
   <meta name="description" content="Fantastic Matrix 在线阅读：在书页之间，留一点自己的时间。">
   <title>在线阅读 | Fantastic Matrix</title>
-  <link rel="stylesheet" href="reader.css?v=20261112-immersive-2">
+  <link rel="stylesheet" href="reader.css?v=20261112-pdf-1">
   <script src="book-library.js" defer></script>
-  <script src="reader.js?v=20261112-immersive-2" defer></script>
-  <script src="reader-screen.js?v=20261112-immersive-3" defer></script>
+  <script src="pdf-reader.js?v=20261112-pdf-1" defer></script>
+  <script src="reader.js?v=20261112-pdf-1" defer></script>
+  <script src="reader-screen.js?v=20261112-pdf-1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#reader-stage">跳到正文</a>
@@ -27,7 +28,7 @@
     <div class="tool-group" id="font-tools"><button type="button" id="font-smaller" aria-label="缩小字号">A−</button><output id="font-size">18</output><button type="button" id="font-larger" aria-label="放大字号">A＋</button></div>
     <div class="tool-group theme-tools" role="group" aria-label="阅读配色"><button type="button" data-theme="paper" aria-label="纸张配色" title="纸张" aria-pressed="true">纸</button><button type="button" data-theme="light" aria-label="明亮配色" title="明亮" aria-pressed="false">日</button><button type="button" data-theme="dark" aria-label="深色配色" title="深色" aria-pressed="false">夜</button></div>
     <label class="encoding-tool" id="encoding-tool" hidden>编码 <select id="text-encoding" aria-label="文字编码"><option value="auto">自动</option><option value="utf-8">UTF-8</option><option value="gb18030">GB18030 / GBK</option><option value="utf-16le">UTF-16</option></select></label>
-    <div class="tool-group pdf-tools" id="pdf-tools" hidden><button type="button" id="zoom-out" aria-label="缩小 PDF">−</button><output id="pdf-zoom">100%</output><button type="button" id="zoom-in" aria-label="放大 PDF">＋</button></div>
+    <div class="tool-group pdf-tools" id="pdf-tools" hidden><button type="button" id="zoom-out" aria-label="缩小 PDF">−</button><output id="pdf-zoom" aria-label="PDF 缩放比例">100%</output><button type="button" id="zoom-in" aria-label="放大 PDF">＋</button><button type="button" id="pdf-fit-width" title="按屏幕宽度显示">适宽</button><button type="button" id="pdf-zoom-lock" aria-pressed="false" title="固定缩放比例，仍可上下滑动">锁定缩放</button></div>
   </div>
   </div>
   <div class="reader-layout" id="reader-layout">
@@ -36,7 +37,7 @@
     <main class="reader-stage" id="reader-stage" tabindex="-1">
       <section class="reader-message" id="reader-message" role="status" aria-live="polite"><span class="message-mark" aria-hidden="true">✳</span><h2 id="message-title">正在打开书籍</h2><p id="message-detail">请稍等，让文字慢慢铺开。</p><button class="retry-button" id="reader-retry" type="button" hidden>重新打开</button><a href="bookshelf.html" class="message-back">返回书架 →</a></section>
       <iframe id="reading-frame" title="书籍正文" sandbox="allow-same-origin" referrerpolicy="no-referrer" hidden></iframe>
-      <div class="pdf-view" id="pdf-view" hidden><canvas id="pdf-canvas" role="img" aria-label="PDF 书页"></canvas><div class="sr-only" id="pdf-text"></div></div>
+      <div class="pdf-view" id="pdf-view" aria-label="PDF 连续阅读，可上下滑动，双指缩放" tabindex="0" hidden><div class="pdf-pages" id="pdf-pages"></div><div class="sr-only" id="pdf-text"></div></div>
     </main>
   </div>
   <footer class="reader-footer" id="reader-footer">

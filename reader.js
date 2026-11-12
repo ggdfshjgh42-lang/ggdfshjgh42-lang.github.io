@@ -7,7 +7,7 @@
   const frame = $('reading-frame');
   const clamp = (v, min, max) => Math.max(min, Math.min(max, Number(v) || 0));
   const escape = text => String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const state = { book: null, chapters: [], chapter: 0, ratio: 0, zip: null, pdf: null, page: 1, zoom: 1, textBytes: null, blobs: [], saving: false, ready: false, renderToken: 0, storageWarned: false };
+  const state = { book: null, chapters: [], chapter: 0, ratio: 0, zip: null, pdf: null, pdfReader: null, page: 1, zoom: 1, textBytes: null, blobs: [], saving: false, ready: false, renderToken: 0, storageWarned: false };
   const savedSettings = library ? library.loadSettings() : {};
   const settings = { theme: ['paper','light','dark'].includes(savedSettings.theme) ? savedSettings.theme : 'paper', fontSize: clamp(savedSettings.fontSize || 18, 14, 30) };
   let saveTimer, toastTimer, resizeTimer, controlsTimer;
@@ -152,6 +152,10 @@
     if (!state.ready || !state.book || !library) return;
     if (!state.pdf) state.ratio = frameRatio();
     const record = { title: state.book.title, format: state.book.format, chapter: state.chapter, scrollRatio: state.ratio, page: state.page, progress: updateProgress(), encoding: $('text-encoding').value };
+    if (state.pdfReader) {
+      const position = state.pdfReader.position();
+      Object.assign(record, {page:position.page, pdfOffset:position.offset, pdfHorizontal:position.horizontal, pdfZoom:position.zoom, pdfZoomLocked:position.locked});
+    }
     if (!library.saveProgress(state.book.path, record) && !state.storageWarned) {
       state.storageWarned = true;
       toast('浏览器未允许保存进度，本次阅读仍可继续。');
@@ -159,7 +163,7 @@
   }
   function scheduleSave() {
     if (!state.ready) return;
-    state.ratio = frameRatio();
+    if (!state.pdf) state.ratio = frameRatio();
     updateProgress();
     clearTimeout(saveTimer);
     saveTimer = setTimeout(persist, 300);
@@ -442,58 +446,39 @@
     $('next-chapter').querySelector('span').textContent = '下一页';
     fillDirectory();
   }
-  let pdfRenderTask;
-  async function showPDFPage(pageNumber) {
-    const token = ++state.renderToken;
-    const targetPage = Math.floor(clamp(pageNumber, 1, state.pdf.numPages));
-    // Record the requested destination immediately so a zoom/resize arriving
-    // while cancellation is pending keeps the reader on that destination.
-    state.page = targetPage;
-    state.ready = false;
-    try {
-      // Several fast page/zoom changes may be waiting for the same old render.
-      // Only the newest request may resize and reuse the shared canvas.
-      const previousTask = pdfRenderTask;
-      if (previousTask) {
-        previousTask.cancel();
-        try { await previousTask.promise; } catch {}
-        if (pdfRenderTask === previousTask) pdfRenderTask = null;
-      }
-      if (token !== state.renderToken) return;
-      const page = await state.pdf.getPage(targetPage);
-      if (token !== state.renderToken) return;
+  function syncPDFControls(position) {
+    state.page = position.page; state.zoom = position.zoom;
+    if (document.activeElement !== $('page-number')) $('page-number').value = position.page;
+    $('pdf-zoom').textContent = Math.round(position.zoom * 100) + '%';
+    $('pdf-zoom-lock').textContent = position.locked ? '解锁缩放' : '锁定缩放';
+    $('pdf-zoom-lock').setAttribute('aria-pressed', String(position.locked));
+    for (const id of ['zoom-in','zoom-out','pdf-fit-width']) $(id).disabled = position.locked;
+    updateButtons(); scheduleSave();
+  }
+  async function showPDFPage(pageNumber, saved = {}) {
+    if (!state.pdfReader) {
+      if (!window.PDFReading) throw new Error('PDF 阅读组件未能载入，请刷新后重试。');
       $('reader-message').hidden = true; frame.hidden = true; $('pdf-view').hidden = false;
       enterReadingMode();
-      const viewport = page.getViewport({scale:1});
-      // Read the actual padding: immersive mode removes the old PDF surround.
-      const padding = getComputedStyle($('pdf-view'));
-      const available = $('pdf-view').clientWidth - parseFloat(padding.paddingLeft) - parseFloat(padding.paddingRight);
-      const width = Math.max(240, Math.min(available, 850)) * state.zoom;
-      const scaled = page.getViewport({scale:width / viewport.width});
-      // Stay within common mobile canvas limits, including unusually long pages.
-      const density = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(16 * 1024 * 1024 / (scaled.width * scaled.height)), 8192 / scaled.width, 8192 / scaled.height);
-      const canvas = $('pdf-canvas');
-      canvas.width = Math.max(1, Math.floor(scaled.width * density)); canvas.height = Math.max(1, Math.floor(scaled.height * density));
-      canvas.style.width = Math.ceil(scaled.width) + 'px'; canvas.style.height = Math.ceil(scaled.height) + 'px';
-      canvas.setAttribute('aria-label', state.book.title + '，第 ' + targetPage + ' 页');
-      const renderTask = page.render({canvas,viewport:scaled,transform:density === 1 ? null : [density,0,0,density,0,0]});
-      pdfRenderTask = renderTask;
-      try { await renderTask.promise; }
-      finally { if (pdfRenderTask === renderTask) pdfRenderTask = null; }
-      if (token !== state.renderToken) return;
-      $('pdf-view').scrollTop = 0;
-      $('page-number').value = targetPage;
-      $('pdf-zoom').textContent = Math.round(state.zoom * 100) + '%';
-      state.ready = true; updateButtons(); persist();
-      $('pdf-text').textContent = '';
-      try {
-        const text = await page.getTextContent();
-        if (token === state.renderToken) $('pdf-text').textContent = text.items.map(item => item.str).join(' ');
-      } catch (error) { console.warn('PDF text could not be extracted:', error); }
-    } catch (error) {
-      if (token !== state.renderToken || error.name === 'RenderingCancelledException') return;
-      throw error;
+      state.pdfReader = new window.PDFReading.Viewer({
+        pdf:state.pdf, container:$('pdf-view'), pages:$('pdf-pages'), text:$('pdf-text'), title:state.book.title,
+        zoom:saved.pdfZoom || 1, locked:saved.pdfZoomLocked === true,
+        onChange:syncPDFControls, onGesture:() => setReaderControls(false), onError:errorMessage
+      });
+      await state.pdfReader.open(pageNumber, saved.pdfOffset || 0, saved.pdfHorizontal || 0);
+      if (state.pdfReader.failed) throw new Error('PDF 页面未能载入，请刷新后重试。');
+      state.ready = true;
+    } else {
+      restoringScrollUntil = performance.now() + 250;
+      await state.pdfReader.goTo(pageNumber);
     }
+    $('page-number').value = state.page;
+    updateProgress(); persist();
+  }
+  function changePDFZoom(value) {
+    if (!state.pdfReader) return;
+    restoringScrollUntil = performance.now() + 250;
+    state.pdfReader.setZoom(value).catch(errorMessage);
   }
   function keyboard(event) {
     if (event.key === 'Tab' && immersive()) {
@@ -524,7 +509,7 @@
     $('original-link').href = library.urlFor(book.path); $('original-link').hidden = false;
     const saved = library.readProgress(book.path) || {};
     if (book.format === 'pdf') {
-      await loadPDF(); await showPDFPage(saved.page || 1);
+      await loadPDF(); await showPDFPage(saved.page || 1, saved);
     } else {
       const bytes = await fetchBytes();
       if (book.format === 'epub') await loadEPUB(bytes);
@@ -551,8 +536,10 @@
     catch (error) { errorMessage(error); }
   });
   $('page-number').addEventListener('change', () => { if (state.pdf) showPDFPage($('page-number').value).catch(errorMessage); });
-  $('zoom-in').addEventListener('click', () => { state.zoom = clamp(state.zoom + .25,.5,2); if (state.pdf) showPDFPage(state.page).catch(errorMessage); });
-  $('zoom-out').addEventListener('click', () => { state.zoom = clamp(state.zoom - .25,.5,2); if (state.pdf) showPDFPage(state.page).catch(errorMessage); });
+  $('zoom-in').addEventListener('click', () => changePDFZoom(state.zoom + .25));
+  $('zoom-out').addEventListener('click', () => changePDFZoom(state.zoom - .25));
+  $('pdf-fit-width').addEventListener('click', () => changePDFZoom(1));
+  $('pdf-zoom-lock').addEventListener('click', () => { state.pdfReader?.setLocked(!state.pdfReader.locked); persist(); });
   $('reader-retry').addEventListener('click', () => location.reload());
   $('reader-controls-hide').addEventListener('click', () => setReaderControls(false));
   $('reader-controls-toggle').addEventListener('focus', () => { keyboardControls = true; setReaderControls(true); });
@@ -569,7 +556,7 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
   window.addEventListener('pagehide', persist);
   window.addEventListener('resize', () => {
-    if (state.pdf && state.ready) { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => showPDFPage(state.page).catch(errorMessage),250); }
+    if (state.pdfReader && state.ready) { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { restoringScrollUntil = performance.now() + 250; state.pdfReader.resize(); },250); }
     else if (state.ready) restoreRatio(state.ratio);
   });
   start().catch(errorMessage);
