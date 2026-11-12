@@ -12,7 +12,7 @@
 /* Menus overlay the book, so showing them never resizes or moves the page. */
 .reader-topbar{flex-shrink:0}
 .reader-menu-toggle{position:fixed;top:12px;left:12px;width:1px;height:1px;min-height:0;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;z-index:90}
-.reader-menu-toggle:focus-visible{width:auto;height:auto;min-height:44px;padding:8px 14px;border:1px solid var(--accent);clip-path:none;background:var(--page)}
+.reader-menu-toggle:focus-visible{top:auto;bottom:calc(var(--footer-height) + 16px);left:50%;transform:translateX(-50%);width:auto;height:auto;min-height:44px;padding:8px 14px;border:1px solid var(--accent);clip-path:none;background:var(--page)}
 #reader-controls-hide{flex-shrink:0;font-size:11px;padding:5px 10px}
 body.reader-immersive{background:var(--page)}
 .reader-immersive .reader-layout,.reader-immersive .reader-stage{position:absolute;inset:0}
