@@ -11,6 +11,7 @@
   const savedSettings = library ? library.loadSettings() : {};
   const settings = { theme: ['paper','light','dark'].includes(savedSettings.theme) ? savedSettings.theme : 'paper', fontSize: clamp(savedSettings.fontSize || 18, 14, 30) };
   let saveTimer, toastTimer, resizeTimer, controlsTimer;
+  let restoringScrollUntil = 0;
   let keyboardControls = false;
   const controlsHidden = () => document.body.classList.contains('reader-controls-hidden');
   const immersive = () => document.body.classList.contains('reader-immersive');
@@ -64,7 +65,8 @@
     surface.addEventListener('scroll', () => {
       // Font changes and restoring progress also scroll the document. Only a
       // reading gesture should dismiss the menu during those operations.
-      if (gesture?.moved) setReaderControls(false);
+      if (gesture) gesture.moved = true;
+      if (performance.now() >= restoringScrollUntil) setReaderControls(false);
     }, {passive:true, capture:true});
     surface.addEventListener('wheel', () => setReaderControls(false), {passive:true});
   }
@@ -133,6 +135,7 @@
     const doc = frame.contentDocument;
     if (!doc) return;
     const scrolling = doc.scrollingElement || doc.documentElement;
+    restoringScrollUntil = performance.now() + 150;
     scrolling.scrollTop = clamp(ratio, 0, 1) * Math.max(0, scrolling.scrollHeight - scrolling.clientHeight);
   }
   function updateProgress(ratio = state.ratio) {
