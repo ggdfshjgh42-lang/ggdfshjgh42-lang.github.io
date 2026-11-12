@@ -8,8 +8,10 @@
     <title>书架 | Fantastic Matrix</title>
     <link rel="stylesheet" href="blog.css">
     <link rel="stylesheet" href="bookshelf.css">
+    <link rel="stylesheet" href="reader-screen.css">
     <script src="book-library.js" defer></script>
     <script src="bookshelf.js" defer></script>
+    <script src="reader-screen.js" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#my-books">跳到书籍列表</a>
@@ -24,8 +26,17 @@
         </header>
         <section class="continue-panel" id="continue-reading" aria-label="继续阅读" hidden><div><p class="eyebrow">PICK UP WHERE YOU LEFT OFF</p><h2 id="resume-title"></h2><p id="resume-detail"></p></div><a id="resume-book" class="shelf-button" href="bookshelf.html">继续阅读 <span aria-hidden="true">→</span></a></section>
         <section id="my-books" aria-labelledby="shelf-title">
-            <div class="shelf-heading"><div><p class="eyebrow">THE BOOKSHELF</p><h2 id="shelf-title">我的书架<span>。</span></h2></div><span id="shelf-count">正在整理书籍…</span></div>
+            <div class="shelf-heading"><div><p class="eyebrow">THE BOOKSHELF</p><h2 id="shelf-title">我的书架<span>。</span></h2></div><span id="shelf-count" role="status" aria-live="polite">正在整理书籍…</span></div>
             <div class="shelf-toolbar"><label class="search-wrap" for="book-search"><span aria-hidden="true">⌕</span><input id="book-search" type="search" placeholder="搜书名、作者或关键词" autocomplete="off"><span class="sr-only">搜索书籍</span></label><label class="filter-wrap"><span class="sr-only">书籍格式</span><select id="format-filter"><option value="all">全部格式</option><option value="epub">EPUB</option><option value="pdf">PDF</option><option value="txt">TXT</option></select></label><label class="filter-wrap"><span class="sr-only">书籍分类</span><select id="category-filter"><option value="all">全部分类</option></select></label><button class="refresh-button" id="refresh-books" type="button" aria-label="刷新书架"><span aria-hidden="true">↻</span> 刷新</button></div>
+            <div class="shelf-browse-tools">
+                <div class="reading-filters" role="group" aria-label="阅读状态">
+                    <button type="button" data-reading-status="all" aria-pressed="true">全部 <span data-status-count="all">0</span></button>
+                    <button type="button" data-reading-status="unread" aria-pressed="false">未读 <span data-status-count="unread">0</span></button>
+                    <button type="button" data-reading-status="reading" aria-pressed="false">在读 <span data-status-count="reading">0</span></button>
+                    <button type="button" data-reading-status="finished" aria-pressed="false">读完 <span data-status-count="finished">0</span></button>
+                </div>
+                <label class="sort-wrap" for="book-sort">排序 <select id="book-sort"><option value="title">书名</option><option value="recent">最近阅读</option><option value="progress">阅读进度</option></select></label>
+            </div>
             <p class="shelf-warning" id="shelf-warning" role="status" hidden></p>
             <p id="shelf-status" class="shelf-status" role="status" aria-live="polite">正在整理书架，请稍等…</p>
             <div class="book-grid" id="book-grid"></div>

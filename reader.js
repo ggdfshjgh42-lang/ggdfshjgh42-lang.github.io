@@ -336,13 +336,38 @@
 
   async function loadPDF() {
     let pdfjs;
-    try { pdfjs = await import('./vendor/pdfjs/pdf.mjs'); }
-    catch { throw new Error('PDF 阅读组件未能载入。请刷新后重试，或通过上方「原文件」打开。'); }
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.mjs', location.href).href;
+    // The legacy build includes the compatibility code needed by both the page
+    // and its worker. Keep their versions together when a browser has cached
+    // the previous reader assets.
+    try { pdfjs = await import('./vendor/pdfjs/pdf.mjs?v=5.6.205-legacy-1'); }
+    catch (error) {
+      console.error('PDF component failed:', error);
+      throw new Error('PDF 阅读组件未能载入。请刷新后重试，或通过上方「原文件」打开。');
+    }
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.mjs?v=5.6.205-legacy-1', location.href).href;
+    let task, timer;
     try {
-      const task = pdfjs.getDocument({url:library.urlFor(state.book.path),isEvalSupported:false,enableXfa:false,useSystemFonts:true,cMapUrl:new URL('vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('vendor/pdfjs/standard_fonts/',location.href).href,wasmUrl:new URL('vendor/pdfjs/wasm/',location.href).href});
-      state.pdf = await task.promise;
-    } catch (error) { throw new Error(error.name === 'PasswordException' ? '这份 PDF 需要密码，请通过「原文件」在支持密码的阅读器中打开。' : 'PDF 文件未能读取，请检查文件是否完整，或通过「原文件」打开。'); }
+      task = pdfjs.getDocument({url:library.urlFor(state.book.path),isEvalSupported:false,enableXfa:false,useSystemFonts:true,cMapUrl:new URL('vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('vendor/pdfjs/standard_fonts/',location.href).href,wasmUrl:new URL('vendor/pdfjs/wasm/',location.href).href});
+      task.onProgress = ({loaded, total}) => {
+        $('message-detail').textContent = total > 0 ? '正在载入 PDF：' + Math.min(100, Math.round(loaded / total * 100)) + '%' : '正在载入 PDF，请稍等。';
+      };
+      const timeout = new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          const error = new Error('加载 PDF 超时，请检查网络后重新打开。');
+          error.name = 'TimeoutError';
+          reject(error);
+        }, 90000);
+      });
+      state.pdf = await Promise.race([task.promise, timeout]);
+    } catch (error) {
+      console.error('PDF loading failed:', error);
+      if (task) task.destroy().catch(() => {});
+      if (error.name === 'PasswordException') throw new Error('这份 PDF 需要密码，请通过「原文件」在支持密码的阅读器中打开。');
+      if (error.name === 'TimeoutError') throw error;
+      if (error.status === 404 || error.name === 'MissingPDFException') throw new Error('没有找到 PDF 文件。刚上传的书籍请等待网站发布完成后再试。');
+      if (error.name === 'InvalidPDFException') throw new Error('这份文件不是有效的 PDF，或文件已损坏。请检查原文件后重新上传。');
+      throw new Error('PDF 未能载入，请检查网络后重试，也可以通过「原文件」打开。');
+    } finally { clearTimeout(timer); }
     $('font-tools').hidden = true; $('pdf-tools').hidden = false; $('page-label').hidden = false;
     $('chapter-status').hidden = true;
     $('page-total').textContent = state.pdf.numPages;
@@ -354,32 +379,52 @@
   let pdfRenderTask;
   async function showPDFPage(pageNumber) {
     const token = ++state.renderToken;
+    const targetPage = Math.floor(clamp(pageNumber, 1, state.pdf.numPages));
+    // Record the requested destination immediately so a zoom/resize arriving
+    // while cancellation is pending keeps the reader on that destination.
+    state.page = targetPage;
     state.ready = false;
-    if (pdfRenderTask) { try { pdfRenderTask.cancel(); await pdfRenderTask.promise; } catch {} pdfRenderTask = null; }
-    state.page = clamp(pageNumber, 1, state.pdf.numPages);
-    $('reader-message').hidden = true; frame.hidden = true; $('pdf-view').hidden = false;
-    const page = await state.pdf.getPage(state.page);
-    if (token !== state.renderToken) return;
-    const viewport = page.getViewport({scale:1});
-    const available = $('pdf-view').clientWidth - (matchMedia('(max-width:700px)').matches ? 16 : 44);
-    const width = Math.max(240, Math.min(available, 850)) * state.zoom;
-    const scale = width / viewport.width;
-    const scaled = page.getViewport({scale});
-    const density = Math.min(2, window.devicePixelRatio || 1);
-    const canvas = $('pdf-canvas');
-    canvas.width = Math.ceil(scaled.width * density); canvas.height = Math.ceil(scaled.height * density);
-    canvas.style.width = Math.ceil(scaled.width) + 'px'; canvas.style.height = Math.ceil(scaled.height) + 'px';
-    canvas.setAttribute('aria-label', state.book.title + '，第 ' + state.page + ' 页');
-    pdfRenderTask = page.render({canvasContext:canvas.getContext('2d'),viewport:scaled,transform:density === 1 ? null : [density,0,0,density,0,0]});
-    try { await pdfRenderTask.promise; } catch (error) { if (error.name === 'RenderingCancelledException') return; throw error; }
-    if (token !== state.renderToken) return;
-    pdfRenderTask = null;
-    $('pdf-view').scrollTop = 0;
-    $('page-number').value = state.page;
-    $('pdf-zoom').textContent = Math.round(state.zoom * 100) + '%';
-    state.ready = true; updateButtons(); persist();
-    const text = await page.getTextContent();
-    if (token === state.renderToken) $('pdf-text').textContent = text.items.map(item => item.str).join(' ');
+    try {
+      // Several fast page/zoom changes may be waiting for the same old render.
+      // Only the newest request may resize and reuse the shared canvas.
+      const previousTask = pdfRenderTask;
+      if (previousTask) {
+        previousTask.cancel();
+        try { await previousTask.promise; } catch {}
+        if (pdfRenderTask === previousTask) pdfRenderTask = null;
+      }
+      if (token !== state.renderToken) return;
+      const page = await state.pdf.getPage(targetPage);
+      if (token !== state.renderToken) return;
+      $('reader-message').hidden = true; frame.hidden = true; $('pdf-view').hidden = false;
+      const viewport = page.getViewport({scale:1});
+      const available = $('pdf-view').clientWidth - (matchMedia('(max-width:700px)').matches ? 16 : 44);
+      const width = Math.max(240, Math.min(available, 850)) * state.zoom;
+      const scaled = page.getViewport({scale:width / viewport.width});
+      // Stay within common mobile canvas limits, including unusually long pages.
+      const density = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(16 * 1024 * 1024 / (scaled.width * scaled.height)), 8192 / scaled.width, 8192 / scaled.height);
+      const canvas = $('pdf-canvas');
+      canvas.width = Math.max(1, Math.floor(scaled.width * density)); canvas.height = Math.max(1, Math.floor(scaled.height * density));
+      canvas.style.width = Math.ceil(scaled.width) + 'px'; canvas.style.height = Math.ceil(scaled.height) + 'px';
+      canvas.setAttribute('aria-label', state.book.title + '，第 ' + targetPage + ' 页');
+      const renderTask = page.render({canvas,viewport:scaled,transform:density === 1 ? null : [density,0,0,density,0,0]});
+      pdfRenderTask = renderTask;
+      try { await renderTask.promise; }
+      finally { if (pdfRenderTask === renderTask) pdfRenderTask = null; }
+      if (token !== state.renderToken) return;
+      $('pdf-view').scrollTop = 0;
+      $('page-number').value = targetPage;
+      $('pdf-zoom').textContent = Math.round(state.zoom * 100) + '%';
+      state.ready = true; updateButtons(); persist();
+      $('pdf-text').textContent = '';
+      try {
+        const text = await page.getTextContent();
+        if (token === state.renderToken) $('pdf-text').textContent = text.items.map(item => item.str).join(' ');
+      } catch (error) { console.warn('PDF text could not be extracted:', error); }
+    } catch (error) {
+      if (token !== state.renderToken || error.name === 'RenderingCancelledException') return;
+      throw error;
+    }
   }
   function keyboard(event) {
     if (/INPUT|SELECT|TEXTAREA/.test(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;

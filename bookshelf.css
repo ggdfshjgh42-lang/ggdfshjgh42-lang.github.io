@@ -28,7 +28,7 @@
 .shelf-heading { padding: 30px 0 26px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: end; gap: 20px; }
 .shelf-heading h2 { font-size: 25px; letter-spacing: -.8px; margin-top: 4px; }
 #shelf-count { font-size: 11px; color: var(--text-secondary); padding-bottom: 3px; }
-.shelf-toolbar { display: flex; gap: 10px; margin-bottom: 22px; }
+.shelf-toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
 .search-wrap { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 100px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
 .search-wrap > span:first-child { font-size: 25px; line-height: 1; color: #7e8c73; }
 .search-wrap input { font: inherit; font-size: 12px; border: 0; background: none; color: var(--text); width: 100%; padding: 12px 0; min-width: 0; outline: none; }
@@ -39,6 +39,15 @@
 .refresh-button > span { font-size: 17px; vertical-align: -1px; margin-right: 3px; }
 .refresh-button:hover { color: var(--accent); border-color: #9db67b; }
 .refresh-button:disabled { opacity: .5; cursor: wait; }
+.shelf-browse-tools { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+.reading-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.reading-filters button { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 11px; padding: 8px 12px; border: 1px solid transparent; border-radius: 6px; color: var(--text-secondary); background: transparent; cursor: pointer; }
+.reading-filters button:hover { background: #edf1e4; }
+.reading-filters button[aria-pressed="true"] { color: #355844; border-color: #cbd9b9; background: #e7edda; font-weight: 600; }
+.reading-filters button > span { font-variant-numeric: tabular-nums; opacity: .7; }
+.sort-wrap { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); }
+.sort-wrap select { font: inherit; color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 7px 9px; background: var(--surface); cursor: pointer; }
+.reading-filters button:focus-visible, .sort-wrap select:focus-visible, .filter-wrap select:focus-visible, .refresh-button:focus-visible, .book-card:focus-visible { outline: 2px solid #7e9d5f; outline-offset: 4px; }
 .shelf-status { font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; min-height: 20px; }
 .shelf-status:empty { min-height: 0; margin: 0; }
 .shelf-warning { font-size: 12px; line-height: 1.8; border: 1px solid #e2d7b4; border-radius: 8px; padding: 12px 16px; color: #776137; background: #f6f0df; margin-bottom: 20px; }
@@ -60,6 +69,7 @@
 .book-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; color: #7a856e; margin-top: 10px; }
 .book-bottom > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .book-bottom > span:last-child { flex-shrink: 0; }
+.book-reading-state.is-finished { color: #355844; font-weight: 600; }
 .book-meter { margin-top: 10px; height: 3px; background: #e2e8d8; border-radius: 5px; overflow: hidden; }
 .book-meter > span { display: block; height: 100%; background: #91ab6a; }
 .empty-shelf { text-align: center; padding: 55px 24px 60px; background: #f0f3e8; border: 1px dashed #cdd7bd; border-radius: 14px; }
@@ -79,10 +89,10 @@
 .import-content .guide-footnote { font-size: 10px; margin: 0; }
 @media (max-width:800px) { .book-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 25px 20px; } .shelf-hero { gap: 10px; } .book-stack { transform: scale(.85); } .art-shelf-line { width: 285px; bottom: 51px; } .shelf-art::before { width: 250px; height: 250px; } }
 @media (max-width:600px) {
-  .shelf-hero { grid-template-columns: 1fr; padding: 40px 0 30px; gap: 8px; }
+  .shelf-hero { grid-template-columns: minmax(0,1fr); padding: 40px 0 30px; gap: 8px; }
   .shelf-hero h1 { font-size: 46px; margin: 20px 0 16px; }
   .shelf-hero-copy > p:not(.eyebrow) { font-size: 13px; }
-  .shelf-art { height: 240px; width: 100%; max-width: 350px; justify-self: center; }
+  .shelf-art { height: 240px; width: 100%; min-width: 0; max-width: 350px; justify-self: center; }
   .shelf-art::before { width: 220px; height: 220px; }
   .book-stack { transform: scale(.8); }
   .art-shelf-line { bottom: 30px; width: 280px; }
@@ -94,6 +104,10 @@
   .shelf-heading { padding: 25px 0 22px; }
   .shelf-heading h2 { font-size: 23px; }
   .shelf-toolbar { flex-wrap: wrap; gap: 8px; }
+  .shelf-browse-tools { gap: 10px; }
+  .reading-filters { flex: 1 1 100%; gap: 4px; }
+  .reading-filters button { flex: 1; padding: 9px 5px; justify-content: center; }
+  .sort-wrap { margin-left: auto; }
   .search-wrap { flex-basis: 100%; }
   .filter-wrap { flex: 1; }
   .filter-wrap select { width: 100%; max-width: none; height: 40px; }
@@ -112,3 +126,4 @@
   .empty-shelf { padding: 40px 16px; }
 }
 @media (max-width:390px) { .cover-title { font-size: 20px; } .nav-logo { font-size: 10px; } .nav-links { gap: 10px; } .brand-mark { display: none; } }
+@media (prefers-reduced-motion:reduce) { .book-visual, .shelf-button, .guide-chevron { transition: none; } .book-card:hover .book-visual, .shelf-button:hover { transform: none; } }

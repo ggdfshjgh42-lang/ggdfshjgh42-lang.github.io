@@ -7,6 +7,18 @@
       "author": "Fantastic Matrix",
       "category": "书架指南",
       "description": "一份很短的阅读示例，也告诉你怎样把自己的书放上书架。"
+    },
+    {
+      "path": "books/置身事内：中国政府与经济发展 (兰小欢) (Z-Library).pdf",
+      "title": "置身事内：中国政府与经济发展",
+      "author": "兰小欢",
+      "category": "经济"
+    },
+    {
+      "path": "books/邓小平时代 (傅高义) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "title": "邓小平时代",
+      "author": "傅高义",
+      "category": "历史"
     }
   ]
 }

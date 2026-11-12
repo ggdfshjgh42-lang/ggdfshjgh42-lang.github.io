@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="reader.css">
   <script src="book-library.js" defer></script>
   <script src="reader.js" defer></script>
+  <script src="reader-screen.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#reader-stage">跳到正文</a>
@@ -16,6 +17,7 @@
     <a class="back-link" href="bookshelf.html"><span aria-hidden="true">←</span> 书架</a>
     <div class="book-heading"><p id="book-format">FANTASTIC MATRIX / READING ROOM</p><h1 id="book-title">打开一本书</h1></div>
     <a class="original-link" id="original-link" hidden target="_blank" rel="noopener">原文件 <span aria-hidden="true">↗</span></a>
+    <button type="button" id="fullscreen-toggle" aria-pressed="false" title="进入全屏">全屏</button>
   </header>
   <div class="reader-tools" aria-label="阅读设置">
     <button type="button" id="directory-toggle" aria-expanded="false" aria-controls="reader-sidebar">☰ <span>目录</span></button>

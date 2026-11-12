@@ -41,7 +41,11 @@ GitHub Pages 的发布分支应指向 `main`，目录为仓库根目录（Settin
 
 ## 在线书架
 
-打开 [书架](https://fantasticmatrix.xyz/bookshelf.html)，可以在线阅读 EPUB、PDF 和 TXT。把书籍上传到仓库 `books/` 文件夹并提交到 `main`，等待 Pages 更新后刷新书架即可。支持子文件夹分类、书名与作者搜索、格式筛选、文字封面、继续阅读和本地阅读进度。书籍资料和上传方法见 [添加书籍说明](books/README.md)。
+打开 [书架](https://fantasticmatrix.xyz/bookshelf.html)，可以在线阅读 EPUB、PDF 和 TXT。把书籍上传到仓库 `books/` 文件夹并提交到 `main`，等待 Pages 更新后刷新书架即可。支持子文件夹分类、书名与作者搜索、格式及未读／在读／读完筛选，支持按书名、最近阅读和进度排序。继续阅读会优先选择尚未读完的书。书籍资料和上传方法见 [添加书籍说明](books/README.md)。
 
 EPUB/TXT 支持章节目录、字号与阅读主题；PDF 保留固定版式，支持页码跳转。阅读进度和偏好只保存在当前浏览器，不会跨设备自动同步。现有 Jekyll 发布流程自动生成 `books/index.json` 书单，本地预览时可回退至 GitHub 公开目录；同步错误时保留缓存及 `books/catalog.json` 备用书单。不需要向读者索取 GitHub 令牌。
+
+在书架点击书籍或「继续阅读」会直接打开全屏阅读器，点击「书架」可返回并更新进度。浏览器支持时会同时进入原生全屏，可按 Esc 或点击「退出全屏」退出；不支持时仍使用整个页面阅读。直接打开阅读链接时，可点击右上角「全屏」。PDF 使用与网站一起托管的 PDF.js 兼容构建，支持缺少较新 Promise 接口的浏览器；主模块及 Worker 版本需保持一致。
+
+阅读器浏览器回归：安装 Python Playwright（`pip install playwright`，`playwright install chromium`）后运行 `python tests/reader.browser.py`；也可加 `--browser /usr/bin/chromium` 使用已有浏览器。测试启动临时本地服务并生成书单，检查三种格式、阅读状态、全屏及返回、进度保存和手机布局，不访问外部服务。
 
