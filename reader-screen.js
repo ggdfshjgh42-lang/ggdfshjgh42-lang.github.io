@@ -88,6 +88,8 @@
     frame.allow = 'fullscreen';
     const frameURL = new URL(url);
     frameURL.searchParams.set('embedded', '1');
+    // Reopening a previously read book must not reuse an older reader document.
+    frameURL.searchParams.set('v', '20261112-immersive-3');
     frame.src = frameURL.href;
     overlay.append(frame);
     const siblings = [...document.body.children].map(node => [node, node.inert]);
