@@ -27,6 +27,7 @@ function loadState() {
     if (!Array.isArray(value.maps) || !value.maps.length || value.maps.length > 200) throw Error();
     const maps = value.maps.map(validateMap);
     if (new Set(maps.map(m => m.id)).size !== maps.length) throw Error();
+    // Preserve older saved ideas when simplifying the navigation.
     const inbox = Array.isArray(value.inbox) ? value.inbox.filter(i => i && typeof i.id === 'string' && typeof i.text === 'string').map(i => ({ id: i.id, text: i.text.slice(0, 300), createdAt: typeof i.createdAt === 'string' ? i.createdAt : new Date().toISOString() })).slice(0, 2000) : [];
     return { maps, inbox, activeId: maps.some(m => m.id === value.activeId) ? value.activeId : maps[0].id };
   } catch {
@@ -37,7 +38,6 @@ function loadState() {
 
 let state = loadState();
 let selectedId = null;
-let page = 'maps';
 let view = 'map';
 let tool = 'select';
 let linkingFrom = null;
@@ -116,22 +116,14 @@ function restoreHistory(direction) {
 
 function renderSidebar() {
   $('#map-count').textContent = state.maps.length;
-  $('#inbox-count').textContent = state.inbox.length;
-  $('#map-list').innerHTML = state.maps.map((m, i) => `<button class="map-list-item ${m.id === state.activeId && page === 'maps' ? 'active' : ''}" data-map-id="${escapeHTML(m.id)}" title="${escapeHTML(m.title)}"><span class="map-dot" data-color="${['sage', 'peach', 'blue', 'lavender'][i % 4]}"></span><span>${escapeHTML(m.title)}</span>${m.id === state.activeId && page === 'maps' ? '<span class="map-active-mark"></span>' : ''}</button>`).join('');
-  $$('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+  $('#map-list').innerHTML = state.maps.map((m, i) => `<button class="map-list-item ${m.id === state.activeId ? 'active' : ''}" data-map-id="${escapeHTML(m.id)}" title="${escapeHTML(m.title)}" ${m.id === state.activeId ? 'aria-current="true"' : ''}><span class="map-dot" data-color="${['sage', 'peach', 'blue', 'lavender'][i % 4]}"></span><span>${escapeHTML(m.title)}</span>${m.id === state.activeId ? '<span class="map-active-mark"></span>' : ''}</button>`).join('');
 }
 function renderHeader() {
   const map = currentMap();
-  $('#map-title').value = page === 'inbox' ? '灵感收集' : map.title;
-  $('#map-title').readOnly = page === 'inbox';
+  $('#map-title').value = map.title;
   sizeTitle();
-  $('#breadcrumb-title').textContent = page === 'inbox' ? '灵感收集' : map.title;
-  $('.breadcrumb-parent').textContent = '← 网站首页';
-  $('#workspace-subtitle').textContent = page === 'inbox' ? '让每个一闪而过的念头，都被好好接住。' : '不必急着找到答案，先让想法自由展开。';
-  document.title = `${page === 'inbox' ? '灵感收集' : map.title} · 思维导图 · Fantastic Matrix`;
-  $('.heading-actions').hidden = page === 'inbox';
-  $('.title-menu').hidden = page === 'inbox';
-  $('#export-open').hidden = page === 'inbox';
+  $('#breadcrumb-title').textContent = map.title;
+  document.title = `${map.title} · 思维导图 · Fantastic Matrix`;
 }
 function sizeTitle() {
   const input = $('#map-title');
@@ -185,7 +177,7 @@ function updateSelection() {
   });
   const node = nodeById(selectedId);
   const toolbar = $('#node-toolbar');
-  toolbar.hidden = !node || page !== 'maps' || view !== 'map' || !!editingId || !!linkingFrom;
+  toolbar.hidden = !node || view !== 'map' || !!editingId || !!linkingFrom;
   if (!toolbar.hidden) {
     const width = viewport.clientWidth;
     toolbar.style.left = `${Math.max(80, Math.min(width - 88, transform.x + node.x * transform.scale))}px`;
@@ -262,22 +254,19 @@ function renderOutline() {
 function setView(next) {
   finishEditing();
   view = next;
-  $('#map-viewport').hidden = view !== 'map' || page !== 'maps';
-  $('#outline-view').hidden = view !== 'outline' || page !== 'maps';
-  $('#inbox-view').hidden = page !== 'inbox';
-  const showControls = page === 'maps' && view === 'map';
+  $('#map-viewport').hidden = view !== 'map';
+  $('#outline-view').hidden = view !== 'outline';
+  const showControls = view === 'map';
   $$('.zoom-controls, #canvas-toolbar, .canvas-bottom-right, .canvas-tip').forEach(el => { el.hidden = !showControls; });
-  $('#canvas-label-text').textContent = page === 'inbox' ? '灵感收集盒' : view === 'outline' ? '思绪大纲' : '自由画布';
+  $('#canvas-label-text').textContent = view === 'outline' ? '思绪大纲' : '自由画布';
   $$('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   $('#canvas-wrap').classList.toggle('document-mode', !showControls);
   closeNote();
   cancelLink();
   renderMap();
-  if (page === 'inbox') renderInbox();
   if (showControls) requestAnimationFrame(() => transforms.has(state.activeId) ? applyTransform() : fitMap({ initial: true }));
 }
-function setPage(next) {
-  page = next;
+function showMap() {
   selectedId = null;
   renderSidebar();
   renderHeader();
@@ -289,14 +278,13 @@ function switchMap(id) {
   if (!state.maps.some(m => m.id === id)) return;
   state.activeId = id;
   transform = transforms.get(id) || { x: 0, y: 0, scale: 1 };
-  setPage('maps');
+  showMap();
   updateHistoryButtons();
   save();
 }
 
 function addIdea(sibling = false, text) {
   finishEditing();
-  if (page !== 'maps') setPage('maps');
   const parent = selectedId || rootNode().id;
   remember();
   try {
@@ -545,38 +533,6 @@ $('#note-colors').addEventListener('click', e => {
   changed();
 });
 
-function renderInbox() {
-  $('#inbox-count').textContent = state.inbox.length;
-  $('#inbox-cards').innerHTML = state.inbox.length ? state.inbox.map(i => `<article class="idea-card"><span class="idea-card-mark">${icon('spark')}</span><p>${escapeHTML(i.text)}</p><time>${escapeHTML(new Date(i.createdAt).toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' }))}</time><div class="idea-actions"><button data-idea-add="${escapeHTML(i.id)}" title="添加到当前导图">${icon('map')}放入导图</button><button class="icon-btn" data-idea-delete="${escapeHTML(i.id)}" title="移除灵感" aria-label="移除灵感">${icon('trash')}</button></div></article>`).join('') : '<div class="inbox-empty"><span>✧</span><h3>灵感来了，就在这里落笔。</h3><p>一句话、一个问题、一个天马行空的念头，都可以。</p></div>';
-}
-function captureIdea(text) {
-  text = text.trim();
-  if (!text) return false;
-  if (state.inbox.length >= 2000) { toast('灵感盒已满，先把一些灵感放入导图吧。'); return false; }
-  state.inbox.unshift({ id: uid(), text: text.slice(0, 300), createdAt: new Date().toISOString() });
-  save();
-  renderSidebar();
-  renderInbox();
-  toast('灵感已收好，随时回来继续想。');
-  return true;
-}
-$('#capture-form').addEventListener('submit', e => {
-  e.preventDefault();
-  if (captureIdea($('#capture-input').value)) { $('#capture-input').value = ''; $('#capture-dialog').close(); }
-});
-$('#inbox-composer').addEventListener('submit', e => { e.preventDefault(); if (captureIdea($('#inbox-input').value)) $('#inbox-input').value = ''; });
-$('#inbox-cards').addEventListener('click', e => {
-  const add = e.target.closest('[data-idea-add]');
-  if (add) {
-    const idea = state.inbox.find(i => i.id === add.dataset.ideaAdd);
-    selectedId = null;
-    setPage('maps');
-    if (addIdea(false, idea.text)) { state.inbox = state.inbox.filter(i => i.id !== idea.id); save(); renderSidebar(); toast(`已放入「${currentMap().title}」`); }
-  }
-  const del = e.target.closest('[data-idea-delete]');
-  if (del) { state.inbox = state.inbox.filter(i => i.id !== del.dataset.ideaDelete); save(); renderSidebar(); renderInbox(); }
-});
-
 function showDialog(id) { finishEditing(); $('#map-options').hidden = true; $(id).showModal(); }
 $$('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
 $$('dialog').forEach(dialog => dialog.addEventListener('click', e => {
@@ -584,9 +540,8 @@ $$('dialog').forEach(dialog => dialog.addEventListener('click', e => {
   const r = dialog.getBoundingClientRect();
   if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dialog.close();
 }));
-function openNewMap() { $('#new-title').value = ''; showDialog('#new-dialog'); requestAnimationFrame(() => $('#new-title').focus()); }
+function openNewMap() { $('#maps-dialog').close(); $('#new-title').value = ''; showDialog('#new-dialog'); requestAnimationFrame(() => $('#new-title').focus()); }
 $('#new-map').addEventListener('click', openNewMap);
-$('#new-map-small').addEventListener('click', openNewMap);
 $('#new-form').addEventListener('submit', e => {
   e.preventDefault();
   const title = $('#new-title').value.trim();
@@ -598,8 +553,8 @@ $('#new-form').addEventListener('submit', e => {
   switchMap(map.id);
   toast('新的思维空间，准备好了。');
 });
-$('#map-list').addEventListener('click', e => { const b = e.target.closest('[data-map-id]'); if (b) switchMap(b.dataset.mapId); });
-$$('[data-page]').forEach(b => b.addEventListener('click', () => setPage(b.dataset.page)));
+$('#map-list').addEventListener('click', e => { const b = e.target.closest('[data-map-id]'); if (b) { $('#maps-dialog').close(); switchMap(b.dataset.mapId); } });
+$('#maps-open').addEventListener('click', () => { closeSidebar(); renderSidebar(); showDialog('#maps-dialog'); });
 $$('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
 $$('[data-tool]').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 $('#add-branch').addEventListener('click', () => addIdea());
@@ -615,11 +570,9 @@ $('#link-cancel').addEventListener('click', () => cancelLink());
 $('#export-open').addEventListener('click', () => showDialog('#export-dialog'));
 $('#help-open').addEventListener('click', () => showDialog('#help-dialog'));
 $('#shortcuts-open').addEventListener('click', () => showDialog('#help-dialog'));
-$('#capture-open').addEventListener('click', () => { showDialog('#capture-dialog'); $('#capture-input').focus(); });
 
 $('#map-title').addEventListener('focus', () => { titleHistoryStarted = false; });
 $('#map-title').addEventListener('input', () => {
-  if (page !== 'maps') return;
   if (!titleHistoryStarted) { remember(); titleHistoryStarted = true; }
   currentMap().title = $('#map-title').value.trim() || '未命名导图';
   sizeTitle();
@@ -698,69 +651,24 @@ $('#import-file').addEventListener('change', async e => {
     const map = validateMap(await file.text());
     map.id = uid();
     state.maps.unshift(map);
+    $('#maps-dialog').close();
     switchMap(map.id);
     toast('导图已导入，继续你的想法。');
   } catch (error) { toast(`导入失败：${error.message}`); }
 });
 
-let searchItems = [];
-function renderSearch() {
-  const query = $('#search-input').value.trim().toLocaleLowerCase();
-  searchItems = [];
-  if (query) {
-    for (const map of state.maps) {
-      if (map.title.toLocaleLowerCase().includes(query)) searchItems.push({ type: 'map', mapId: map.id, text: map.title, detail: '思维导图' });
-      for (const node of map.nodes) if ((node.text + ' ' + node.note).toLocaleLowerCase().includes(query)) searchItems.push({ type: 'node', mapId: map.id, nodeId: node.id, text: node.text, detail: map.title });
-    }
-    for (const idea of state.inbox) if (idea.text.toLocaleLowerCase().includes(query)) searchItems.push({ type: 'idea', text: idea.text, detail: '灵感收集' });
-  } else searchItems = state.maps.map(m => ({ type: 'map', mapId: m.id, text: m.title, detail: '思维导图' }));
-  searchItems = searchItems.slice(0, 40);
-  $('#search-results').innerHTML = searchItems.length ? `<span class="search-section-label">${query ? `${searchItems.length} 个相关想法` : '我的导图'}</span>` + searchItems.map((r, i) => `<button class="search-result" data-result="${i}">${icon(r.type === 'idea' ? 'bulb' : 'map')}<span><strong>${escapeHTML(r.text)}</strong><small>${escapeHTML(r.detail)}</small></span>${icon('chevron')}</button>`).join('') : '<div class="search-empty">还没找到，换个词再试试？</div>';
-}
-function openSearch() { showDialog('#search-dialog'); $('#search-input').value = ''; renderSearch(); $('#search-input').focus(); }
-$('#search-trigger').addEventListener('click', openSearch);
-$('#search-input').addEventListener('input', renderSearch);
-$('#search-results').addEventListener('click', e => {
-  const button = e.target.closest('[data-result]');
-  if (!button) return;
-  const item = searchItems[Number(button.dataset.result)];
-  $('#search-dialog').close();
-  if (item.type === 'idea') { setPage('inbox'); return; }
-  switchMap(item.mapId);
-  if (item.nodeId) {
-    const n = nodeById(item.nodeId);
-    let parent = nodeById(n.parentId);
-    while (parent) { parent.collapsed = false; parent = nodeById(parent.parentId); }
-    setView('map');
-    selectedId = n.id;
-    renderMap();
-    requestAnimationFrame(() => bringIntoView(n, true));
-  }
-});
-$('#search-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) $('[data-result="0"]')?.click(); if (e.key === 'ArrowDown') { e.preventDefault(); $('[data-result="0"]')?.focus(); } });
-$('#search-results').addEventListener('keydown', e => {
-  if (!['ArrowDown', 'ArrowUp'].includes(e.key)) return;
-  e.preventDefault();
-  const results = $$('[data-result]');
-  const i = results.indexOf(document.activeElement);
-  results[(i + (e.key === 'ArrowDown' ? 1 : -1) + results.length) % results.length]?.focus();
-});
-
 function closeSidebar() { $('#sidebar').classList.remove('open'); $('#sidebar-backdrop').classList.remove('visible'); }
 $('#mobile-menu').addEventListener('click', () => { $('#sidebar').classList.toggle('open'); $('#sidebar-backdrop').classList.toggle('visible'); });
 $('#sidebar-backdrop').addEventListener('click', closeSidebar);
-$('.brand').addEventListener('click', e => { e.preventDefault(); setPage('maps'); });
-if (!/Mac|iPhone|iPad/.test(navigator.platform)) $('.search-trigger kbd').textContent = 'Ctrl K';
+$('.brand').addEventListener('click', e => { e.preventDefault(); showMap(); });
 
 document.addEventListener('keydown', e => {
   if (e.isComposing) return;
   const typing = e.target.closest('input,textarea,[contenteditable="true"]');
   const mod = e.ctrlKey || e.metaKey;
-  if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!$('#search-dialog').open) openSearch(); return; }
   if ($('dialog[open]')) return;
   if (e.key === 'Escape') { cancelLink(); closeNote(); closeSidebar(); selectedId = null; updateSelection(); return; }
   if (typing) return;
-  if (page !== 'maps') return;
   const canvasKey = e.target === document.body || e.target === viewport || e.target.closest('.map-node');
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); restoreHistory(e.shiftKey ? 'redo' : 'undo'); return; }
   if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); restoreHistory('redo'); return; }
@@ -783,7 +691,7 @@ document.addEventListener('keyup', e => { if (e.code === 'Space') { spaceHeld = 
 window.addEventListener('blur', () => { spaceHeld = false; viewport.classList.toggle('hand-mode', tool === 'hand'); });
 window.addEventListener('beforeunload', () => { finishEditing(); save(); });
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (page === 'maps' && view === 'map') fitMap({ initial: true }); }, 100); });
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === 'map') fitMap({ initial: true }); }, 100); });
 
 renderSidebar();
 renderHeader();

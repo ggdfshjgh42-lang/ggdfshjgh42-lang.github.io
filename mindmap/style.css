@@ -59,11 +59,6 @@ kbd { font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; bord
 .brand-mark i:nth-child(2) { right: 0; top: 0; }
 .brand-mark i:nth-child(3) { left: 0; bottom: 0; width: 9px; height: 9px; }
 .brand-mark i:nth-child(4) { right: 1px; bottom: 2px; width: 7px; height: 7px; }
-.search-trigger { display: flex; align-items: center; gap: 9px; min-height: 36px; width: 100%; margin-top: 35px; padding: 0 10px; color: #98a18f; background: #f0f2ec; border: 1px solid #e9ece4; border-radius: 7px; text-align: left; font-size: 12px; }
-.search-trigger .icon { width: 15px; height: 15px; }
-.search-trigger span { flex: 1; }
-.search-trigger kbd { padding: 2px 4px; font-size: 10px; color: #9ba493; border-color: #e1e6da; background: #f6f7f2; }
-.search-trigger:hover { background: #e9eee3; }
 .primary-nav { display: flex; flex-direction: column; gap: 5px; margin-top: 26px; }
 .nav-item { width: 100%; display: flex; align-items: center; gap: 11px; text-align: left; padding: 12px; color: #7c8679; border-radius: 7px; font-size: 13px; }
 .nav-item.active { color: #506a54; background: #e8eee3; font-weight: 500; }
@@ -72,10 +67,7 @@ kbd { font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; bord
 .nav-item span:nth-child(2) { flex: 1; }
 .nav-count { color: #97a08f; font-size: 10px; font-weight: 400; }
 .nav-item.active .nav-count { color: #7a8d71; }
-.sidebar-section-label { display: flex; align-items: center; justify-content: space-between; margin: 29px 3px 8px 12px; font-size: 11px; color: #778175; letter-spacing: 1px; }
-.sidebar-section-label .icon-btn { width: 24px; height: 24px; color: #939f8c; }
-.sidebar-section-label .icon { width: 14px; height: 14px; }
-.map-list { display: flex; flex-direction: column; gap: 3px; min-height: 0; max-height: 240px; overflow: auto; scrollbar-width: thin; scrollbar-color: #dce2d5 transparent; }
+.map-list { display: flex; flex-direction: column; gap: 3px; min-height: 0; max-height: min(50dvh, 360px); padding: 4px; overflow: auto; scrollbar-width: thin; scrollbar-color: #dce2d5 transparent; }
 .map-list-item { display: flex; align-items: center; gap: 10px; flex-shrink: 0; width: 100%; padding: 11px 12px; text-align: left; color: #8b9485; font-size: 12px; border-radius: 6px; }
 .map-list-item > span:not(.map-dot) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .map-list-item.active { color: #5d7359; background: #edf1e8; }
@@ -84,24 +76,6 @@ kbd { font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; bord
 .map-dot[data-color="blue"] { background: #a2b5c8; }
 .map-dot[data-color="peach"] { background: #ceb59a; }
 .map-dot[data-color="lavender"] { background: #b8aacb; }
-.new-map-btn { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; margin-top: 13px; color: #8c9784; font-size: 12px; border: 1px dashed #dce3d3; border-radius: 6px; width: 100%; }
-.new-map-btn .icon { width: 14px; height: 14px; }
-.new-map-btn:hover { border-color: #b9c8ac; background: #eff3e9; }
-.sidebar-bottom { margin-top: auto; padding-top: 28px; }
-.thought-card { padding: 20px 17px 16px; border: 1px solid #e7ebdf; border-radius: 9px; color: #8b9d7d; background: #f0f3e9; }
-.thought-card > .icon { width: 21px; height: 21px; stroke-width: 1.15; margin-bottom: 11px; }
-.thought-card p { color: #87967b; font-size: 12px; line-height: 1.9; letter-spacing: .2px; }
-.thought-card button { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 16px; color: #738569; font-size: 11px; }
-.thought-card button span { font-size: 15px; }
-.import-btn { display: flex; align-items: center; gap: 9px; width: 100%; padding: 23px 12px; color: #939b8e; font-size: 12px; }
-.import-btn .icon { width: 15px; height: 15px; }
-.workspace-profile { display: flex; align-items: center; gap: 9px; margin: 0 -19px; border-top: 1px solid #e6eade; padding: 17px 19px 19px; }
-.avatar { width: 31px; height: 31px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #788a6b; background: #e9eede; font-size: 12px; font-weight: 500; }
-.workspace-profile > span:nth-child(2) { flex: 1; }
-.workspace-profile strong { display: block; font-size: 11px; font-weight: 500; color: #78836f; }
-.workspace-profile small { display: block; margin-top: 5px; color: #778175; font-size: 10px; white-space: nowrap; }
-.workspace-profile small .status-dot { width: 4px; height: 4px; background: #a5b69b; }
-.workspace-profile > .icon { width: 15px; height: 15px; color: #9da693; }
 .sidebar-backdrop { display: none; }
 
 .workspace { margin-left: 232px; height: 100vh; height: 100dvh; display: grid; grid-template-rows: 72px 135px minmax(0, 1fr) 43px; min-width: 0; }
@@ -235,31 +209,9 @@ kbd { font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; bord
 .outline-row:hover .outline-add, .outline-add:focus-visible { opacity: 1; }
 .outline-note { color: #778175; font-size: 10px; margin-left: auto; max-width: 30%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-.inbox-view { position: absolute; inset: 0; overflow: auto; background: #fdfefb; padding: 55px max(35px, 10%) 35px; scrollbar-width: thin; scrollbar-color: #dfe6d6 transparent; }
-.inbox-heading { text-align: center; max-width: 500px; margin: 0 auto 27px; }
-.inbox-symbol { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; background: #eef3e6; border: 1px solid #e2eacf; color: #91a57b; border-radius: 12px; margin-bottom: 16px; }
-.inbox-symbol .icon { width: 22px; height: 22px; stroke-width: 1.2; }
-.inbox-heading h2 { color: #627853; font-size: 19px; font-weight: 400; letter-spacing: .5px; line-height: 1.6; }
-.inbox-heading p { margin-top: 8px; color: #778175; font-size: 12px; line-height: 1.7; }
-.inbox-composer { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 600px; margin: 0 auto 28px; }
-.inbox-composer input { flex: 1; padding: 12px 14px; font-size: 12px; border-color: #e0e8d7; }
-.inbox-composer .button { min-height: 41px; }
-.inbox-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; max-width: 760px; margin: 0 auto; }
-.idea-card { min-height: 145px; display: flex; flex-direction: column; border: 1px solid #e6ebdd; border-radius: 8px; background: #fff; padding: 18px; }
-.idea-card-mark { display: inline-flex; color: #95a67e; margin-bottom: 9px; }
-.idea-card-mark .icon { width: 16px; height: 16px; stroke-width: 1.3; }
-.idea-card p { color: #6d7e5f; font-size: 13px; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
-.idea-card time { color: #778175; font-size: 10px; display: block; margin: 13px 0 10px; }
-.idea-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 4px; }
-.idea-actions button { display: inline-flex; align-items: center; gap: 5px; color: #778175; font-size: 11px; }
-.idea-actions button .icon { width: 13px; height: 13px; }
-.idea-actions button:first-child { padding: 6px 9px; border-radius: 5px; border: 1px solid #e8eddf; background: #f7f9f2; }
-.inbox-empty { text-align: center; color: #778175; font-size: 12px; line-height: 2; padding: 38px 0; grid-column: 1 / -1; }
-.inbox-empty > span { display: block; font-size: 34px; line-height: 1.3; color: #9caf87; margin-bottom: 13px; }
-.inbox-empty h3 { font-size: 14px; font-weight: 400; color: #7c906a; margin-bottom: 7px; }
-.inbox-empty p { font-size: 12px; color: #8a997b; line-height: 1.9; }
 
 dialog { width: 440px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 48px); overflow: auto; border: 1px solid #e7ecdf; border-radius: 14px; padding: 29px; color: var(--ink); background: #fff; box-shadow: 0 24px 90px #24331d1f; scrollbar-width: thin; scrollbar-color: #dfe7d4 transparent; }
+.maps-dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 dialog[open] { animation: dialog-in .2s ease-out; }
 dialog::backdrop { background: #2d3a263b; backdrop-filter: blur(4px); }
 @keyframes dialog-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -296,23 +248,6 @@ dialog form > .full-width { min-height: 41px; gap: 15px; font-size: 12px; }
 dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
 .dialog-actions .button { min-width: 82px; }
-#search-dialog { width: 530px; padding: 0; margin-top: min(20vh, 160px); }
-.search-dialog-input { display: flex; align-items: center; gap: 12px; padding: 15px 17px; border-bottom: 1px solid #e8efde; }
-.search-dialog-input > .icon { color: #9aab87; }
-.search-dialog-input input { width: 100%; flex: 1; padding: 7px 0; color: #7f916d; border: 0; box-shadow: none; font-size: 12px; }
-.search-dialog-input .icon-btn { width: 25px; height: 25px; }
-.search-dialog-input input::placeholder { color: #778175; }
-#search-results { padding: 9px; max-height: 380px; overflow: auto; }
-.search-result { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px; border-radius: 6px; text-align: left; }
-.search-result > .icon { width: 17px; height: 17px; color: #8da175; }
-.search-result > .icon:last-child { width: 12px; height: 12px; margin-left: auto; color: #9bac89; }
-.search-result > span { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 5px; }
-.search-result:hover { background: #f2f7ea; }
-.search-result strong { font-size: 13px; font-weight: 400; color: #6a8156; line-height: 1.6; overflow-wrap: anywhere; }
-.search-result small { font-size: 10px; color: #778175; }
-.search-empty { color: #778175; text-align: center; font-size: 11px; padding: 32px 12px; line-height: 1.8; }
-.search-group-label { font-size: 10px; color: #778175; padding: 10px 13px 3px; }
-.search-section-label { display: block; font-size: 11px; color: #849570; padding: 10px 13px 4px; }
 .map-active-mark { width: 4px; height: 4px; flex: 0 0 auto; border-radius: 50%; background: #94a77e; margin-left: auto; }
 .save-state.save-error { color: #778175; }
 .popover { position: fixed; z-index: 45; min-width: 150px; padding: 5px; background: #fff; border: 1px solid #e0e8d5; border-radius: 8px; box-shadow: 0 5px 20px #33452216; }
@@ -344,7 +279,6 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
 
 @media (max-width: 1024px) {
   .sidebar { width: 210px; padding-left: 15px; padding-right: 15px; }
-  .workspace-profile { margin-left: -15px; margin-right: -15px; padding-left: 15px; padding-right: 15px; }
   .brand { padding-left: 6px; }
   .workspace { margin-left: 210px; grid-template-rows: 65px 128px minmax(0, 1fr) 36px; }
   .topbar, .workspace-heading { padding-left: 24px; padding-right: 24px; }
@@ -371,17 +305,7 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
 
 @media (max-height: 760px) and (min-width: 761px) {
   .sidebar { padding-top: 25px; }
-  .search-trigger { margin-top: 26px; }
   .primary-nav { margin-top: 20px; }
-  .sidebar-section-label { margin-top: 22px; }
-  .sidebar-bottom { padding-top: 18px; }
-  .thought-card { padding: 14px 15px; }
-  .thought-card > .icon { width: 17px; height: 17px; margin-bottom: 6px; }
-  .thought-card p { font-size: 10px; }
-  .thought-card button { margin-top: 9px; }
-  .import-btn { padding-top: 18px; padding-bottom: 18px; }
-  .workspace-profile { padding-top: 13px; padding-bottom: 13px; }
-  .map-list { max-height: 155px; }
   .workspace { grid-template-rows: 61px 116px minmax(0, 1fr) 34px; }
 }
 
@@ -389,7 +313,6 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
   .sidebar { width: 232px; transform: translateX(-100%); transition: transform .22s ease; padding: 27px 19px 0; z-index: 60; }
   .sidebar.open { transform: translateX(0); }
   .sidebar.open + .sidebar-backdrop, .sidebar-backdrop.visible { display: block; position: fixed; inset: 0; z-index: 50; background: #2f3c2447; backdrop-filter: blur(2px); }
-  .workspace-profile { margin-left: -19px; margin-right: -19px; padding-left: 19px; padding-right: 19px; }
   .workspace { margin-left: 0; grid-template-rows: 64px 126px minmax(0, 1fr) 33px; }
   .topbar { padding-left: 15px; padding-right: 20px; gap: 14px; }
   .mobile-menu { display: inline-flex; width: 28px; height: 28px; margin-right: 0; color: #98a78a; }
@@ -417,7 +340,6 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
   .note-panel { right: 10px; top: 50px; bottom: 78px; width: min(252px, calc(100% - 20px)); }
   .outline-view { padding-left: 24px; padding-right: 24px; }
   .toast { left: 50%; bottom: 30px; }
-  .inbox-view { padding-left: 30px; padding-right: 30px; }
 }
 
 @media (max-width: 600px) {
@@ -468,18 +390,6 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
   .outline-text { font-size: 11px; }
   .outline-add { opacity: 1; width: 22px; height: 22px; }
   .outline-note { display: none; }
-  .inbox-view { padding: 42px 20px 30px; }
-  .inbox-heading { margin-bottom: 22px; }
-  .inbox-symbol { width: 36px; height: 36px; border-radius: 10px; margin-bottom: 14px; }
-  .inbox-symbol .icon { width: 20px; height: 20px; }
-  .inbox-heading h2 { font-size: 16px; }
-  .inbox-heading p { font-size: 10px; }
-  .inbox-composer { gap: 7px; }
-  .inbox-composer input { padding: 11px; font-size: 10px; }
-  .inbox-composer .button { min-height: 38px; padding: 8px 10px; font-size: 10px; gap: 5px; }
-  .inbox-composer .button .icon { width: 14px; height: 14px; }
-  .inbox-cards { grid-template-columns: 1fr; gap: 12px; }
-  .idea-card { min-height: 125px; padding: 16px; }
   dialog { padding: 23px; border-radius: 12px; }
   dialog h2 { font-size: 18px; }
   dialog p { font-size: 10px; margin-bottom: 20px; }
@@ -493,7 +403,6 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
   .shortcut-list { gap: 0 10px; }
   .shortcut-list > span { font-size: 10px; padding: 11px 0; }
   .shortcut-list kbd { font-size: 10px; padding: 4px 5px; }
-  #search-dialog { margin-top: 12vh; }
   .toast { bottom: 24px; padding: 10px 15px; font-size: 10px; }
 }
 
