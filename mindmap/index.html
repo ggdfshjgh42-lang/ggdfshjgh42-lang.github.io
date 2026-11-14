@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f8f6">
+  <meta name="description" content="漫想，一个安静的思维空间。自由发散、收集灵感，让想法慢慢生长。">
+  <title>思维导图 · Fantastic Matrix</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><rect x="3" y="9" width="6" height="6" rx="2"/><path d="M9 12h5m0-7v14m0-14h4m-4 7h4m-4 7h4"/><path d="M18 3h3v4h-3zM18 10h3v4h-3zM18 17h3v4h-3z"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0c-1 .8-1.4 1.5-1.4 2H9.4c0-.5-.4-1.2-1.4-2Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1"/></symbol>
+    <symbol id="i-cursor" viewBox="0 0 24 24"><path d="m5 3 14 10-7 1-3 7Z"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path d="M8 12V6a2 2 0 0 1 4 0v6-8a2 2 0 0 1 4 0v8-6a2 2 0 0 1 4 0v10c0 4-3 6-7 6-3 0-4-1-6-4l-3-5a2 2 0 0 1 3-2l1 1Z"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="m10 13 4-4m-7 6-2 2a4 4 0 0 0 6 6l4-4a4 4 0 0 0 0-6M17 9l2-2a4 4 0 0 0-6-6L9 5a4 4 0 0 0 0 6" transform="translate(0 -1) scale(.96)"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M8 4 3 9l5 5M3 9h11a6 6 0 0 1 0 12h-3"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m16 4 5 5-5 5m5-5H10a6 6 0 0 0 0 12h3"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5M8 8h8v8H8z"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 5 2c-1 .6-2 1-2 3m0 3v.1"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8Zm0 0v5h5M8 12h8m-8 4h6"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m-4 4 4-4 4 4M4 16v5h16v-5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></symbol>
+  </defs></svg>
+
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#" aria-label="漫想首页"><span class="brand-mark"><i></i><i></i><i></i><i></i></span><span>漫想<span class="brand-english">mindspace</span></span></a>
+    <button class="search-trigger" id="search-trigger"><svg class="icon"><use href="#i-search"/></svg><span>寻找一个想法</span><kbd>⌘ K</kbd></button>
+    <nav class="primary-nav" aria-label="工作空间">
+      <button class="nav-item active" data-page="maps"><svg class="icon"><use href="#i-map"/></svg><span>我的导图</span><span class="nav-count" id="map-count">1</span></button>
+      <button class="nav-item" data-page="inbox"><svg class="icon"><use href="#i-bulb"/></svg><span>灵感收集</span><span class="nav-count" id="inbox-count">0</span></button>
+    </nav>
+    <div class="sidebar-section-label"><span>我的空间</span><button class="icon-btn" id="new-map-small" title="新建导图" aria-label="新建导图"><svg class="icon"><use href="#i-plus"/></svg></button></div>
+    <div class="map-list" id="map-list"></div>
+    <button class="new-map-btn" id="new-map"><svg class="icon"><use href="#i-plus"/></svg>新建导图</button>
+    <div class="sidebar-bottom">
+      <div class="thought-card"><svg class="icon"><use href="#i-spark"/></svg><p>好想法，<br>常常从一个小念头开始。</p><button id="capture-open">记下此刻的灵感 <span>↗</span></button></div>
+      <button class="import-btn" id="import-btn"><svg class="icon"><use href="#i-upload"/></svg>导入导图</button>
+      <div class="workspace-profile"><span class="avatar">M</span><span><strong>我的思维空间</strong><small><span class="status-dot"></span> 只属于你的自由角落</small></span><svg class="icon"><use href="#i-more"/></svg></div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <main class="workspace">
+    <header class="topbar">
+      <div class="breadcrumb"><button class="icon-btn mobile-menu" id="mobile-menu" aria-label="展开侧栏"><svg class="icon"><use href="#i-menu"/></svg></button><a class="breadcrumb-parent site-return" href="../" aria-label="返回 Fantastic Matrix 网站首页">← 网站首页</a><svg class="icon breadcrumb-arrow"><use href="#i-chevron"/></svg><span id="breadcrumb-title">自由生长的想法</span></div>
+      <div class="top-actions"><span class="save-state" id="save-state"><svg class="icon"><use href="#i-check"/></svg><span>已保存到本机</span></span><button class="button export-button" id="export-open"><svg class="icon"><use href="#i-download"/></svg><span>导出</span></button></div>
+    </header>
+    <section class="workspace-heading">
+      <div><div class="eyebrow">A LITTLE SPACE FOR BIG IDEAS</div><div class="title-row"><input id="map-title" class="map-title" aria-label="导图名称" maxlength="60" value="自由生长的想法"><button class="icon-btn title-menu" id="map-options-open" aria-label="导图选项" title="导图选项"><svg class="icon"><use href="#i-more"/></svg></button></div><p id="workspace-subtitle">不必急着找到答案，先让想法自由展开。</p></div>
+      <div class="heading-actions"><div class="view-switch" role="group" aria-label="视图"><button class="active" data-view="map"><svg class="icon"><use href="#i-map"/></svg>导图</button><button data-view="outline"><svg class="icon"><use href="#i-list"/></svg>大纲</button></div><button class="button primary" id="add-branch"><svg class="icon"><use href="#i-plus"/></svg>添加想法</button></div>
+    </section>
+
+    <section class="canvas-wrap" id="canvas-wrap" aria-label="思维导图画布">
+      <div class="canvas-top"><span class="canvas-label"><span class="status-dot"></span><span id="canvas-label-text">自由画布</span></span><button class="canvas-tip" id="help-open">双击节点编辑 <span>·</span> Tab 延伸想法<svg class="icon"><use href="#i-help"/></svg></button></div>
+      <div class="map-viewport" id="map-viewport" tabindex="0" aria-label="可拖动和缩放的导图"><div class="map-world" id="map-world"><svg id="connections" class="connections" aria-hidden="true"></svg><div id="nodes"></div></div></div>
+      <div class="outline-view" id="outline-view" hidden></div>
+      <div class="inbox-view" id="inbox-view" hidden><div class="inbox-heading"><span class="inbox-symbol"><svg class="icon"><use href="#i-bulb"/></svg></span><h2>给零散的想法，一个落脚点。</h2><p>先记录，再整理。灵感不需要一开始就有逻辑。</p></div><form class="inbox-composer" id="inbox-composer"><input id="inbox-input" placeholder="刚刚想到什么？" maxlength="300" aria-label="输入灵感"><button class="button primary" type="submit"><svg class="icon"><use href="#i-plus"/></svg>收集</button></form><div class="inbox-cards" id="inbox-cards"></div></div>
+      <div class="node-toolbar" id="node-toolbar" hidden><button data-node-action="child" title="添加子节点 (Tab)" aria-label="添加子节点"><svg class="icon"><use href="#i-plus"/></svg></button><span></span><button data-node-action="note" title="节点笔记" aria-label="节点笔记"><svg class="icon"><use href="#i-note"/></svg></button><button data-node-action="link" title="关联另一个节点" aria-label="关联另一个节点"><svg class="icon"><use href="#i-link"/></svg></button><button data-node-action="delete" title="删除节点" aria-label="删除节点"><svg class="icon"><use href="#i-trash"/></svg></button></div>
+      <div class="link-hint" id="link-hint" hidden>选择另一个节点，连接两个想法 <button id="link-cancel">取消</button></div>
+      <div class="zoom-controls"><button class="icon-btn" id="zoom-out" title="缩小" aria-label="缩小"><svg class="icon"><use href="#i-minus"/></svg></button><button class="zoom-value" id="zoom-value" title="重置为 100%">100%</button><button class="icon-btn" id="zoom-in" title="放大" aria-label="放大"><svg class="icon"><use href="#i-plus"/></svg></button><span class="control-divider"></span><button class="icon-btn" id="fit-map" title="适应画布" aria-label="适应画布"><svg class="icon"><use href="#i-fit"/></svg></button></div>
+      <div class="canvas-toolbar" id="canvas-toolbar" role="toolbar" aria-label="画布工具"><button class="tool active" data-tool="select" title="选择 (V)" aria-label="选择"><svg class="icon"><use href="#i-cursor"/></svg></button><button class="tool" data-tool="hand" title="拖动画布 (H)" aria-label="拖动画布"><svg class="icon"><use href="#i-hand"/></svg></button><span class="control-divider"></span><button class="tool" id="toolbar-add" title="添加想法" aria-label="添加想法"><svg class="icon"><use href="#i-plus"/></svg></button><button class="tool" data-tool="link" title="关联想法 (L)" aria-label="关联想法"><svg class="icon"><use href="#i-link"/></svg></button><span class="control-divider"></span><button class="tool" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销" disabled><svg class="icon"><use href="#i-undo"/></svg></button><button class="tool" id="redo" title="重做 (Ctrl+Shift+Z)" aria-label="重做" disabled><svg class="icon"><use href="#i-redo"/></svg></button></div>
+      <div class="canvas-bottom-right"><button class="auto-layout" id="auto-layout"><svg class="icon"><use href="#i-grid"/></svg>整理布局</button><span id="node-count">14 个想法，更多种可能</span></div>
+      <aside class="note-panel" id="note-panel" hidden><div class="panel-heading"><h3>想法笔记</h3><button class="icon-btn" id="note-close" aria-label="关闭笔记"><svg class="icon"><use href="#i-close"/></svg></button></div><p id="note-node-name"></p><label for="node-note">给这个想法补充一点细节</label><textarea id="node-note" placeholder="可以是一段文字、一个链接，或尚未成形的念头……" maxlength="10000"></textarea><div class="note-colors" id="note-colors" aria-label="分支颜色"><button data-color="sage" title="鼠尾草绿" aria-label="鼠尾草绿"></button><button data-color="blue" title="雾蓝" aria-label="雾蓝"></button><button data-color="peach" title="浅杏" aria-label="浅杏"></button><button data-color="lavender" title="浅紫" aria-label="浅紫"></button></div><small>修改会自动保存</small></aside>
+    </section>
+    <footer class="workspace-footer"><span>让思绪漫游，让灵感发生。</span><button id="shortcuts-open"><svg class="icon"><use href="#i-help"/></svg>快捷键</button></footer>
+  </main>
+
+  <dialog id="new-dialog"><form id="new-form"><div class="dialog-heading"><span class="dialog-icon"><svg class="icon"><use href="#i-spark"/></svg></span><button class="icon-btn" type="button" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><h2>一个想法的开始</h2><p>给这片新的思维空间起个名字。</p><label for="new-title">导图名称</label><input id="new-title" placeholder="比如：我的下一个好点子" maxlength="60" required><div class="template-options"><label><input type="radio" name="template" value="blank" checked><span><svg class="icon"><use href="#i-plus"/></svg><strong>一张白纸</strong><small>从一个中心想法开始</small></span></label><label><input type="radio" name="template" value="starter"><span><svg class="icon"><use href="#i-map"/></svg><strong>灵感发散</strong><small>带着几个方向自由探索</small></span></label></div><button type="submit" class="button primary full-width">开始漫想 <span>↗</span></button></form></dialog>
+  <dialog id="export-dialog"><div class="dialog-heading"><h2>带走你的想法</h2><button class="icon-btn" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><p>导出当前导图，继续创作或分享。</p><div class="export-options"><button data-export="svg"><span class="format-icon">SVG</span><span><strong>矢量图片</strong><small>清晰的完整导图，适合分享与打印</small></span><svg class="icon"><use href="#i-download"/></svg></button><button data-export="md"><span class="format-icon">MD</span><span><strong>Markdown 大纲</strong><small>把想法变成有层次的文字</small></span><svg class="icon"><use href="#i-download"/></svg></button><button data-export="json"><span class="format-icon">JSON</span><span><strong>导图备份</strong><small>保留节点、布局与笔记，可再次导入</small></span><svg class="icon"><use href="#i-download"/></svg></button></div></dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>给思绪一点捷径</h2><button class="icon-btn" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><p>选中一个想法，让它继续生长。</p><div class="shortcut-list"><span>添加子节点</span><kbd>Tab</kbd><span>添加同级节点</span><kbd>Enter</kbd><span>编辑节点</span><kbd>双击 / F2</kbd><span>删除节点及分支</span><kbd>Delete</kbd><span>撤销 / 重做</span><kbd>Ctrl Z / Ctrl ⇧ Z</kbd><span>搜索想法</span><kbd>Ctrl K</kbd><span>拖动画布</span><kbd>空白拖动 / Space 拖动</kbd><span>缩放画布</span><kbd>滚轮 / 双指缩放</kbd><span>选择 / 拖动 / 关联工具</span><kbd>V / H / L</kbd></div><p class="help-footnote">想法保存在当前浏览器。定期导出 JSON，可以安心留存。</p></dialog>
+  <dialog id="search-dialog"><div class="search-dialog-input"><svg class="icon"><use href="#i-search"/></svg><input id="search-input" placeholder="寻找导图、节点或灵感…" aria-label="搜索导图和灵感"><button class="icon-btn" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><div id="search-results"></div></dialog>
+  <dialog id="capture-dialog"><form id="capture-form"><div class="dialog-heading"><h2>记下这一闪而过</h2><button class="icon-btn" type="button" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><p>不用分类，也不用想清楚。</p><textarea id="capture-input" placeholder="此刻，你想到了什么？" maxlength="300" required aria-label="此刻的灵感"></textarea><button type="submit" class="button primary full-width">收进灵感盒 <svg class="icon"><use href="#i-bulb"/></svg></button></form></dialog>
+  <dialog id="confirm-dialog"><div class="dialog-heading"><h2 id="confirm-title">删除导图？</h2><button class="icon-btn" data-close aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button></div><p id="confirm-description"></p><div class="dialog-actions"><button class="button" data-close>取消</button><button class="button danger" id="confirm-action">确认删除</button></div></dialog>
+  <div id="map-options" class="popover" hidden><button id="rename-map"><svg class="icon"><use href="#i-note"/></svg>重命名</button><button id="duplicate-map"><svg class="icon"><use href="#i-plus"/></svg>复制导图</button><button id="delete-map"><svg class="icon"><use href="#i-trash"/></svg>删除导图</button></div>
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

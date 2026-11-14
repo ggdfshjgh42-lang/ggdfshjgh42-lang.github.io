@@ -87,6 +87,15 @@ nav.is-scrolled { border-color: var(--border); box-shadow: 0 3px 20px #25372d05;
 .hero-enter:nth-child(3) { animation-delay: .16s; }
 .hero-enter:nth-child(4) { animation-delay: .22s; }
 .hero-enter:nth-child(5) { animation-delay: .28s; }
+/* A small doorway into the site's thought canvas. */
+.mindmap-feature { display: grid; grid-template-columns: minmax(0, 1fr) 220px 36px; align-items: center; gap: 28px; padding: 25px 30px; margin: 0 0 39px; border: 1px solid #d8e1ce; border-radius: 16px; background: #edf2e5; text-decoration: none; transition: border-color .25s, background .25s, box-shadow .25s; }
+.mindmap-feature:hover { border-color: #b4c4a3; background: #e9f0df; box-shadow: 0 7px 22px #25372d06; }
+.mindmap-feature .eyebrow { color: #6d805f; font-size: 9px; letter-spacing: 1.5px; }
+.mindmap-feature h2 { font-size: 23px; font-weight: 600; letter-spacing: -.5px; margin: 5px 0 7px; line-height: 1.5; }
+.mindmap-feature-copy > p:last-child { font-size: 12px; color: var(--text-secondary); line-height: 1.8; }
+.mindmap-feature-art { width: 220px; height: 104px; }
+.mindmap-feature-arrow { display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid #c6d2b9; border-radius: 50%; font-size: 20px; color: #607e50; transition: transform .25s, background .25s; }
+.mindmap-feature:hover .mindmap-feature-arrow { transform: translate(2px, -2px); background: #d8e6c3; }
 /* Journal cards: a small highlight follows the pointer; content stays still. */
 .notes-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 32px 0 25px; border-top: 1px solid var(--border); scroll-margin-top: 104px; }
 .notes-heading h2 { font-size: 24px; font-weight: 700; letter-spacing: -.8px; margin-top: 6px; }
@@ -122,7 +131,7 @@ nav.is-scrolled { border-color: var(--border); box-shadow: 0 3px 20px #25372d05;
 .reveal-in { animation: enter .75s var(--ease) both; animation-delay: var(--reveal-delay, 0ms); }
 .list-message { grid-column: 1 / -1; padding: 40px 0; font-size: 14px; color: var(--text-secondary); }
 /* A focused reading view, with a progress line at the very top. */
-.is-reading .hero, .is-reading .notes-heading { display: none; }
+.is-reading .hero, .is-reading .notes-heading, .is-reading .mindmap-feature { display: none; }
 #blog-post { max-width: 720px; padding-top: 52px; margin: 0 auto; outline: none; }
 .post-back { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-size: 12px; color: var(--text-secondary); transition: color .2s; }
 .post-back span { display: inline-block; transition: transform .25s; }
@@ -237,6 +246,24 @@ footer p { font-size: 10px; color: var(--text-secondary); margin-top: 5px; }
     .nav-links { gap: 12px; }
     .nav-logo { font-size: 11px; }
     .brand-mark { display: none; }
+}
+/* Give all five sections their own row on phones. */
+@media (max-width: 600px) {
+    html { scroll-padding-top: 128px; }
+    body { padding-top: 108px; }
+    body::before { top: 108px; }
+    .nav-inner { height: 108px; min-height: 108px; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px; padding: 12px 0 0; }
+    .brand { gap: 9px; margin-right: auto; }
+    .brand-mark { display: grid; width: 29px; height: 29px; }
+    .nav-logo { font-size: 13px; max-width: none; }
+    .nav-links { width: 100%; justify-content: space-between; gap: 8px; flex-shrink: 1; }
+    .nav-links a { font-size: 12px; padding: 8px 0 11px; white-space: nowrap; }
+    .mindmap-feature { grid-template-columns: minmax(0, 1fr) 30px; gap: 16px; padding: 22px 21px; margin-bottom: 28px; border-radius: 13px; }
+    .mindmap-feature h2 { font-size: 21px; }
+    .mindmap-feature .eyebrow { font-size: 9px; letter-spacing: 1px; }
+    .mindmap-feature-copy > p:last-child { font-size: 11px; }
+    .mindmap-feature-art { display: none; }
+    .mindmap-feature-arrow { width: 30px; height: 30px; font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }

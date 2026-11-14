@@ -125,5 +125,5 @@
   .import-guide { margin-top: 34px; padding: 0 17px; }
   .empty-shelf { padding: 40px 16px; }
 }
-@media (max-width:390px) { .cover-title { font-size: 20px; } .nav-logo { font-size: 10px; } .nav-links { gap: 10px; } .brand-mark { display: none; } }
+@media (max-width:390px) { .cover-title { font-size: 20px; } }
 @media (prefers-reduced-motion:reduce) { .book-visual, .shelf-button, .guide-chevron { transition: none; } .book-card:hover .book-visual, .shelf-button:hover { transform: none; } }
