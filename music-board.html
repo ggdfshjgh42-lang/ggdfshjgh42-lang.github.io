@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8f2">
+  <meta name="description" content="在彩色格子里画一段旋律。点按、涂画、加入鼓点，让自己的小曲子循环起来。">
+  <title>音乐画板 | Fantastic Matrix</title>
+  <link rel="stylesheet" href="blog.css">
+  <link rel="stylesheet" href="music-board.css?v=20261116">
+</head>
+<body>
+  <a class="skip-link" href="#music-board">跳到音乐画板</a>
+  <svg class="music-icons" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="m-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="m-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="m-note" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></symbol>
+    <symbol id="m-undo" viewBox="0 0 24 24"><path d="M8 5 3 10l5 5M3 10h10a6 6 0 0 1 0 12"/></symbol>
+    <symbol id="m-redo" viewBox="0 0 24 24"><path d="m16 5 5 5-5 5m5-5H11a6 6 0 0 0 0 12"/></symbol>
+    <symbol id="m-clear" viewBox="0 0 24 24"><path d="m9 3 12 12-6 6H8l-6-6ZM5 18h13M9 8l7 7"/></symbol>
+    <symbol id="m-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></symbol>
+    <symbol id="m-volume" viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4ZM15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
+  </defs></svg>
+  <nav aria-label="主导航"><div class="nav-inner">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f</span><span class="nav-logo">Fantastic Matrix</span></a>
+    <ul class="nav-links"><li><a href="index.html">博客</a></li><li><a href="optics-roadmap.html">光学学习 <span aria-hidden="true">↗</span></a></li><li><a href="bookshelf.html">书架 <span aria-hidden="true">↗</span></a></li><li><a href="mindmap/">思维导图 <span aria-hidden="true">↗</span></a></li><li><a href="games.html" class="is-active">小游戏 <span class="nav-dot" aria-hidden="true"></span></a></li></ul>
+  </div></nav>
+
+  <main class="container music-main">
+    <header class="music-heading">
+      <div><a class="music-back" href="games.html">← 返回小游戏</a><p class="eyebrow">A LITTLE ROOM FOR YOUR MELODY</p><h1>画一段，<span>自己的旋律。</span></h1><p class="music-intro">不用懂乐理，点亮几个格子就好。</p></div>
+      <div class="heading-notes" aria-hidden="true"><span>♪</span><span>♫</span><i></i><i></i><i></i></div>
+    </header>
+
+    <section class="music-studio" aria-labelledby="studio-title">
+      <div class="studio-topline"><div class="studio-name"><span class="studio-mark" aria-hidden="true"><svg><use href="#m-note"/></svg></span><div><h2 id="studio-title">音乐画板</h2><p>16 个格子，一段小小的循环</p></div></div><span class="music-save" id="save-status" role="status">准备画板…</span></div>
+
+      <div class="transport">
+        <button class="play-button" id="play" type="button" aria-label="播放旋律" aria-pressed="false" disabled><svg aria-hidden="true"><use href="#m-play"/></svg><span>播放</span></button>
+        <div class="tempo-control"><label for="tempo">速度 <output id="tempo-value" for="tempo">104</output><span>BPM</span></label><input id="tempo" type="range" min="50" max="180" step="1" value="104" aria-label="播放速度"></div>
+        <div class="timbre-control"><label for="timbre">音色</label><select id="timbre"><option value="piano">柔和琴声</option><option value="mallet">轻盈木琴</option><option value="synth">电子波纹</option></select></div>
+        <div class="volume-control"><label for="volume"><svg aria-hidden="true"><use href="#m-volume"/></svg><span>音量</span><output id="volume-value" for="volume">60%</output></label><input id="volume" type="range" min="0" max="100" step="1" value="60" aria-label="播放音量"></div>
+      </div>
+
+      <div class="score-heading"><span><i class="melody-dot" aria-hidden="true"></i>旋律</span><p>越往上，音越高 <span aria-hidden="true">↑</span></p><span class="score-legend"><i aria-hidden="true"></i>点按或拖动涂画</span></div>
+      <div id="music-board" class="music-board" role="group" aria-label="旋律与鼓点画板" aria-describedby="board-help" tabindex="-1"></div>
+      <p id="board-help" class="board-help">每个格子是一小步，从左到右循环播放。键盘可用方向键移动、空格点亮。</p>
+
+      <div class="studio-bottom"><div class="studio-state"><span class="play-dot" id="play-dot" aria-hidden="true"></span><span id="play-status" role="status">点一下播放，听听这段小曲子</span><span id="note-count"></span></div><div class="edit-actions"><button id="undo" type="button" title="撤销 (Ctrl+Z)" aria-label="撤销" disabled><svg aria-hidden="true"><use href="#m-undo"/></svg></button><button id="redo" type="button" title="重做 (Ctrl+Shift+Z)" aria-label="重做" disabled><svg aria-hidden="true"><use href="#m-redo"/></svg></button><span class="action-divider" aria-hidden="true"></span><button id="clear" type="button"><svg aria-hidden="true"><use href="#m-clear"/></svg><span>清空</span></button></div></div>
+    </section>
+
+    <div class="music-underbar"><div class="demo-controls"><span>找一点灵感</span><button data-demo="morning" type="button">☀ 晨间漫步</button><button data-demo="night" type="button">✧ 小小星河</button></div><button class="download-button" id="download" type="button" disabled><svg aria-hidden="true"><use href="#m-download"/></svg><span>下载音频</span><small>WAV</small></button></div>
+    <p class="music-footnote">旋律会自动留在当前浏览器里。下次打开，接着画。</p>
+    <noscript><p class="music-error">请启用 JavaScript 后使用音乐画板。</p></noscript>
+  </main>
+  <footer class="music-footer"><div class="container footer-inner"><a class="footer-wordmark" href="index.html">fantastic matrix</a><p>给想法一点声音。</p><a href="games.html">再玩点别的 ↗</a></div></footer>
+  <div class="music-toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="music-board.js?v=20261116"></script>
+</body>
+</html>

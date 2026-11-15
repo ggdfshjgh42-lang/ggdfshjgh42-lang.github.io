@@ -11,6 +11,12 @@
 .game-art { height: 248px; display: grid; place-items: center; position: relative; overflow: hidden; }
 .gomoku-art { background: #e8eddc; }
 .xiangqi-art { background: #f2e7d6; }
+.music-art { background: #e9efdf; }
+.game-card-music { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+.game-card-music .game-art { height: 230px; }
+.game-card-music .game-card-copy { padding: 28px 32px; }
+.mini-music { width: 78%; max-width: 310px; height: auto; transform: rotate(-7deg) translate(3px, 16px); }
+.music-art-note { position: absolute; right: 30px; top: 18px; color: #73915d; font: 46px/1 Georgia, serif; transform: rotate(13deg); }
 .art-number { position: absolute; left: 22px; top: 18px; font-size: 9px; letter-spacing: 1.4px; color: #69735c; }
 .mini-gomoku { position: relative; width: 216px; height: 216px; background-image: linear-gradient(#9eaf8950 1px, transparent 1px), linear-gradient(90deg, #9eaf8950 1px, transparent 1px); background-size: 36px 36px; transform: rotate(-12deg) translate(14px, 23px); }
 .stone { display: block; position: absolute; height: 29px; width: 29px; border-radius: 50%; box-shadow: 2px 5px 8px #1e302521; transform: translate(-50%, -50%); }
@@ -88,3 +94,5 @@
 }
 @media (max-width: 550px) { .game-cards { grid-template-columns: 1fr; }.game-art { height: 205px; }.games-hero h1 { font-size: 43px; }.games-hero h1 br { display: initial; }.game-card-copy p br { display: none; }.game-tags { margin-top: 16px; }.games-home { padding-bottom: 25px; }.board-frame { padding: 7px; }.chess-rules { margin-top: 24px; }.chess-main { width: calc(100% - 28px); }.chess-sidebar { gap: 16px; } }
 @media (prefers-reduced-motion: reduce) { .game-card, .game-arrow, .square .piece { transition: none; } }
+@media (max-width: 550px) { .game-card-music { display: block; }.game-card-music .game-art { height: 205px; }.game-card-music .game-card-copy { padding: 20px; }.mini-music { max-width: 280px; } }
+
