@@ -116,6 +116,10 @@ kbd { font: 10px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; bord
 .canvas-tip { display: flex; align-items: center; gap: 8px; color: #778175; font-size: 10px; pointer-events: auto; background: #ffffffdb; }
 .canvas-tip span { color: #c8cfbf; }
 .canvas-tip .icon { width: 13px; height: 13px; color: #778175; }
+.canvas-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; min-width: 0; }
+.canvas-fullscreen { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 6px 10px; flex-shrink: 0; border: 1px solid var(--line); border-radius: 6px; background: #ffffffed; color: var(--soft-ink); font-size: 11px; white-space: nowrap; pointer-events: auto; }
+.canvas-fullscreen:hover { background: var(--sage-light); }
+.canvas-fullscreen .icon { width: 14px; height: 14px; }
 .map-viewport { position: absolute; inset: 0; overflow: hidden; touch-action: none; outline: none; cursor: default; }
 .map-viewport.hand, .map-viewport.hand-mode, .map-viewport[data-tool="hand"], .map-viewport.panning { cursor: grab; }
 .map-viewport.panning, .map-viewport.dragging { cursor: grabbing; }
@@ -406,6 +410,22 @@ dialog p.help-footnote { font-size: 10px; margin: 22px 0 0; color: #778175; }
   .toast { bottom: 24px; padding: 10px 15px; font-size: 10px; }
 }
 
+body.map-fullscreen .sidebar, body.map-fullscreen .sidebar-backdrop, body.map-fullscreen .topbar, body.map-fullscreen .workspace-heading, body.map-fullscreen .workspace-footer { display: none; }
+body.map-fullscreen .workspace { display: block; margin: 0; height: 100vh; height: 100dvh; }
+body.map-fullscreen .canvas-wrap { margin: 0; width: 100%; height: 100%; border: 0; border-radius: 0; }
+body.map-fullscreen .canvas-top { top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); }
+body.map-fullscreen .toast { left: 50%; }
+
+@media (max-width: 600px) {
+  .canvas-actions { gap: 8px; }
+  .canvas-actions .canvas-tip { width: 28px; height: 32px; font-size: 0; gap: 0; justify-content: center; }
+  .canvas-actions .canvas-tip span { display: none; }
+  .canvas-actions .canvas-tip .icon { width: 15px; height: 15px; }
+  .canvas-fullscreen { min-height: 36px; padding: 7px 10px; }
+  body.map-fullscreen .canvas-toolbar { bottom: max(14px, env(safe-area-inset-bottom)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+

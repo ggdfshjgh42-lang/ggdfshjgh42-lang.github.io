@@ -129,7 +129,7 @@ export function addNode(map, parentId, options = {}) {
   let direction = Math.sign(parent.x - root.x);
   if (!direction) {
     if (options.sibling && selected.id !== root.id) direction = Math.sign(selected.x - root.x) || 1;
-    else direction = siblings.filter(node => node.x >= root.x).length <= siblings.filter(node => node.x < root.x).length ? 1 : -1;
+    else direction = 1;
   }
   const x = Number.isFinite(options.x) ? options.x : parent.x + direction * (parent.id === root.id ? 280 : 240);
   let y = Number.isFinite(options.y) ? options.y : (options.sibling ? selected.y + 78 : parent.y);
@@ -182,7 +182,7 @@ export function autoLayout(map) {
   };
   const branches = children.get(root.id) || [];
   const sides = { '-1': [], '1': [] };
-  branches.forEach((node, index) => sides[Math.sign(node.x) || (index % 2 ? -1 : 1)].push(node));
+  branches.forEach(node => sides[Math.sign(node.x) || 1].push(node));
   [-1, 1].forEach(side => {
     const group = sides[side];
     const gap = 88;
@@ -252,3 +252,4 @@ export function toSVG(map) {
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}" role="img"><title>${esc(map.title)}</title><rect x="${minX}" y="${minY}" width="${width}" height="${height}" fill="#fafbf9"/>${links}${paths}${boxes}</svg>`;
 }
+

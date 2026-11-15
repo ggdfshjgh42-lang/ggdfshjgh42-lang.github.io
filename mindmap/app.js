@@ -1,4 +1,4 @@
-import { createMap, validateMap, addNode, removeNode, autoLayout, getDescendants, toMarkdown, toSVG } from './graph.js';
+import { createMap, validateMap, addNode, removeNode, autoLayout, getDescendants, toMarkdown, toSVG } from './graph.js?v=20261116';
 
 const $ = (selector, scope = document) => scope.querySelector(selector);
 const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
@@ -56,6 +56,59 @@ const nodeById = id => currentMap().nodes.find(n => n.id === id);
 const rootNode = () => currentMap().nodes.find(n => n.parentId === null);
 const viewport = $('#map-viewport');
 const world = $('#map-world');
+let fullscreenMode = false;
+let fullscreenBusy = false;
+const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+
+function setFullscreenMode(active) {
+  if (fullscreenMode === active) return;
+  fullscreenMode = active;
+  document.body.classList.toggle('map-fullscreen', active);
+  const button = $('#fullscreen-toggle');
+  button.setAttribute('aria-pressed', String(active));
+  button.setAttribute('aria-label', active ? '退出全屏编辑' : '全屏编辑导图');
+  button.title = active ? '退出全屏编辑 (Esc)' : '全屏编辑导图';
+  $('span', button).textContent = active ? '退出全屏' : '全屏';
+  $('use', button).setAttribute('href', active ? '#i-contract' : '#i-expand');
+  closeSidebar();
+  $('#map-options').hidden = true;
+  requestAnimationFrame(() => {
+    if (view === 'map') {
+      fitMap({ initial: true });
+      const selected = nodeById(selectedId);
+      if (selected) bringIntoView(selected);
+    }
+    button.focus({ preventScroll: true });
+  });
+}
+
+async function toggleFullscreen() {
+  if (fullscreenBusy) return;
+  fullscreenBusy = true;
+  finishEditing();
+  try {
+    if (fullscreenMode) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (fullscreenElement() && exit) {
+        try { await exit.call(document); } catch { /* Keep the in-page exit usable. */ }
+      }
+      setFullscreenMode(false);
+    } else {
+      setFullscreenMode(true);
+      const enter = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+      if (enter && (document.fullscreenEnabled ?? document.webkitFullscreenEnabled ?? true)) {
+        try { await enter.call(document.documentElement); } catch { /* In-page fullscreen also works without browser support. */ }
+      }
+    }
+  } finally {
+    fullscreenBusy = false;
+  }
+}
+
+$('#fullscreen-toggle').addEventListener('click', toggleFullscreen);
+['fullscreenchange', 'webkitfullscreenchange'].forEach(type => document.addEventListener(type, () => {
+  if (!fullscreenElement()) setFullscreenMode(false);
+}));
 
 function toast(message) {
   clearTimeout(toastTimer);
@@ -667,7 +720,10 @@ document.addEventListener('keydown', e => {
   const typing = e.target.closest('input,textarea,[contenteditable="true"]');
   const mod = e.ctrlKey || e.metaKey;
   if ($('dialog[open]')) return;
-  if (e.key === 'Escape') { cancelLink(); closeNote(); closeSidebar(); selectedId = null; updateSelection(); return; }
+  if (e.key === 'Escape') {
+    if (fullscreenMode) { e.preventDefault(); toggleFullscreen(); return; }
+    cancelLink(); closeNote(); closeSidebar(); selectedId = null; updateSelection(); return;
+  }
   if (typing) return;
   const canvasKey = e.target === document.body || e.target === viewport || e.target.closest('.map-node');
   if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); restoreHistory(e.shiftKey ? 'redo' : 'undo'); return; }
@@ -699,3 +755,4 @@ setView('map');
 updateHistoryButtons();
 if (!startupMessage) save();
 else toast(startupMessage);
+

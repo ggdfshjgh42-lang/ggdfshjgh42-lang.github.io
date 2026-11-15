@@ -7,7 +7,7 @@
   <meta name="description" content="漫想，一个安静的思维空间。自由发散、收集灵感，让想法慢慢生长。">
   <title>思维导图 · Fantastic Matrix</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=20261116">
 </head>
 <body>
   <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -34,6 +34,7 @@
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></symbol>
     <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></symbol>
+    <symbol id="i-contract" viewBox="0 0 24 24"><path d="M3 8h5V3m8 0v5h5M3 16h5v5m8 0v-5h5"/></symbol>
   </defs></svg>
 
   <aside class="sidebar" id="sidebar">
@@ -55,7 +56,7 @@
     </section>
 
     <section class="canvas-wrap" id="canvas-wrap" aria-label="思维导图画布">
-      <div class="canvas-top"><span class="canvas-label"><span class="status-dot"></span><span id="canvas-label-text">自由画布</span></span><button class="canvas-tip" id="help-open">双击节点编辑 <span>·</span> Tab 延伸想法<svg class="icon"><use href="#i-help"/></svg></button></div>
+      <div class="canvas-top"><span class="canvas-label"><span class="status-dot"></span><span id="canvas-label-text">自由画布</span></span><div class="canvas-actions"><button class="canvas-tip" id="help-open">双击节点编辑 <span>·</span> Tab 延伸想法<svg class="icon"><use href="#i-help"/></svg></button><button class="canvas-fullscreen" id="fullscreen-toggle" type="button" aria-label="全屏编辑导图" aria-pressed="false" aria-controls="canvas-wrap" title="全屏编辑导图"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg><span>全屏</span></button></div></div>
       <div class="map-viewport" id="map-viewport" tabindex="0" aria-label="可拖动和缩放的导图"><div class="map-world" id="map-world"><svg id="connections" class="connections" aria-hidden="true"></svg><div id="nodes"></div></div></div>
       <div class="outline-view" id="outline-view" hidden></div>
       <div class="node-toolbar" id="node-toolbar" hidden><button data-node-action="child" title="添加子节点 (Tab)" aria-label="添加子节点"><svg class="icon"><use href="#i-plus"/></svg></button><span></span><button data-node-action="note" title="节点笔记" aria-label="节点笔记"><svg class="icon"><use href="#i-note"/></svg></button><button data-node-action="link" title="关联另一个节点" aria-label="关联另一个节点"><svg class="icon"><use href="#i-link"/></svg></button><button data-node-action="delete" title="删除节点" aria-label="删除节点"><svg class="icon"><use href="#i-trash"/></svg></button></div>
@@ -76,6 +77,7 @@
   <div id="map-options" class="popover" hidden><button id="rename-map"><svg class="icon"><use href="#i-note"/></svg>重命名</button><button id="duplicate-map"><svg class="icon"><use href="#i-plus"/></svg>复制导图</button><button id="delete-map"><svg class="icon"><use href="#i-trash"/></svg>删除导图</button></div>
   <input type="file" id="import-file" accept=".json,application/json" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=20261116"></script>
 </body>
 </html>
+
