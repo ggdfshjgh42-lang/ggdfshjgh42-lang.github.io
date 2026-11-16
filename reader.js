@@ -108,7 +108,7 @@
     $('directory-toggle').setAttribute('aria-expanded', 'true');
   }
   function themeCSS() {
-    const colors = settings.theme === 'dark' ? ['#202b23','#dce5d8','#a0af9f','#b3ce94','#3b493d'] : settings.theme === 'light' ? ['#fff','#292d29','#727872','#356344','#e0e4e0'] : ['#fffefa','#25372d','#667066','#356344','#dfe4d7'];
+    const colors = settings.theme === 'dark' ? ['#202b23','#dce5d8','#a0af9f','#b3ce94','#3b493d'] : settings.theme === 'light' ? ['#fff','#292d29','#727872','#356344','#e0e4e0'] : ['#fffdf8','#493e35','#786b60','#94634f','#e3d9cb'];
     return `:root{color-scheme:${settings.theme === 'dark' ? 'dark' : 'light'};background:${colors[0]};color:${colors[1]};font-size:${settings.fontSize}px}*{box-sizing:border-box}html{overflow-wrap:anywhere;scroll-behavior:auto;scrollbar-color:${colors[4]} ${colors[0]};scrollbar-width:none}html::-webkit-scrollbar{display:none}body{max-width:800px;margin:0 auto;padding:48px 54px 70px;font-family:"Noto Serif SC","Songti SC",SimSun,serif;line-height:2;letter-spacing:.02em}p{margin:0 0 1em}h1,h2,h3,h4,h5,h6{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-weight:600;line-height:1.6;margin:1.6em 0 1em}h1:first-child,h2:first-child{margin-top:0}h1{font-size:1.65em}h2{font-size:1.35em}h3{font-size:1.15em}a{color:${colors[3]};text-underline-offset:3px}img{max-width:100%;height:auto;display:block;margin:1.5em auto}figure{margin:1.5em 0}figcaption{font-size:.8em;color:${colors[2]};text-align:center}blockquote{border-left:3px solid ${colors[4]};padding-left:1em;margin:1.5em 0;color:${colors[2]}}pre{overflow-x:auto;white-space:pre-wrap;font-size:.8em;border:1px solid ${colors[4]};padding:1em;border-radius:8px}table{display:block;overflow-x:auto;border-collapse:collapse;font-size:.85em;margin:1.5em 0}td,th{border:1px solid ${colors[4]};padding:.45em .7em}hr{border:0;border-top:1px solid ${colors[4]};margin:2em 0}ul,ol{padding-left:1.5em}li{margin:.35em 0}ruby{ruby-align:center}rt{font-size:.55em}.txt-paragraph{text-indent:2em;white-space:pre-wrap}.reader-chapter-title{font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:1.4em;line-height:1.6;margin:0 0 2em}.reader-end{margin-top:3em;text-align:center;font-size:.75em;color:${colors[2]}}@media(max-width:600px){body{padding:30px 23px 55px;line-height:1.95}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}`;
   }
   function applySettings() {
@@ -564,3 +564,4 @@
   });
   start().catch(errorMessage);
 })();
+

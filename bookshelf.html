@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f7f8f2">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f6f1e8">
     <meta name="description" content="Fantastic Matrix 私人书架。挑一本书，慢慢读，保存属于自己的阅读进度。">
     <title>书架 | Fantastic Matrix</title>
     <link rel="stylesheet" href="blog.css">
@@ -12,12 +12,13 @@
     <script src="book-library.js" defer></script>
     <script src="bookshelf.js" defer></script>
     <script src="reader-screen.js?v=20261112-pdf-2" defer></script>
+    <link rel="stylesheet" href="theme.css?v=20261116-warm1">
 </head>
-<body>
+<body class="has-site-nav" data-section="reading">
     <a class="skip-link" href="#my-books">跳到书籍列表</a>
-    <nav aria-label="主导航"><div class="nav-inner">
-        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">f</span><span class="nav-logo">Fantastic Matrix</span></a>
-        <ul class="nav-links"><li><a href="index.html">博客</a></li><li><a href="optics-roadmap.html">光学学习 <span aria-hidden="true">↗</span></a></li><li><a href="bookshelf.html" class="is-active" aria-current="page">书架 <span class="nav-dot" aria-hidden="true"></span></a></li><li><a href="mindmap/">思维导图 <span aria-hidden="true">↗</span></a></li><li><a href="games.html">小游戏 <span aria-hidden="true">↗</span></a></li></ul>
+    <nav data-site-nav aria-label="主导航"><div class="nav-inner">
+        <a href="index.html" class="brand" aria-label="返回网站首页"><span class="brand-mark" aria-hidden="true">f</span><span class="nav-logo">Fantastic Matrix</span></a>
+        <ul class="nav-links"><li><a href="bookshelf.html" class="is-active" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5c3.2-.8 6.1-.3 9 1.5v14c-2.9-1.8-5.8-2.3-9-1.5zM21 5.5c-3.2-.8-6.1-.3-9 1.5v14c2.9-1.8 5.8-2.3 9-1.5z"/><path d="M6 9h3M15 9h3M6 12h3M15 12h3"/></svg><span class="nav-label">阅读</span></a></li><li><a href="optics-roadmap.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5zM6 11v6c4 2.5 8 2.5 12 0v-6M22 9v8"/></svg><span class="nav-label">学习</span></a></li><li><a href="games.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="8" cy="8" r=".7" fill="currentColor"/><circle cx="16" cy="8" r=".7" fill="currentColor"/><circle cx="12" cy="12" r=".7" fill="currentColor"/><circle cx="8" cy="16" r=".7" fill="currentColor"/><circle cx="16" cy="16" r=".7" fill="currentColor"/></svg><span class="nav-label">游戏</span></a></li><li><a href="mindmap/"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="6" height="6" rx="2"/><rect x="16" y="3" width="5" height="5" rx="1.5"/><rect x="16" y="16" width="5" height="5" rx="1.5"/><path d="M9 12h3c2 0 1-6.5 4-6.5M12 12c2 0 1 6.5 4 6.5"/></svg><span class="nav-label">脑图</span></a></li><li><a href="index.html#notes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg><span class="nav-label">博客</span></a></li></ul>
     </div></nav>
     <main class="container shelf-home">
         <header class="shelf-hero">
@@ -45,6 +46,7 @@
         </section>
         <details class="import-guide" id="add-books"><summary><span><span aria-hidden="true">＋</span> 给书架添一本书</span><span class="guide-chevron" aria-hidden="true">⌄</span></summary><div class="import-content"><p>将 <strong>EPUB、PDF 或 TXT</strong> 文件上传到网站仓库的 <code>books/</code> 文件夹。提交到 <code>main</code>，等待网站更新后，点击「刷新」，新书就会出现在这里。</p><p>文件名可以写成 <code>书名 - 作者.epub</code>，也可以按文件夹分类，例如 <code>books/文学/书名.epub</code>。封面、简介等资料可以在 <code>books/catalog.json</code> 中补充。</p><a class="import-link" href="https://github.com/ggdfshjgh42-lang/ggdfshjgh42-lang.github.io/upload/main/books" target="_blank" rel="noopener noreferrer">去 GitHub 上传书籍 <span aria-hidden="true">↗</span></a><p class="guide-footnote">阅读进度保存在当前浏览器，换设备不会自动同步。</p></div></details>
     </main>
-    <footer><div class="container footer-inner"><div><a class="footer-wordmark" href="index.html">fantastic matrix</a><p>一页一页，读进自己的时间里。</p></div><div class="footer-details"><a href="index.html">返回博客 <span aria-hidden="true">↗</span></a></div></div></footer>
+    <footer><div class="container footer-inner"><div><a class="footer-wordmark" href="index.html">fantastic matrix</a><p>一页一页，读进自己的时间里。</p></div><div class="footer-details"><a href="index.html">返回首页 <span aria-hidden="true">↗</span></a></div></div></footer>
 </body>
 </html>
+

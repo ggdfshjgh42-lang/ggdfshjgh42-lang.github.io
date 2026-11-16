@@ -92,8 +92,7 @@
         document.title = siteTitle;
         document.querySelector('meta[name="description"]').content = data.site.description;
         document.querySelector('.nav-logo').textContent = data.site.name;
-        document.querySelector('.section-title').textContent = data.site.heading;
-        document.getElementById('site-description').textContent = data.site.description;
+        document.getElementById('journal-heading').textContent = data.site.heading || '最近的文字';
         document.getElementById('site-footer').textContent = '© ' + new Date().getFullYear() + ' fantasticmatrix.xyz — ' + data.site.name;
         document.getElementById('notes-count').textContent = String(data.posts.length).padStart(2, '0') + ' 篇文章 / 慢慢更新';
         const fragment = document.createDocumentFragment();
@@ -174,3 +173,4 @@
         document.getElementById('notes-count').textContent = '暂时无法加载';
     }
 })();
+

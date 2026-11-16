@@ -234,7 +234,10 @@ function updateSelection() {
   if (!toolbar.hidden) {
     const width = viewport.clientWidth;
     toolbar.style.left = `${Math.max(80, Math.min(width - 88, transform.x + node.x * transform.scale))}px`;
-    toolbar.style.top = `${Math.max(58, transform.y + node.y * transform.scale - (node.parentId === null ? 31 : 23) * transform.scale - 52)}px`;
+    const proposedTop = transform.y + node.y * transform.scale - (node.parentId === null ? 31 : 23) * transform.scale - 52;
+    const bottomReserve = window.matchMedia('(max-width: 700px)').matches ? 126 : 86;
+    const maximumTop = Math.max(58, viewport.clientHeight - bottomReserve - toolbar.offsetHeight);
+    toolbar.style.top = `${Math.max(58, Math.min(maximumTop, proposedTop))}px`;
     $('[data-node-action="delete"]').disabled = node.parentId === null;
   }
   if (!$('#note-panel').hidden && node) {
@@ -257,7 +260,7 @@ function applyTransform() {
   transforms.set(state.activeId, { ...transform });
   updateSelection();
 }
-function fitMap({ initial = false } = {}) {
+function fitMap() {
   const nodes = visibleNodes();
   const minX = Math.min(...nodes.map(n => n.x - (n.parentId === null ? 95 : 74)));
   const maxX = Math.max(...nodes.map(n => n.x + (n.parentId === null ? 95 : 74)));
@@ -266,12 +269,13 @@ function fitMap({ initial = false } = {}) {
   const w = viewport.clientWidth, h = viewport.clientHeight;
   if (!w || !h) return;
   const pad = w < 600 ? 50 : 104;
-  let scale = Math.max(.15, Math.min(1, (w - pad) / (maxX - minX), (h - 180) / (maxY - minY)));
-  const focusRoot = initial && w < 600 && scale < .68;
-  if (focusRoot) scale = .68;
-  const cx = focusRoot ? rootNode().x : (minX + maxX) / 2;
-  const cy = focusRoot ? rootNode().y : (minY + maxY) / 2;
-  transform = { x: w / 2 - cx * scale, y: h / 2 - 10 - cy * scale, scale };
+  const topReserve = 64;
+  const bottomReserve = w <= 700 ? 124 : 88;
+  const availableHeight = Math.max(1, h - topReserve - bottomReserve);
+  const scale = Math.max(.15, Math.min(1, (w - pad) / (maxX - minX), availableHeight / (maxY - minY)));
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  transform = { x: w / 2 - cx * scale, y: topReserve + availableHeight / 2 - cy * scale, scale };
   applyTransform();
 }
 function zoomTo(scale, x = viewport.clientWidth / 2, y = viewport.clientHeight / 2) {
@@ -641,9 +645,11 @@ $('#map-options-open').addEventListener('click', e => {
   e.stopPropagation();
   const menu = $('#map-options');
   const rect = e.currentTarget.getBoundingClientRect();
-  menu.style.left = `${Math.min(window.innerWidth - 180, rect.left)}px`;
-  menu.style.top = `${rect.bottom + 8}px`;
-  menu.hidden = !menu.hidden;
+  if (!menu.hidden) { menu.hidden = true; return; }
+  menu.hidden = false;
+  const bounds = menu.getBoundingClientRect();
+  menu.style.left = `${Math.max(12, Math.min(window.innerWidth - bounds.width - 12, rect.left))}px`;
+  menu.style.top = `${Math.max(12, Math.min(window.innerHeight - bounds.height - 12, rect.bottom + 8))}px`;
 });
 document.addEventListener('click', e => { if (!e.target.closest('#map-options,#map-options-open')) $('#map-options').hidden = true; });
 $('#rename-map').addEventListener('click', () => { $('#map-options').hidden = true; $('#map-title').focus(); $('#map-title').select(); });
@@ -747,7 +753,7 @@ document.addEventListener('keyup', e => { if (e.code === 'Space') { spaceHeld = 
 window.addEventListener('blur', () => { spaceHeld = false; viewport.classList.toggle('hand-mode', tool === 'hand'); });
 window.addEventListener('beforeunload', () => { finishEditing(); save(); });
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === 'map') fitMap({ initial: true }); }, 100); });
+window.addEventListener('resize', () => { $('#map-options').hidden = true; clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === 'map') fitMap({ initial: true }); }, 100); });
 
 renderSidebar();
 renderHeader();
@@ -755,4 +761,5 @@ setView('map');
 updateHistoryButtons();
 if (!startupMessage) save();
 else toast(startupMessage);
+
 
