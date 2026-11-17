@@ -1,0 +1,226 @@
+/* Page-specific layouts for the Fantastic Matrix editorial redesign.
+   Keep application canvases, piece geometry, reader themes and saved state intact. */
+
+body[data-section="reading"] { --section-color: #b8a1ec; }
+body[data-section="learning"] { --section-color: #d9f176; }
+body[data-section="playing"], body[data-section="gomoku"] { --section-color: #ffab84; }
+
+/* Destination pages open with one confident title and a generous color field. */
+.has-site-nav :is(.shelf-hero h1, .games-hero h1, .course-hero h1, .music-heading h1, .chess-heading h1) {
+  font-family: inherit;
+  font-weight: 850;
+  letter-spacing: -.065em;
+}
+.has-site-nav :is(.shelf-hero h1, .games-hero h1, .course-hero h1) {
+  font-size: clamp(44px, 5.9vw, 84px);
+  line-height: 1.17;
+}
+.has-site-nav :is(.shelf-hero h1 span, .games-hero h1 span, .course-hero h1 span, .music-heading h1 span) { color: inherit; }
+.has-site-nav :is(.shelf-heading h2, .workspace-heading h2, .tool-heading h2, .game-card-title h2, .week-header h2, .lesson-card h3.lesson-title) {
+  font-family: inherit;
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+.has-site-nav :is(.shelf-hero, .course-hero) { min-height: 510px; padding-top: 66px; padding-bottom: 64px; gap: 40px; }
+.has-site-nav :is(.shelf-hero-copy > p:not(.eyebrow), .games-hero > p:not(.eyebrow), .hero-intro) { color: var(--text-secondary); font-size: 14px; line-height: 1.95; }
+.has-site-nav :is(.shelf-heading, .workspace-heading) h2 { font-size: clamp(26px, 3.4vw, 42px); }
+.has-site-nav :is(.shelf-heading, .course-facts, .workspace-tabs) { border-color: var(--text); }
+.has-site-nav :is(.shelf-button, .button.primary, .next-button) { background: var(--text); color: #fffdf8; border-color: var(--text); border-radius: 999px; box-shadow: none; }
+.has-site-nav :is(.shelf-button, .button.primary, .next-button):hover { background: #38352f; color: #fffdf8; }
+.has-site-nav .shelf-button.secondary { background: transparent; color: var(--text); border-color: var(--text); }
+.has-site-nav :is(.continue-panel, .progress-card, .game-status) { border: 1px solid var(--text); background: var(--section-color); border-radius: 18px; box-shadow: none; }
+.has-site-nav :is(.game-card, .lesson-card, .formula-card, .resource-card, .lab-card, .music-studio, .study-method, .import-guide) { border-color: var(--text); box-shadow: none; }
+.has-site-nav :is(.lesson-card, .formula-card, .lab-card, .music-studio) { border-radius: 20px; }
+
+/* Reading room: three graphic book spines, then the actual library. */
+[data-section="reading"] .shelf-art { height: 355px; background: var(--section-color); border-radius: 45% 45% 10px 10px; overflow: hidden; }
+[data-section="reading"] .shelf-art::before { display: none; }
+[data-section="reading"] .book-stack { transform: rotate(-6deg); gap: 7px; }
+[data-section="reading"] .art-book { border: 1px solid #22221f; border-left-width: 6px; box-shadow: 5px 6px 0 #22221f; border-radius: 1px 6px 6px 1px; }
+[data-section="reading"] .art-book-one { background: #d9f176; color: #22221f; }
+[data-section="reading"] .art-book-two { background: #22221f; color: #fffdf8; }
+[data-section="reading"] .art-book-three { background: #ffab84; color: #22221f; }
+[data-section="reading"] .art-shelf-line { background: #22221f; height: 2px; bottom: 58px; box-shadow: none; }
+[data-section="reading"] .shelf-art-note { bottom: 23px; color: #22221f; }
+[data-section="reading"] .continue-panel { padding: 26px 30px; }
+[data-section="reading"] .continue-panel :is(.eyebrow, h2, p) { color: #22221f; }
+[data-section="reading"] :is(.search-wrap, .filter-wrap select, .refresh-button, .sort-wrap select) { border: 1px solid #aaa69d; border-radius: 999px; background: transparent; color: var(--text); }
+[data-section="reading"] .search-wrap { padding-left: 20px; }
+[data-section="reading"] .search-wrap input { font-size: 13px; padding: 15px 0; }
+[data-section="reading"] .filter-wrap select { height: 52px; padding-left: 17px; }
+[data-section="reading"] .search-wrap > span:first-child { color: var(--text); }
+[data-section="reading"] .reading-filters { gap: 8px; }
+[data-section="reading"] .reading-filters button { border: 1px solid #aaa69d; border-radius: 999px; color: var(--text); }
+[data-section="reading"] .reading-filters button:hover { background: #e7e3d9; }
+[data-section="reading"] .reading-filters button[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: #fffdf8; }
+[data-section="reading"] .book-grid { row-gap: 38px; }
+[data-section="reading"] .book-visual { border: 1px solid #22221f; border-left-width: 5px; border-radius: 2px 9px 9px 2px; box-shadow: 4px 4px 0 #22221f; }
+[data-section="reading"] .book-card:hover .book-visual { box-shadow: 6px 7px 0 #22221f; }
+[data-section="reading"] .book-copy h3 { font-size: 16px; font-weight: 750; }
+[data-section="reading"] .book-bottom { color: var(--text-secondary); }
+[data-section="reading"] .book-meter { background: #dedad1; }
+[data-section="reading"] .book-meter > span { background: #6750ac; }
+[data-section="reading"] .empty-shelf { border: 1px solid var(--text); border-radius: 20px; background: #e9e2f8; }
+[data-section="reading"] .import-guide { border-radius: 16px; }
+[data-section="reading"] .import-guide summary { padding-top: 22px; padding-bottom: 22px; }
+
+/* Study room: keep the lesson hierarchy quiet beneath the bright introduction. */
+[data-section="learning"] .hero-art { background: #d9f176; border-radius: 12px 100px 12px 100px; padding: 15px; height: 330px; }
+[data-section="learning"] .art-grid { opacity: .25; }
+[data-section="learning"] .art-caption { color: #22221f; right: 24px; bottom: 20px; }
+[data-section="learning"] .floating-note { background: #fffdf8; border: 1px solid #22221f; color: #22221f; border-radius: 999px; box-shadow: none; }
+[data-section="learning"] .course-facts { padding: 30px 0; }
+[data-section="learning"] .course-facts strong { font-size: 42px; font-weight: 800; }
+[data-section="learning"] .course-facts strong > span { font-size: 12px; font-weight: 500; }
+[data-section="learning"] .course-facts p { font-size: 11px; }
+[data-section="learning"] .workspace { padding-top: 60px; }
+[data-section="learning"] .workspace-tabs button { font-size: 14px; }
+[data-section="learning"] .workspace-tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--text); }
+[data-section="learning"] .progress-title strong { font-weight: 800; }
+[data-section="learning"] .progress-track { background: #aec653; }
+[data-section="learning"] .progress-track span { background: #22221f; }
+[data-section="learning"] .resume-button { border-color: #9db448; color: #22221f; }
+[data-section="learning"] .week-link[aria-current="step"] { background: #22221f; border-color: #22221f; color: #fffdf8; }
+[data-section="learning"] .week-link[aria-current="step"] :is(.week-number, .week-tally) { color: #fffdf8; }
+[data-section="learning"] .week-link:hover:not([aria-current="step"]) { background: #e5ebcf; }
+[data-section="learning"] .day-tab { border-color: #aaa69d; border-radius: 10px; }
+[data-section="learning"] .day-tab[aria-current="step"] { background: #22221f; border-color: #22221f; color: #fffdf8; }
+[data-section="learning"] .day-tab.is-complete:not([aria-current="step"]) { background: #d9f176; border-color: #a3bc46; color: #22221f; }
+[data-section="learning"] .lesson-card { padding: 34px; background: var(--surface); }
+[data-section="learning"] .lesson-card h3.lesson-title { font-size: 26px; }
+[data-section="learning"] :is(.equation, .practice, .solution, .note-input, .checkpoint) { border-color: #c8c4ba; border-radius: 10px; }
+[data-section="learning"] .equation { background: #edf0df; border-left: 3px solid #22221f; }
+[data-section="learning"] .practice { background: #f2efe6; }
+[data-section="learning"] .checkpoint { background: #e8e1f6; box-shadow: none; }
+[data-section="learning"] .source-links > a { color: #48432e; border-radius: 999px; }
+[data-section="learning"] .resource-card { border-radius: 12px; }
+[data-section="learning"] .study-method { border-radius: 20px; background: #d9f176; }
+[data-section="learning"] .time-blocks b { color: #22221f; font-family: inherit; font-weight: 800; }
+
+/* Game hall: the boards become large, colorful editorial illustrations. */
+[data-section="playing"] .games-hero { padding-top: 66px; padding-bottom: 54px; }
+[data-section="playing"] .games-note { display: inline-block; border: 1px solid var(--text); border-radius: 999px; padding: 8px 14px; color: var(--text); }
+[data-section="playing"] .game-cards { gap: 26px; }
+[data-section="playing"] .game-card { border: 1px solid var(--text); border-radius: 25px; background: var(--surface); box-shadow: none; }
+[data-section="playing"] .game-card:hover { transform: translateY(-5px); box-shadow: 0 6px 0 var(--text); }
+[data-section="playing"] .game-art { height: 290px; border-bottom: 1px solid var(--text); }
+[data-section="playing"] .gomoku-art { background: #b8a1ec; }
+[data-section="playing"] .xiangqi-art { background: #ffab84; }
+[data-section="playing"] .music-art { background: #d9f176; }
+[data-section="playing"] .game-card-music .game-card-copy { background: var(--surface); }
+[data-section="playing"] .art-number { color: #22221f; font-weight: 600; left: 26px; top: 22px; }
+[data-section="playing"] .mini-gomoku { background-image: linear-gradient(#22221f66 1px, transparent 1px), linear-gradient(90deg,#22221f66 1px,transparent 1px); }
+[data-section="playing"] .mini-xiangqi { background-image: linear-gradient(#22221f55 1px,transparent 1px),linear-gradient(90deg,#22221f55 1px,transparent 1px); }
+[data-section="playing"] .river-label { background: #ffab84; color: #593226; }
+[data-section="playing"] .game-card-copy { padding: 30px; }
+[data-section="playing"] .game-card-title h2 { font-size: 31px; }
+[data-section="playing"] .game-arrow { border: 1px solid var(--text); background: var(--text); color: #fffdf8; width: 42px; height: 42px; }
+[data-section="playing"] .game-card:hover .game-arrow { background: #fffdf8; color: var(--text); }
+[data-section="playing"] .game-tags span { border-color: #aaa69d; border-radius: 999px; color: var(--text); }
+[data-section="playing"] .new-tag { border-radius: 999px; background: #d9f176; color: #22221f; }
+[data-section="playing"] .game-card-music .game-art { border-bottom: 0; border-right: 1px solid var(--text); }
+[data-section="playing"] .music-art-note { color: #22221f; }
+[data-section="playing"] .hall-footnote { margin-top: 45px; }
+
+/* Playing screens: style the shell and controls without altering board sizing. */
+[data-section="playing"] .chess-heading h1 { font-size: clamp(32px,4vw,48px); }
+[data-section="playing"] .chess-heading-mark { color: #ffab84; font-size: 82px; }
+[data-section="playing"] :is(.chess-settings, .move-panel, .chess-rules) { border-color: #aaa69d; border-radius: 13px; }
+[data-section="playing"] .chess-actions button { border-radius: 999px; border-color: #aaa69d; }
+[data-section="playing"] .chess-actions .primary-action { border-color: var(--text); background: var(--text); color: #fffdf8; }
+[data-section="playing"] .music-heading { padding-top: 37px; padding-bottom: 35px; }
+[data-section="playing"] .music-heading h1 { font-size: clamp(32px,4.2vw,53px); }
+[data-section="playing"] .heading-notes { color: #22221f; }
+[data-section="playing"] .heading-notes span:nth-child(2) { color: #987bd9; }
+[data-section="playing"] .music-studio { background: var(--surface); border: 1px solid var(--text); box-shadow: none; }
+[data-section="playing"] .studio-mark { background: #d9f176; color: #22221f; border: 1px solid #22221f; border-radius: 50%; }
+[data-section="playing"] .transport { background: var(--surface); border-color: #bcb8ae; }
+[data-section="playing"] .play-button { background: #22221f; border-color: #22221f; border-radius: 999px; color: #fffdf8; }
+[data-section="playing"] .play-button:hover:not(:disabled) { background: #514b41; }
+[data-section="playing"] .transport input[type="range"] { accent-color: #22221f; }
+[data-section="playing"] :is(.demo-controls button, .download-button) { border-radius: 999px; border: 1px solid #aaa69d; background: #fffdf8; color: #22221f; }
+[data-section="playing"] .download-button { background: #d9f176; border-color: #22221f; }
+[data-section="playing"] .board-row[data-tone="sage"] { --note-fill: #d9f176; --note-line: #a5ba50; --note-dot: #424d1c; }
+[data-section="playing"] .board-row[data-tone="lavender"] { --note-fill: #b8a1ec; --note-line: #9177cd; --note-dot: #5d448f; }
+[data-section="playing"] .board-row[data-tone="peach"] { --note-fill: #ffab84; --note-line: #d37b65; --note-dot: #8f4331; }
+[data-section="gomoku"] .side-panel { border: 1px solid #22221f; border-radius: 22px; box-shadow: none; }
+[data-section="gomoku"] .side-panel h1 { font-size: 35px; letter-spacing: -.06em; }
+[data-section="gomoku"] .status-box { border: 1px solid #22221f; background: #b8a1ec; border-radius: 16px; }
+[data-section="gomoku"] :is(.btn, .back-link a) { border-radius: 999px; box-shadow: none; }
+[data-section="gomoku"] .btn-primary { background: #22221f; color: #fffdf8; }
+[data-section="gomoku"] .mode-btn.active { background: #ff5b23; color: #22221f; border-color: #22221f; }
+[data-section="gomoku"] .room-panel { background: #f2efe6; border-color: #aaa69d; border-radius: 16px; }
+
+/* Utility workspaces retain their existing dimensions and reader theme controls. */
+[data-section="mindmap"] { --sage: #65518d; --sage-dark: #473267; --sage-light: #e8def8; }
+[data-section="mindmap"] .sidebar { background: #e9e2f8; border-color: #bbb0ce; }
+[data-section="mindmap"] :is(.topbar, .canvas-top, .workspace-footer) { background: #fffdf8; border-color: #c9c4b9; }
+[data-section="mindmap"] .brand { color: #22221f; font-weight: 800; }
+[data-section="mindmap"] .brand-english { color: #665979; }
+[data-section="mindmap"] .primary-nav .nav-item.active { background: #22221f; color: #fffdf8; border-radius: 999px; }
+[data-section="mindmap"] .primary-nav .nav-item.active .nav-count { color: #fffdf8; }
+[data-section="mindmap"] .map-list-item.active { background: #d7c7f1; color: #45305e; }
+[data-section="mindmap"] .workspace-heading { background: var(--bg); }
+[data-section="mindmap"] .map-title { font-weight: 800; letter-spacing: -.05em; }
+[data-section="mindmap"] .button { border-radius: 999px; border-color: #aaa69d; }
+[data-section="mindmap"] .button.primary { background: #22221f; color: #fffdf8; border-color: #22221f; }
+[data-section="mindmap"] :is(.canvas-wrap, .inspector) { border-color: #c9c4b9; }
+[data-section="mindmap"] .map-node.root { background: #22221f; color: #fffdf8; border-color: #22221f; box-shadow: none; }
+[data-section="mindmap"] .map-node.root:hover { background: #443e52; }
+[data-section="admin"] .topbar { background: #fffdf8; border-bottom: 1px solid #22221f; }
+[data-section="admin"] .brand { color: #22221f; font-weight: 800; }
+[data-section="admin"] :is(.sidebar, .editor-panel) { border: 1px solid #aaa69d; border-radius: 18px; box-shadow: none; }
+[data-section="admin"] .sidebar { background: #e9e2f8; }
+[data-section="admin"] :is(button, .button) { border-radius: 999px; }
+[data-section="admin"] :is(.primary, .post-item.selected) { background: #22221f; color: #fffdf8; border-color: #22221f; }
+[data-section="admin"] :is(.post-item.selected small, .post-item.selected span) { color: #fffdf8; }
+[data-section="admin"] :is(input, textarea, .rich-editor) { border-color: #aaa69d; border-radius: 8px; }
+[data-section="admin"] .toolbar { background: #f2efe6; }
+[data-section="reader"] .reader-topbar { border-color: var(--line); box-shadow: 0 4px 18px #0000000e; }
+[data-section="reader"] :is(.reader-tools button, .reader-header button, .reader-footer button) { border-radius: 999px; }
+[data-section="reader"] .reader-header .back-link { font-weight: 750; }
+
+@media (max-width: 1000px) {
+  .has-site-nav :is(.shelf-hero, .course-hero) { gap: 24px; }
+  [data-section="reading"] .shelf-art { height: 310px; }
+  [data-section="learning"] .hero-art { height: 290px; border-radius: 12px 75px 12px 75px; }
+  [data-section="learning"] .course-facts strong { font-size: 34px; }
+}
+@media (max-width: 600px) {
+  .has-site-nav :is(.shelf-hero, .course-hero) { padding-top: 38px; padding-bottom: 35px; gap: 25px; min-height: 0; }
+  .has-site-nav :is(.shelf-hero h1, .games-hero h1, .course-hero h1) { font-size: clamp(40px, 11vw, 62px); letter-spacing: -.06em; }
+  .has-site-nav[data-section="reading"] .shelf-art { display: grid; height: 275px; max-width: 100%; border-radius: 100px 100px 10px 10px; }
+  [data-section="reading"] .book-stack { transform: scale(.8) rotate(-6deg); }
+  [data-section="reading"] .art-shelf-line { bottom: 40px; width: 250px; }
+  [data-section="reading"] .shelf-art-note { bottom: 12px; }
+  [data-section="reading"] .continue-panel { padding: 22px; }
+  [data-section="reading"] .filter-wrap select { height: 44px; }
+  [data-section="reading"] .refresh-button { height: 44px; }
+  [data-section="reading"] .book-copy h3 { font-size: 14px; }
+  [data-section="reading"] .reading-filters { gap: 5px; }
+  .has-site-nav .course-hero .hero-art { display: grid; height: 230px; width: 100%; border-radius: 12px 65px 12px 65px; padding: 9px; }
+  [data-section="learning"] .floating-note { top: 1px; right: 10px; }
+  [data-section="learning"] .art-caption { bottom: 10px; right: 16px; }
+  [data-section="learning"] .course-facts { padding: 23px 0; }
+  [data-section="learning"] .course-facts strong { font-size: 30px; }
+  [data-section="learning"] .course-facts strong > span { font-size: 9px; }
+  [data-section="learning"] .course-facts p { font-size: 9px; }
+  [data-section="learning"] .workspace { padding-top: 38px; }
+  [data-section="learning"] .workspace-tabs { gap: 8px; }
+  [data-section="learning"] .workspace-tabs button { font-size: 12px; }
+  [data-section="learning"] .lesson-card { padding: 23px 19px; border-radius: 16px; }
+  [data-section="learning"] .lesson-card h3.lesson-title { font-size: 23px; }
+  [data-section="playing"] .games-hero { padding-top: 38px; padding-bottom: 35px; }
+  [data-section="playing"] .game-cards { gap: 22px; }
+  [data-section="playing"] .game-art { height: 260px; }
+  [data-section="playing"] .game-card-copy { padding: 25px; }
+  [data-section="playing"] .game-card-title h2 { font-size: 28px; }
+  [data-section="playing"] .game-card-music .game-art { border-right: 0; border-bottom: 1px solid var(--text); }
+  [data-section="playing"] .music-heading { padding: 25px 6px; }
+  [data-section="playing"] .music-heading h1 { font-size: 31px; }
+  [data-section="playing"] .chess-heading h1 { font-size: 32px; }
+  [data-section="gomoku"] .side-panel h1 { font-size: 27px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-section="playing"] .game-card:hover { transform: none; }
+}

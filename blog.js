@@ -6,10 +6,8 @@
     const progress = document.getElementById('reading-progress-bar');
     const backToTop = document.getElementById('back-to-top');
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     let reading = false;
     let frame = 0;
-    let pointerFrame = 0;
 
     function scrollToTop() {
         window.scrollTo({top: 0, behavior: motion.matches ? 'instant' : 'smooth'});
@@ -61,20 +59,6 @@
     list.addEventListener('animationend', event => {
         if (event.animationName === 'enter') event.target.classList.remove('reveal-in');
     });
-    // One delegated listener and one frame for the pointer glow.
-    list.addEventListener('pointermove', event => {
-        if (motion.matches || !finePointer.matches) return;
-        const card = event.target.closest('.blog-card');
-        if (!card) return;
-        const x = event.clientX, y = event.clientY;
-        if (pointerFrame) cancelAnimationFrame(pointerFrame);
-        pointerFrame = requestAnimationFrame(() => {
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty('--pointer-x', (x - rect.left) + 'px');
-            card.style.setProperty('--pointer-y', (y - rect.top) + 'px');
-            pointerFrame = 0;
-        });
-    }, {passive: true});
     function element(tag, className, text) {
         const node = document.createElement(tag);
         if (className) node.className = className;
