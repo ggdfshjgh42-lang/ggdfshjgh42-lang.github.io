@@ -151,3 +151,68 @@ test('search respects supplied repetition history and does not mutate it', () =>
     const original = history.slice(), m = X.findBestMove(b, 'r', {depth: 2, timeMs: 1000, history});
     assert.equal(m.score, 0); assert.equal(m.depth, 2); assert.deepEqual(history, original);
 });
+function recordLine(start, side, moves) {
+    let board = start.slice(), turn = side, halfmove = 0;
+    const history = [{key: X.positionKey(board, turn), check: X.inCheck(board, turn)}];
+    for (const [from, to] of moves) {
+        assert.ok(X.legalMoves(board, turn, from).some(m => m.to === to), `legal move ${from}:${to}`);
+        halfmove = board[to] ? 0 : halfmove + 1;
+        board = X.applyMove(board, {from, to}); turn = X.other(turn);
+        history.push({key: X.positionKey(board, turn), check: X.inCheck(board, turn)});
+    }
+    return {board, turn, history, halfmove};
+}
+test('only the third occurrence draws; a normal horse cycle remains a legitimate draw', () => {
+    const cycle = [[82, 65], [1, 20], [65, 82], [20, 1]];
+    const twice = recordLine(X.initialBoard(), 'r', cycle);
+    assert.equal(X.adjudicate(twice.board, twice.turn, twice), null);
+    const third = recordLine(X.initialBoard(), 'r', [...cycle, ...cycle]);
+    assert.deepEqual(X.adjudicate(third.board, third.turn, third), {winner: null, reason: 'repetition'});
+});
+test('one-sided perpetual check loses for either color, and incomplete cycles do not', () => {
+    const start = fixture([...kings, [2, 5, 'rR']]), cycle = [[23, 22], [4, 5], [22, 23], [5, 4]];
+    for (const mirror of [false, true]) {
+        const b = mirror ? start.slice().reverse().map(p => p ? X.other(p[0]) + p[1] : null) : start;
+        const moves = mirror ? cycle.map(([f, t]) => [89 - f, 89 - t]) : cycle;
+        const partial = recordLine(b, mirror ? 'b' : 'r', moves);
+        assert.equal(X.repetitionOutcome(partial.history), null);
+        const game = recordLine(b, mirror ? 'b' : 'r', [...moves, ...moves]);
+        assert.deepEqual(X.adjudicate(game.board, game.turn, game), {winner: mirror ? 'r' : 'b', reason: 'perpetual-check'});
+        assert.equal(X.repetitionOutcome(game.history.slice(0, -1)), null);
+    }
+});
+test('missing or intermittent check evidence cannot cause a perpetual-check loss', () => {
+    const cycle = [[23, 22], [4, 5], [22, 23], [5, 4]];
+    const game = recordLine(fixture([...kings, [2, 5, 'rR']]), 'r', [...cycle, ...cycle]);
+    const noEvidence = game.history.map(entry => entry.key);
+    assert.deepEqual(X.repetitionOutcome(noEvidence), {winner: null, reason: 'repetition'});
+    game.history[1].check = false;
+    assert.deepEqual(X.repetitionOutcome(game.history), {winner: null, reason: 'repetition'});
+});
+test('no-capture limit is exact and never overrides checkmate or stalemate', () => {
+    const b = X.initialBoard();
+    assert.equal(X.adjudicate(b, 'r', {halfmove: 119}), null);
+    assert.deepEqual(X.adjudicate(b, 'r', {halfmove: 120}), {winner: null, reason: 'no-capture'});
+    const stuck = fixture([...kings, [2, 3, 'rR'], [2, 5, 'rR'], [1, 0, 'rR']]);
+    assert.deepEqual(X.adjudicate(stuck, 'b', {halfmove: 120}), {winner: 'r', reason: 'stalemate'});
+});
+test('AI treats the checking side as losing rather than claiming a perpetual-check draw', () => {
+    const cycle = [[23, 22], [4, 5], [22, 23], [5, 4]];
+    const game = recordLine(fixture([...kings, [2, 5, 'rR']]), 'r', [...cycle, ...cycle.slice(0, 3)]);
+    const original = structuredClone(game.history);
+    const m = X.findBestMove(game.board, game.turn, {depth: 2, timeMs: 2000, history: game.history});
+    assert.ok(m.score > 99000, 'escaping the second full checking cycle is a win for the defender');
+    assert.deepEqual(game.history, original);
+});
+test('AI changes an equivalent plan when that position already occurred, including on timeout', () => {
+    const b = fixture([[0, 4, 'bK'], [9, 4, 'rK'], [8, 4, 'rA'], [7, 0, 'rR'], [2, 8, 'bR']]);
+    for (const timeMs of [0, 2000]) {
+        const options = {depth: 2, timeMs};
+        const first = X.findBestMove(b, 'r', options);
+        const history = [{key: X.positionKey(X.applyMove(b, first), 'b'), check: false}, {key: X.positionKey(b, 'r'), check: false}];
+        const changed = X.findBestMove(b, 'r', {...options, history});
+        assert.notDeepEqual([changed.from, changed.to], [first.from, first.to]);
+        assert.ok(X.legalMoves(b, 'r').some(m => m.from === changed.from && m.to === changed.to));
+    }
+});
+

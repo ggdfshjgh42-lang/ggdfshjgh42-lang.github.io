@@ -141,10 +141,29 @@
         const next = board.slice(); makeMove(next, move); return next;
     }
     function positionKey(board, turn) { return board.map(p => p || '--').join('') + turn; }
+    const historyKey = entry => typeof entry === 'string' ? entry : entry.key;
+    function repetitionOutcome(positions) {
+        if (!positions || !positions.length) return null;
+        const key = historyKey(positions[positions.length - 1]), matches = [];
+        positions.forEach((entry, i) => { if (historyKey(entry) === key) matches.push(i); });
+        if (matches.length < 3) return null;
+        const cycle = positions.slice(matches[matches.length - 3] + 1);
+        const checking = side => {
+            const moves = cycle.filter(entry => other(historyKey(entry).slice(-1)) === side);
+            return moves.length > 0 && moves.every(entry => entry.check === true);
+        };
+        const red = checking('r'), black = checking('b');
+        // Only a proven, one-sided perpetual check is penalized. Other repeats draw.
+        return red !== black ? {winner: red ? 'b' : 'r', reason: 'perpetual-check'} : {winner: null, reason: 'repetition'};
+    }
     function outcome(board, turn) {
         if (board.indexOf(turn + 'K') < 0) return {winner: other(turn), reason: 'capture'};
         if (!legalMoves(board, turn).length) return {winner: other(turn), reason: inCheck(board, turn) ? 'checkmate' : 'stalemate'};
         return null;
+    }
+    function adjudicate(board, turn, options = {}) {
+        return outcome(board, turn) || repetitionOutcome(options.history) ||
+            (options.halfmove >= 120 ? {winner: null, reason: 'no-capture'} : null);
     }
     function evaluate(board, side) {
         let total = 0;
@@ -181,10 +200,20 @@
         const settings = Object.assign({depth: 4, timeMs: 1000, maxNodes: 180000}, options);
         const board = input.slice(), start = Date.now(), stop = {}, rootMoves = legalMoves(board, side);
         if (!rootMoves.length) return null;
-        rootMoves.sort((a, b) => movePriority(board, b) - movePriority(board, a));
         const table = new Map(), killers = [], history = new Int32Array(90 * 90 * 2), repetitions = new Map();
-        for (const key of settings.history || []) repetitions.set(key, (repetitions.get(key) || 0) + 1);
-        if (!repetitions.has(positionKey(board, side))) repetitions.set(positionKey(board, side), 1);
+        const positions = (settings.history || []).slice(), currentKey = positionKey(board, side);
+        if (!positions.length || historyKey(positions[positions.length - 1]) !== currentKey) positions.push({key: currentKey, check: inCheck(board, side)});
+        for (const entry of positions) {
+            const key = historyKey(entry); repetitions.set(key, (repetitions.get(key) || 0) + 1);
+        }
+        const penalties = new Map();
+        for (const m of rootMoves) {
+            const captured = makeMove(board, m), seen = repetitions.get(positionKey(board, other(side))) || 0;
+            penalties.set(m.from * 90 + m.to, Math.min(2, seen) * 32);
+            unmakeMove(board, m, captured);
+        }
+        const penalty = m => penalties.get(m.from * 90 + m.to);
+        rootMoves.sort((a, b) => movePriority(board, b) - penalty(b) - movePriority(board, a) + penalty(a));
         let best = rootMoves[0], bestScore = 0, completedDepth = 0, nodes = 0;
         const same = (a, b) => a && b && a.from === b.from && a.to === b.to;
         const historyIndex = (m, turn) => (turn === 'r' ? 0 : 8100) + m.from * 90 + m.to;
@@ -197,12 +226,16 @@
                 same(m, killers[ply]) ? 90000 : history[historyIndex(m, turn)] + movePriority(board, m)}))
                 .sort((a, b) => b.rank - a.rank).map(item => item.m);
         }
+        function repeatedScore(turn, key, ply) {
+            const result = outcome(board, turn) || repetitionOutcome([...positions, {key, check: inCheck(board, turn)}]);
+            return result && result.winner ? (result.winner === turn ? MATE - ply : -MATE + ply) : 0;
+        }
         // Resolve captures and all check evasions before assessing a quiet position.
         function quiesce(turn, alpha, beta, ply, remaining) {
             visit();
             if (board.indexOf(turn + 'K') < 0) return -MATE + ply;
             const key = positionKey(board, turn), seen = repetitions.get(key) || 0;
-            if (seen >= 2) return 0;
+            if (seen >= 2) return repeatedScore(turn, key, ply);
             const check = inCheck(board, turn), moves = legalMoves(board, turn);
             if (!moves.length) return -MATE + ply;
             const stand = evaluate(board, turn);
@@ -213,6 +246,7 @@
                 if (remaining <= 0) return alpha;
             }
             repetitions.set(key, seen + 1);
+            positions.push({key, check});
             try {
                 for (const m of ordered(check ? moves : moves.filter(m => board[m.to]), turn, ply)) {
                     const captured = makeMove(board, m);
@@ -223,7 +257,7 @@
                     alpha = Math.max(alpha, score);
                 }
                 return alpha;
-            } finally { if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
+            } finally { positions.pop(); if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
         }
         // Mate values in the table are relative to the stored position, not root ply.
         const storeScore = (score, ply) => score > MATE - 100 ? score + ply : score < -MATE + 100 ? score - ply : score;
@@ -233,7 +267,7 @@
             visit();
             if (board.indexOf(turn + 'K') < 0) return -MATE + ply;
             const key = positionKey(board, turn), seen = repetitions.get(key) || 0;
-            if (seen >= 2) return 0;
+            if (seen >= 2) return repeatedScore(turn, key, ply);
             const originalAlpha = alpha, cached = table.get(key);
             if (!seen && cached && cached.depth >= depth) {
                 const value = loadScore(cached.score, ply);
@@ -244,6 +278,7 @@
             if (!moves.length) return -MATE + ply;
             let value = -Infinity, chosen = null;
             repetitions.set(key, seen + 1);
+            positions.push({key, check: inCheck(board, turn)});
             try {
                 for (const m of ordered(moves, turn, ply, cached && cached.move)) {
                     const captured = makeMove(board, m);
@@ -257,23 +292,24 @@
                         break;
                     }
                 }
-            } finally { if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
+            } finally { positions.pop(); if (seen) repetitions.set(key, seen); else repetitions.delete(key); }
             if (!seen && table.size < 60000) table.set(key, {depth, score: storeScore(value, ply), move: chosen,
                 flag: value <= originalAlpha ? 'upper' : value >= beta ? 'lower' : 'exact'});
             return value;
         }
         for (let depth = 1; depth <= settings.depth; depth++) {
-            let iterationBest = best, alpha = -Infinity;
+            let iterationBest = best, iterationScore = bestScore, alpha = -Infinity;
             try {
                 const ordered = [best, ...rootMoves.filter(m => m.from !== best.from || m.to !== best.to)];
                 for (const m of ordered) {
-                    const captured = makeMove(board, m);
+                    const captured = makeMove(board, m), cost = penalty(m);
                     let score;
-                    try { score = -search(other(side), depth - 1, -Infinity, -alpha, 1); }
+                    try { score = -search(other(side), depth - 1, -Infinity, -alpha - cost, 1); }
                     finally { unmakeMove(board, m, captured); }
-                    if (score > alpha) { alpha = score; iterationBest = m; }
+                    // Prefer a fresh plan within a small evaluation margin, while retaining forced draws when losing.
+                    if (score - cost > alpha) { alpha = score - cost; iterationBest = m; iterationScore = score; }
                 }
-                best = iterationBest; bestScore = alpha; completedDepth = depth;
+                best = iterationBest; bestScore = iterationScore; completedDepth = depth;
                 if (alpha > MATE - 100) break;
             } catch (error) { if (error !== stop) throw error; break; }
         }
@@ -284,5 +320,6 @@
         normal: {depth: 4, timeMs: 1000, maxNodes: 180000},
         hard: {depth: 6, timeMs: 2200, maxNodes: 400000}
     };
-    return {initialBoard, pseudoMoves, legalMoves, inCheck, applyMove, outcome, other, positionKey, findBestMove, NAMES, LEVELS};
+    return {initialBoard, pseudoMoves, legalMoves, inCheck, applyMove, outcome, adjudicate, repetitionOutcome, other, positionKey, findBestMove, NAMES, LEVELS};
 });
+

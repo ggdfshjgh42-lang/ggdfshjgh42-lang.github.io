@@ -3,7 +3,7 @@
     const X = window.Xiangqi, $ = id => document.getElementById(id);
     const grid = $('board-grid'), cells = [], dialog = $('confirm-dialog');
     let board = X.initialBoard(), turn = 'r', selected = null, lastMove = null, history = [], result = null;
-    let halfmove = 0, keys = [X.positionKey(board, turn)], mode = 'ai', human = 'r', flipped = false;
+    let halfmove = 0, keys = [{key: X.positionKey(board, turn), check: false}], mode = 'ai', human = 'r', flipped = false;
     let busy = false, worker = null, fallbackTimer = null, watchdog = null, job = 0, pendingAction = null;
     const sideName = side => side === 'r' ? '红方' : '黑方';
     const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
@@ -57,10 +57,9 @@
         const piece = board[valid.from], captured = board[valid.to], label = notation(valid, piece);
         history.push({board: board.slice(), turn, halfmove, lastMove, move: valid, piece, captured, label});
         board = X.applyMove(board, valid); halfmove = captured ? 0 : halfmove + 1;
-        turn = X.other(turn); lastMove = valid; selected = null; keys.push(X.positionKey(board, turn));
-        result = X.outcome(board, turn);
-        if (!result && keys.filter(key => key === keys[keys.length - 1]).length >= 3) result = {winner: null, reason: 'repetition'};
-        if (!result && halfmove >= 120) result = {winner: null, reason: 'no-capture'};
+        turn = X.other(turn); lastMove = valid; selected = null;
+        keys.push({key: X.positionKey(board, turn), check: X.inCheck(board, turn)});
+        result = X.adjudicate(board, turn, {history: keys, halfmove});
         GameAudio.play(captured ? 'capture' : 'move');
         if (result) GameAudio.play(!result.winner ? 'draw' : mode === 'ai' && result.winner !== human ? 'lose' : 'win', 0.12);
         else if (X.inCheck(board, turn)) GameAudio.play('check', 0.1);
@@ -73,7 +72,7 @@
         if (selected === null) return;
         const move = X.legalMoves(board, turn, selected).find(m => m.to === i);
         if (move) apply(move);
-        else $('game-hint').textContent = X.inCheck(board, turn) ? '正在被将军，请选择能解除将军的走法。' : '这里不能走。请选择提示落点，或换一枚棋子。';
+        else { GameAudio.play('invalid'); $('game-hint').textContent = X.inCheck(board, turn) ? '正在被将军，请选择能解除将军的走法。' : '这里不能走。请选择提示落点，或换一枚棋子。'; }
     }
     function scheduleAI() {
         if (mode !== 'ai' || turn === human || result || busy) return;
@@ -96,7 +95,7 @@
             }, 30);
         }
         try {
-            worker = new Worker('xiangqi-worker.js?v=20261112-ai2');
+            worker = new Worker('xiangqi-worker.js?v=20261122-chess1');
             worker.onmessage = event => {
                 if (event.data.id !== id) return;
                 if (event.data.error) fallback(); else finish(event.data.move);
@@ -156,11 +155,14 @@
         $('turn-indicator').className = 'player-dot ' + (turn === 'r' ? 'red-dot' : 'black-dot');
         if (result) {
             $('game-status').textContent = result.winner ? sideName(result.winner) + '获胜' : '本局和棋';
-            const reasons = {capture: '将帅已被吃掉。', checkmate: '将死，对方已无法应将。', stalemate: '困毙，对方已无合法走法。', resign: sideName(X.other(result.winner)) + '认输。', repetition: '同一局面已出现三次。', 'no-capture': '双方连续 60 回合未吃子。'};
+            const reasons = {capture: '将帅已被吃掉。', checkmate: '将死，对方已无法应将。', stalemate: '困毙，对方已无合法走法。', resign: sideName(X.other(result.winner)) + '认输。', 'perpetual-check': sideName(X.other(result.winner)) + '在重复循环中持续将军，长将判负。', repetition: '同一局面已出现三次，且不属于单方长将，本局和棋。', 'no-capture': '双方连续 60 回合未吃子。'};
             $('game-hint').textContent = reasons[result.reason] + ' 可以悔棋复盘，或重新开局。';
         } else {
             $('game-status').textContent = busy ? '电脑思考中…' : check ? sideName(turn) + '被将军' : sideName(turn) + '走棋';
             $('game-hint').textContent = busy ? '正在斟酌下一步，请稍候。' : check ? '必须先解除将军，才能继续行棋。' : selected !== null ? '选择落点；再次点击当前棋子可取消。' : mode === 'ai' ? '你执' + (human === 'r' ? '红棋' : '黑棋') + '，选择一枚棋子开始。' : '在同一台设备上轮流走棋。';
+            if (keys.filter(entry => entry.key === keys[keys.length - 1].key).length === 2) {
+                $('game-hint').textContent = '局面已重复两次，请尝试变招；单方长将判负，其余三次重复和棋。';
+            }
         }
         $('undo').disabled = !history.length || mode === 'ai' && history.every(h => h.turn !== human);
         $('resign').disabled = !!result || busy;
@@ -170,7 +172,7 @@
     function startGame() {
         cancelAI(); GameAudio.stop(); mode = $('game-mode').value; human = $('human-side').value;
         board = X.initialBoard(); turn = 'r'; selected = null; lastMove = null; history = []; halfmove = 0; result = null;
-        keys = [X.positionKey(board, turn)]; flipped = mode === 'ai' && human === 'b';
+        keys = [{key: X.positionKey(board, turn), check: false}]; flipped = mode === 'ai' && human === 'b';
         render(); scheduleAI();
     }
     function confirmAction(title, description, label, action, cancel) {
@@ -212,3 +214,4 @@
     window.addEventListener('pageshow', event => { if (event.persisted) { render(); scheduleAI(); } });
     startGame();
 })();
+

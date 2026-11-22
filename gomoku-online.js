@@ -291,9 +291,13 @@ function applyOnlineState(data) {
     updateOnlineControls();
     draw();
     if (moved) {
-        GameAudio.play('move');
+        if (lastMove) playStoneSound(lastMove[0], lastMove[1]);
         if (data.winner) GameAudio.play(data.winner === myColor ? 'win' : 'lose', 0.12);
         else if (data.draw) GameAudio.play('draw', 0.12);
+        else if (lastMove) {
+            const [r, c] = lastMove, threat = GomokuAI.threatAt(board, r, c, board[r][c]);
+            if (threat === 'three' || threat === 'four') GameAudio.play('threat-' + threat, 0.09);
+        }
     }
     const winKey = roomCode + ':' + data.round;
     if (data.winner && onlineAnnouncedWin !== winKey) {
@@ -335,3 +339,4 @@ function leaveRoom() {
 document.getElementById('room-input').addEventListener('keydown', event => {
     if (event.key === 'Enter') joinRoom();
 });
+

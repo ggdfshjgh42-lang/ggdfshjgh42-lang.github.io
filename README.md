@@ -29,7 +29,7 @@ Chrome 中已登录 GitHub，并不会自动为其他网站提供 API 授权。�
 - `gomoku.html` / `gomoku-online.js`：五子棋及 WebSocket 联机界面。
 - `gomoku-engine.js` / `gomoku-worker.js`：五子棋多步搜索、成五优先、防守跳四和双重威胁；在 Worker 中运行。
 - `xiangqi.html` / `xiangqi.js` / `xiangqi-engine.js` / `xiangqi-worker.js`：中国象棋、走法提示及人机搜索；包含吃子延伸、局面缓存、走法排序及重复局面判断。
-- `game-audio.js` / `game-audio.css`：两种棋共用的落子、吃子、将军与胜负音效，以及静音按钮；浏览器本地合成，无外部音频依赖。
+- `game-audio.js` / `game-audio.css`：两种棋共用的音效控制，以及各自的落子、威胁、吃子、将军与胜负音效，以及静音按钮；浏览器本地合成，无外部音频依赖。
 - `gomoku-config.js`：公开的联机服务地址。
 - `multiplayer/`：免费计划可用的 Cloudflare 房间服务、测试及部署说明，详见 [联机服务部署](multiplayer/README.md)。
 - `CNAME`：自定义域名。
@@ -42,7 +42,7 @@ GitHub Pages 的发布分支应指向 `main`，目录为仓库根目录（Settin
 
 两种棋均提供入门、普通、挑战三档难度，可以在对局中切换。搜索有时间与节点上限，取最后一轮完整搜索的结果；Worker 不可用时回退到短时本地搜索。音效在首次点击或按键后启用，静音选择保存在当前浏览器并在两种棋间共用，不播放背景音乐。
 
-规则与战术测试：`node --test tests/xiangqi.test.cjs tests/gomoku.test.cjs`。浏览器回归：安装 Playwright 和 Chromium 后运行 `python tests/games.browser.py`，覆盖桌面和手机、Worker 取消、回退、难度切换、静音保存、音频波形及联机状态重播。象棋采用休闲和棋规则（三次重复局面或连续 60 回合无吃子），不裁定竞赛中的长将、长捉。
+规则与战术测试：`node --test tests/xiangqi.test.cjs tests/gomoku.test.cjs`。浏览器回归：安装 Playwright 和 Chromium 后运行 `python tests/games.browser.py`，覆盖桌面和手机、Worker 取消、回退、难度切换、静音保存、音频波形及联机状态重播。象棋在第二次重复局面时提示变招，第三次重复时对最近两个循环中单方每步将军判长将负，其余重复或连续 60 回合无吃子判和；长捉等复杂争议仍按重复局面处理。电脑在相近评价内优先变招，搜索与棋盘使用相同长将判定。五子棋采用自由连珠，五子或以上获胜，满盘无人获胜才和棋；黑白子、活三与四连威胁有独立音效，联机重播不重复发声，结束后可悔棋复盘。交互与音效测试：`node --test tests/game-interaction.test.cjs`。
 
 ## 在线书架
 
@@ -71,5 +71,6 @@ PDF 布局与缩放单元测试：`node --test tests/pdf-reader.test.cjs`，检�
 画板、速度、音色及音量自动保存在当前浏览器的独立记录中。打开页面不会自动播放；声音在用户点按后启用，切换到后台或离开页面会停止播放。可以下载包含四次循环与自然收尾的 16 位 PCM WAV 音频。音色、鼓点和下载均在浏览器内生成，无需音频素材、账号或后端服务。
 
 `music-board.html`、`music-board.css` 和 `music-board.js` 提供界面及交互，`music-engine.js` 负责画板验证、合成声音、节拍时长和 WAV 编码。运行 `node --test tests/music.test.cjs` 验证记录恢复、时间换算及音频文件格式；浏览器验证应覆盖手机涂画、播放／停止、刷新恢复及实际下载的音频波形。
+
 
 

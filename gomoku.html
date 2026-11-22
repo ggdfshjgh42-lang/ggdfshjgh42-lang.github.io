@@ -446,9 +446,9 @@
             canvas { max-width: 100%; height: auto; }
         }
     </style>
-    <link rel="stylesheet" href="game-audio.css?v=20261112-ai2">
-    <script src="game-audio.js?v=20261112-ai2"></script>
-    <script src="gomoku-engine.js?v=20261112-ai2"></script>
+    <link rel="stylesheet" href="game-audio.css?v=20261122-chess1">
+    <script src="game-audio.js?v=20261122-chess1"></script>
+    <script src="gomoku-engine.js?v=20261122-chess1"></script>
     <script src="gomoku-config.js"></script>
     <link rel="stylesheet" href="theme.css?v=20261116-warm1">
     <link rel="stylesheet" href="visual.css?v=20261118-curious1">
@@ -478,6 +478,7 @@
                 <p>挑战难度思考稍久；切换难度不重开。</p>
             </div>
             <button type="button" class="game-sound-button" data-game-sound aria-pressed="true">🔊 音效：开</button>
+            <details class="gomoku-rules"><summary>规则与音效</summary><p>黑棋先手，横、竖、斜线连成五子或以上即获胜；本局采用自由连珠，不设禁手。只有棋盘下满且无人获胜时才和棋。</p><p>黑白子有不同落子音，活三、四连威胁与胜负分别提示；音效开关与象棋共用。</p></details>
 
             <div class="status-box">
                 <div class="status-current" id="status-text">黑棋走</div>
@@ -560,6 +561,7 @@
             <div class="winner-icon" id="winner-icon"></div>
             <div class="winner-text" id="winner-text"></div>
             <button class="btn btn-primary" onclick="closeWinner()">再来一局</button>
+            <button class="btn btn-secondary" id="winner-undo" onclick="undo()">悔棋复盘</button>
         </div>
     </div>
 
@@ -824,7 +826,8 @@
 
         // ========== Game Logic ==========
         function placeStone(r, c) {
-            if (board[r][c] !== EMPTY) return;
+            if (gameOver || !isValidMove(r, c)) return;
+            if (board[r][c] !== EMPTY) { GameAudio.play('invalid'); return; }
 
             history.push({
                 board: board.map(row => [...row]),
@@ -835,7 +838,7 @@
 
             board[r][c] = currentPlayer;
             lastMove = [r, c];
-            GameAudio.play('move');
+            playStoneSound(r, c);
 
             const win = checkWin(r, c, currentPlayer);
             if (win) {
@@ -859,6 +862,8 @@
                 return;
             }
 
+            const threat = GomokuAI.threatAt(board, r, c, currentPlayer);
+            if (threat === 'three' || threat === 'four') GameAudio.play('threat-' + threat, 0.09);
             currentPlayer = currentPlayer === BLACK ? WHITE : BLACK;
             aiThinking = false;
             updateStatus();
@@ -871,6 +876,10 @@
                 draw();
                 aiTimer = setTimeout(aiMove, 80);
             }
+        }
+
+        function playStoneSound(r, c) {
+            GameAudio.play(board[r][c] === BLACK ? 'stone-black' : 'stone-white');
         }
 
         function checkWin(r, c, player) {
@@ -940,7 +949,7 @@
                 }, 20);
             }
             try {
-                aiWorker = new Worker('gomoku-worker.js?v=20261112-ai2');
+                aiWorker = new Worker('gomoku-worker.js?v=20261122-chess1');
                 aiWorker.onmessage = event => {
                     if (event.data.id !== id) return;
                     if (event.data.error) fallback(); else finish(event.data.move);
@@ -960,7 +969,7 @@
                 hintEl.textContent = roomCode ? '双方连接后即可落子' : '请先创建或加入房间';
                 return;
             }
-            if (type === 'draw') {
+            if (type === 'draw' || gameOver && !winLine && isBoardFull()) {
                 statusEl.textContent = '平局！';
                 hintEl.textContent = '棋盘已满';
                 return;
@@ -989,6 +998,12 @@
             } else {
                 hintEl.textContent = '点击棋盘落子';
             }
+            if (lastMove) {
+                const [r, c] = lastMove, side = board[r][c];
+                const threat = GomokuAI.threatAt(board, r, c, side);
+                if (threat === 'three' || threat === 'four') hintEl.textContent =
+                    (side === BLACK ? '黑棋' : '白棋') + (threat === 'four' ? '形成四连威胁，请及时应对' : '形成活三，注意防守');
+            }
         }
 
         function updateScores() {
@@ -1000,6 +1015,7 @@
             const overlay = document.getElementById('winner-overlay');
             const icon = document.getElementById('winner-icon');
             const text = document.getElementById('winner-text');
+            document.getElementById('winner-undo').hidden = mode === 'online';
 
             if (player === BLACK) {
                 icon.textContent = '⚫';
@@ -1027,7 +1043,8 @@
 
         function undo() {
             if (mode === 'online') return; // No undo in online mode
-            if (gameOver || history.length === 0) return;
+            if (history.length === 0) return;
+            const undoneWinner = gameOver && winLine ? currentPlayer : null;
             cancelAI();
             // If the computer is still thinking, only the human move needs undoing.
             let prev;
@@ -1038,6 +1055,11 @@
                 lastMove = prev.lastMove;
             } while (mode === 'ai' && prev.player !== BLACK && history.length);
             GameAudio.stop(); GameAudio.play('undo');
+            document.getElementById('winner-overlay').classList.remove('show');
+            if (undoneWinner) {
+                if (undoneWinner === BLACK) scoreBlack--; else scoreWhite--;
+                updateScores();
+            }
             gameOver = false;
             winLine = null;
             aiThinking = false;
@@ -1107,7 +1129,8 @@
         // Redraw on DPR change (e.g., moving between monitors)
         window.addEventListener('resize', draw);
     </script>
-    <script src="gomoku-online.js?v=20261112-ai2"></script>
+    <script src="gomoku-online.js?v=20261122-chess1"></script>
 </body>
 </html>
+
 

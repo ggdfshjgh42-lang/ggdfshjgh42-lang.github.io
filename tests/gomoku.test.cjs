@@ -50,3 +50,14 @@ test('timed-out analysis always returns a legal point and preserves the caller b
     assert.ok(m.r >= 0 && m.r < 15 && m.c >= 0 && m.c < 15); assert.equal(b[m.r][m.c], 0);
     assert.deepEqual(b, original);
 });
+test('move feedback distinguishes open threes, split fours, five, and blocked edges', () => {
+    for (const [dr, dc] of [[0, 1], [1, 0], [1, 1], [1, -1]]) {
+        const point = n => [5 + dr * n, 7 + dc * n, 1];
+        assert.equal(G.threatAt(fixture([0, 1, 2].map(point)), 5, 7, 1), 'three');
+        assert.equal(G.threatAt(fixture([0, 1, 3, 4].map(point)), 5, 7, 1), 'four');
+        assert.equal(G.threatAt(fixture([0, 1, 2, 3, 4].map(point)), 5, 7, 1), 'five');
+    }
+    assert.equal(G.threatAt(fixture([[0, 0, 1], [0, 1, 1], [0, 2, 1]]), 0, 1, 1), null);
+    assert.equal(G.threatAt(fixture(), 7, 7, 1), null);
+});
+

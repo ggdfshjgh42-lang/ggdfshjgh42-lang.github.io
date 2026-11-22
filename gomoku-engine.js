@@ -59,7 +59,12 @@
         else if (fours && threes) score = 800000;
         else if (threes >= 2) score = 160000;
         else score = fours * 70000 + threes * 10000 + twos * 600 + minor;
-        return {score, win: false, wins: wins.size};
+        return {score, win: false, wins: wins.size, threes};
+    }
+    function threatAt(input, r, c, side) {
+        if (!inside(r, c) || input[r][c] !== side) return null;
+        const threat = profile(input.flat(), r * SIZE + c, side);
+        return threat.win ? 'five' : threat.wins ? 'four' : threat.threes ? 'three' : null;
     }
     function candidates(board) {
         const empty = new Set();
@@ -167,5 +172,6 @@
         }
         return finish(best, bestScore);
     }
-    return {findBestMove, LEVELS};
+    return {findBestMove, threatAt, LEVELS};
 });
+

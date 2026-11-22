@@ -44,11 +44,21 @@
         source.onended = () => { playing.delete(source); source.disconnect(); filter.disconnect(); gain.disconnect(); };
         source.start(time);
     }
+    function stone(time, white) {
+        // Hard stones have a brighter, shorter ring than wooden chess pieces.
+        note(white ? 1760 : 1420, time, 0.052, 0.62, 'triangle', white ? 940 : 780);
+        note(white ? 2460 : 2140, time, 0.028, 0.2);
+        note(white ? 520 : 440, time, 0.075, 0.24);
+    }
     function play(name, delay = 0) {
         if (muted || document.hidden || !context || context.state !== 'running') return;
         try {
             const time = context.currentTime + Math.max(0, delay);
             if (name === 'move' || name === 'capture') tap(time, name === 'capture');
+            else if (name === 'stone-black' || name === 'stone-white') stone(time, name === 'stone-white');
+            else if (name === 'threat-three') [740, 930].forEach((f, i) => note(f, time + i * 0.09, 0.11, 0.22, 'triangle'));
+            else if (name === 'threat-four') [880, 1100, 1320].forEach((f, i) => note(f, time + i * 0.085, 0.12, 0.27));
+            else if (name === 'invalid') note(210, time, 0.09, 0.18, 'triangle', 150);
             else if (name === 'check') [660, 880].forEach((f, i) => note(f, time + i * 0.13, 0.17, 0.35));
             else if (name === 'win') [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => note(f, time + i * 0.11, 0.3, 0.32));
             else if (name === 'lose') [392, 329.63, 261.63].forEach((f, i) => note(f, time + i * 0.14, 0.3, 0.28));
@@ -88,3 +98,4 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, {once: true}); else bind();
     window.GameAudio = {play, stop, unlock, setMuted, isMuted: () => muted};
 })();
+

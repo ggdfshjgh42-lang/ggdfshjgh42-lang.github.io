@@ -8,10 +8,10 @@
     <title>中国象棋 · 小游戏 | Fantastic Matrix</title>
     <link rel="stylesheet" href="blog.css">
     <link rel="stylesheet" href="games.css">
-    <link rel="stylesheet" href="game-audio.css?v=20261112-ai2">
-    <script src="game-audio.js?v=20261112-ai2" defer></script>
-    <script src="xiangqi-engine.js?v=20261112-ai2" defer></script>
-    <script src="xiangqi.js?v=20261112-ai2" defer></script>
+    <link rel="stylesheet" href="game-audio.css?v=20261122-chess1">
+    <script src="game-audio.js?v=20261122-chess1" defer></script>
+    <script src="xiangqi-engine.js?v=20261122-chess1" defer></script>
+    <script src="xiangqi.js?v=20261122-chess1" defer></script>
     <link rel="stylesheet" href="theme.css?v=20261116-warm1">
     <link rel="stylesheet" href="visual.css?v=20261118-curious1">
     <link rel="stylesheet" href="interiors.css?v=20261118-curious1">
@@ -47,11 +47,12 @@
                 <section class="move-panel"><div class="move-heading"><h2 class="small-heading">对局记录</h2><span id="move-count">0 步</span></div><div class="move-history" id="move-history" tabindex="0" aria-label="走棋记录"><p class="empty-history">棋盘已摆好，等你落子。</p></div></section>
             </aside>
         </div>
-        <details class="chess-rules"><summary>走棋规则与操作说明 <span aria-hidden="true">＋</span></summary><div class="rules-content"><ul><li>红方先行。车走直线；马走日且不能蹩腿；相象走田、不能塞眼或过河；仕士斜走一步，限九宫内。</li><li>帅将只能在九宫内直走一步，不能照面；炮走直线，吃子时须隔一个炮架；兵卒只进不退，过河后可左右移动。</li><li>被将军必须应将。将死或无合法走法（困毙）均判负。选中棋子后，再点一次可取消选择。</li><li>人机模式悔棋退回到你上次走棋前；本地双人每次退一步。方向键移动棋盘焦点，Enter / 空格选择，Esc 取消。</li><li>休闲规则：同一局面（含行棋方）出现三次，或连续 60 回合未吃子，自动和棋；不另行裁定长将、长捉等竞赛规则。</li></ul><p>本地双人在同一台设备轮流走棋；人机对战在当前设备运行，无需连接对战服务。</p></div></details>
+        <details class="chess-rules"><summary>走棋规则与操作说明 <span aria-hidden="true">＋</span></summary><div class="rules-content"><ul><li>红方先行。车走直线；马走日且不能蹩腿；相象走田、不能塞眼或过河；仕士斜走一步，限九宫内。</li><li>帅将只能在九宫内直走一步，不能照面；炮走直线，吃子时须隔一个炮架；兵卒只进不退，过河后可左右移动。</li><li>被将军必须应将。将死或无合法走法（困毙）均判负。选中棋子后，再点一次可取消选择。</li><li>人机模式悔棋退回到你上次走棋前；本地双人每次退一步。方向键移动棋盘焦点，Enter / 空格选择，Esc 取消。</li><li>同一局面（含行棋方）第二次出现时提示变招；第三次出现时，检查最近两个重复循环：若仅一方每步都将军，该方长将判负，其余重复局面和棋。长捉等复杂争议按重复局面处理。</li><li>双方连续 60 回合未吃子，判和棋。将死、困毙优先判胜负。电脑在走法价值接近时优先变招；落子、吃子、将军、无效走法、悔棋和胜负分别有音效。</li></ul><p>本地双人在同一台设备轮流走棋；人机对战在当前设备运行，无需连接对战服务。</p></div></details>
         <noscript><p>请启用 JavaScript，以使用棋盘和人机对战。</p></noscript>
     </main>
     <footer><div class="container footer-inner"><div><a class="footer-wordmark" href="index.html">fantastic matrix</a><p>不赶时间，落好眼前这一子。</p></div><div class="footer-details"><a href="gomoku.html">也来一盘五子棋 ↗</a></div></div></footer>
     <dialog id="confirm-dialog" class="chess-dialog"><form method="dialog"><p class="eyebrow">ANOTHER MOVE</p><h2 id="confirm-title">重新开局？</h2><p id="confirm-description">当前对局将结束，棋盘会重新摆好。</p><div><button value="cancel">继续这盘</button><button id="confirm-action" class="primary-action" value="confirm">重新开局</button></div></form></dialog>
 </body>
 </html>
+
 
