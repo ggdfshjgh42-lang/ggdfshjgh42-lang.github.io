@@ -7,6 +7,18 @@
   },
   "posts": [
     {
+      "id": 15,
+      "slug": "the-road-on-the-ground-20261126-0500",
+      "title": "地上的路",
+      "date": "2026-11-26",
+      "excerpt": "这正如地上的路，其实地上本没有路；走的人多了，也便成了路。",
+      "tags": [
+        "名著摘录",
+        "鲁迅"
+      ],
+      "body": "<blockquote><p>这正如地上的路，其实地上本没有路；走的人多了，也便成了路。</p></blockquote>\n<p>—— <a href=\"https://zh.wikisource.org/zh-hans/%E6%95%85%E4%B9%A1\">鲁迅《故乡》（收录于《呐喊》）</a></p>"
+    },
+    {
       "id": 14,
       "slug": "a-few-extra-minutes-20261125-1005",
       "title": "多留几分钟",
